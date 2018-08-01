@@ -3,10 +3,11 @@
 /***** public functions *****/
 
 /*** constructor functions ***/
-configVariable::configVariable(std::string newVariableName,std::string newVariableCountType,std::vector<std::string> newConflictingVariables,
-                               std::string newLoaderFunctionName,std::string newVariableDescription)
+configVariable::configVariable(std::string newVariableName,std::string newApplicationUseName,std::string newVariableCountType,
+                               std::vector<std::string> newConflictingVariables,std::string newLoaderFunctionName,std::string newVariableDescription)
 {
     variableName = newVariableName;
+    applicationUseName = newApplicationUseName;
     // type is allowed to be abstract, so type setting and checking is handled by class that creates a vector of these configVariables
     variableCountType = newVariableCountType;
     // no initial check on conflictingVariables because value will be a string meaning a reference to another variable. This will be checked by the classes that setup and use bectors of configVariables
@@ -21,11 +22,14 @@ configVariable::configVariable(std::string newVariableName,std::string newVariab
 /*** reinit functions ***/
 void configVariable::resetVariable()
 {
-    /* in this case, no values are stored, so it should just be resetting the booleans. */
-    /* Would be nice to add in type stuff at some point, but it is just too complex. Would need some kind of lookup table
-     *  to determine the type of value coming in and store something accordingly, and value could be a class or struct as well as simple stuff */
     isFoundInInputFile = false;
     doesVariableConflict = false;
+    variableNameWhiteSpace = "";
+    while(!variableDescriptionLineBreaks.empty())
+    {
+        variableDescriptionLineBreaks.pop_back();
+    }
+
 }
 /*** end reinit functions ***/
 
@@ -39,6 +43,16 @@ void configVariable::set_doesVariableConflict(bool newDoesVariableConflictValue)
 {
     doesVariableConflict = newDoesVariableConflictValue;  //note don't need to check because it is already a bool coming in or it fails
 }
+
+void configVariable::set_variableNameWhiteSpace(std::string newVariableNameWhiteSpace)
+{
+    variableNameWhiteSpace = newVariableNameWhiteSpace;
+}
+
+void configVariable::add_variableDescriptionLineBreaks(unsigned int newVariableDescriptionLineBreak)
+{
+    variableDescriptionLineBreaks.push_back(newVariableDescriptionLineBreak);
+}
 /*** end set new value functions ***/
 
 
@@ -46,6 +60,11 @@ void configVariable::set_doesVariableConflict(bool newDoesVariableConflictValue)
 std::string configVariable::get_variableName()
 {
     return variableName;
+}
+
+std::string configVariable::get_applicationUseName()
+{
+    return applicationUseName;
 }
 
 std::string configVariable::get_variableCountType()
@@ -76,6 +95,16 @@ bool configVariable::get_isFoundInInputFile()
 bool configVariable::get_doesVariableConflict()
 {
     return doesVariableConflict;
+}
+
+std::string configVariable::get_variableNameWhiteSpace()
+{
+    return variableNameWhiteSpace;
+}
+
+std::vector<unsigned int> configVariable::get_variableDescriptionLineBreaks()
+{
+    return variableDescriptionLineBreaks;
 }
 /*** end get value functions ***/
 

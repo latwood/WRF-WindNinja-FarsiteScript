@@ -15,17 +15,21 @@ void scriptInputs::explainInputReqs()
            "WRF-WindNinja-FarsiteScript [inputfile]\n"
            "Where:\n\t[commandfile] is the path to the input file.\n");
     printf("The input file can contain the following variables:\n");
+    printf("\n%s input variables\n",configVariables[0].get_applicationUseName().c_str());
     for(size_t variableIdx = 0; variableIdx < configVariables.size(); variableIdx++)
     {
-        // hmm, need to replace all these \t's with some kind of smart whitespace trick kind of like WindNinja. My guess is it will be like my find largest whitespace function
-        // not really much help to get the variable description nice unless add 4 spaces or so to the found max variable name string size when the description gets big enough to jump lines
-        // guess I need to specify a max variable name string size so a warning to programmer comes if any variable names break the handy formatting with their found max variable name string size
-        // would need something similar, so max total column size to warn if any word in the description with max variable name string size gets so big it can't break the word into two lines.
-        // not really an easy way to avoid too few words to allow the description to make sense when splitting description into multiple lines, though a max number of words found using whitespace
-        // could help with this idea. This is complex enough I think it should be a separate class.
-        // for now, just play around with the formatting each time a new variable is introduced, that is only after all the initial variables are introduced (program finished for first round).
-        // so till program is more firm, ignore format stuff and use whatever rough draft description helps the brain.
-        printf("%s\t\t\t%s\n",configVariables[variableIdx].get_variableName().c_str(),configVariables[variableIdx].get_variableDescription().c_str());
+        if(variableIdx != 0 && configVariables[variableIdx].get_applicationUseName() != configVariables[variableIdx-1].get_applicationUseName())
+        {
+            printf("\n%s input variables\n",configVariables[variableIdx].get_applicationUseName().c_str());
+        }
+        // need to add a description overall vartype to detect when to split up sections between application type variables
+        std::vector<unsigned int> currentLineBreaks = configVariables[variableIdx].get_variableDescriptionLineBreaks();
+        printf("%s%s%s\n",configVariables[variableIdx].get_variableName().c_str(),configVariables[variableIdx].get_variableNameWhiteSpace().c_str(),configVariables[variableIdx].get_variableDescription().substr(0,currentLineBreaks[1]).c_str());
+        for(size_t lineBreakIdx = 1; lineBreakIdx < currentLineBreaks.size()-1; lineBreakIdx++)
+        {
+            printf("%s%s\n",setupConfigVariables.get_maxVarNameColumnWhitespace().c_str(),configVariables[variableIdx].get_variableDescription().substr(currentLineBreaks[lineBreakIdx],currentLineBreaks[lineBreakIdx+1]-currentLineBreaks[lineBreakIdx]).c_str());
+        }
+        printf("\n");
     }
     printf("end description\n");
 }

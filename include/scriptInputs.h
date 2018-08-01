@@ -5,15 +5,7 @@
 
 #include "scriptConfigVariables.h"
 
-#define  input_Sep  ':'  /* used on the end of every switch                  */
-
-/* define variable types */
-#define input_WRF_FILENAMES 'WRF_FILENAMES'
-
-
-/* define conflicting options */
-
-/* define error messages */
+#define  input_Sep  ':'  /* used on the end of every switch. Since this has to do with how input is parsed, this is the right class location as methods for parsing are defined here  */
 
 class scriptInputs
 {
