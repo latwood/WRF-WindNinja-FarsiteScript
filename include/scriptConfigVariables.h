@@ -31,6 +31,7 @@ private:
 
     // setup functions
     void setupAvailableApplicationUseNames();
+    void setupAvailableVariableCountAmounts();
     void setupAvailableVariableCountTypes();
     void addVariable(std::string newVariableName,std::string newApplicationUseName,std::string newVariableCountType,
                      std::vector<std::string> newConflictingVariables,std::string newLoaderFunctionName,std::string newVariableDescription); //make this private so that it is only called by constructor
@@ -41,8 +42,10 @@ private:
     bool check_setupForDuplicateVariableNames();
     bool check_setupForValidApplicationUseNames();
     bool check_setupForValidOrderingByApplicationUseNames();
+    bool check_setupAllowableVariableCountAmounts();
     bool check_setupForValidVariableCountTypes();
     bool check_setupConflictingVariables();
+    bool check_setupLoaderFunctionNames();
     bool check_setupDescription();
 
     // description whitespace and line break calculations, with error checking
@@ -50,10 +53,21 @@ private:
     bool calculateDescriptionLineBreaks();
     void calculate_maxVarNameColumnWhitespace();
 
+    // utility functions used by everything else
+    std::string findCountAmountFromCountType(std::string availableCountType);
+
     // data members
     std::vector<configVariable> theVariables;
-    std::vector<std::string> allowedVariableCountTypes;
     std::vector<std::string> allowedApplicationUseNames;
+    std::vector<std::string> allowedVariableCountAmounts;
+        /* start struct type stuff, probs should make this and other parts relating to it to be a class to make it more organized someday */
+        struct count
+        {
+            std::string countType;
+            std::string countAmount;
+        };
+        std::vector<count> allowedVariableCountTypes;
+        /* end struct variables */
     // for description printing
     unsigned int descriptionVariableNameColumnSize;
     std::string maxVarNameColumnWhitespace;

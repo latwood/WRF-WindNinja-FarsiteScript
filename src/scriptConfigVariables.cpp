@@ -11,6 +11,7 @@ scriptConfigVariables::scriptConfigVariables()
 
     // first setup all the needed stuff for the variables
     setupAvailableApplicationUseNames();
+    setupAvailableVariableCountAmounts();
     setupAvailableVariableCountTypes();
     setupAvailableVariables();
 
@@ -30,6 +31,11 @@ scriptConfigVariables::scriptConfigVariables()
         printf("invalid ordering of variables by application use name found during setup!\n");
         success = false;
     }
+    if(check_setupAllowableVariableCountAmounts() == false)
+    {
+        printf("invalid allowed count amount found during setup!\n");
+        success = false;
+    }
     if(check_setupForValidVariableCountTypes() == false)
     {
         printf("non-allowable count type found during setup!\n");
@@ -38,6 +44,11 @@ scriptConfigVariables::scriptConfigVariables()
     if(check_setupConflictingVariables() == false)
     {
         printf("invalid conflicting variables found during setup!\n");
+        success = false;
+    }
+    if(check_setupLoaderFunctionNames() == false)
+    {
+        printf("invalid loader function name found during setup!\n");
         success = false;
     }
     if(check_setupDescription() == false)
@@ -99,17 +110,22 @@ void scriptConfigVariables::setupAvailableApplicationUseNames()
     allowedApplicationUseNames.push_back("createFarsiteInput");
 }
 
+void scriptConfigVariables::setupAvailableVariableCountAmounts()
+{
+    allowedVariableCountAmounts.push_back("single");
+    allowedVariableCountAmounts.push_back("multiple");
+}
+
 void scriptConfigVariables::setupAvailableVariableCountTypes()
 {
-    // add desired variable count types here. Not all have to be used by a configVariable, but these are the possible options
-    // The idea is that the input file parser determines how to use these config variables, so it has special instructions of what to do with a given config variable using its variable count type
-    allowedVariableCountTypes.push_back("bool");
-    allowedVariableCountTypes.push_back("int");
-    allowedVariableCountTypes.push_back("double");
-    allowedVariableCountTypes.push_back("string");
-    allowedVariableCountTypes.push_back("filename");
-    allowedVariableCountTypes.push_back("date");
-    allowedVariableCountTypes.push_back("count");    // this one is interesting, because it is a type of integer and signifies that the data is more than one value. All others mean data is one value.
+    // this is what will be used in the end, don't need to redefine the count types twice
+    allowedVariableCountTypes.push_back({"bool","single"});
+    allowedVariableCountTypes.push_back({"int","single"});
+    allowedVariableCountTypes.push_back({"double","single"});
+    allowedVariableCountTypes.push_back({"string","single"});
+    allowedVariableCountTypes.push_back({"filename","single"});
+    allowedVariableCountTypes.push_back({"date","single"});
+    allowedVariableCountTypes.push_back({"count","multiple"});
 }
 
 void scriptConfigVariables::addVariable(std::string newVariableName,std::string newApplicationUseName,std::string newVariableCountType,
@@ -258,6 +274,29 @@ bool scriptConfigVariables::check_setupForValidOrderingByApplicationUseNames()
     return success;
 }
 
+bool scriptConfigVariables::check_setupAllowableVariableCountAmounts()
+{
+    bool success = true;
+    for(size_t countTypesIdx = 0; countTypesIdx < allowedVariableCountTypes.size(); countTypesIdx++)
+    {
+        bool isValidCountAmount = false;
+        for(size_t allowedCountAmountIdx = 0; allowedCountAmountIdx < allowedVariableCountAmounts.size(); allowedCountAmountIdx++)
+        {
+            if(allowedVariableCountTypes[countTypesIdx].countAmount == allowedVariableCountAmounts[allowedCountAmountIdx])
+            {
+                isValidCountAmount = true;
+                break;
+            }
+        }
+        if(isValidCountAmount == false)
+        {
+            printf("variable count amount \"%s\" for variable count type \"%s\" is not a valid variable count amount!\n",allowedVariableCountTypes[countTypesIdx].countAmount.c_str(),allowedVariableCountTypes[countTypesIdx].countType.c_str());
+            success = false;
+        }
+    }
+    return success;
+}
+
 bool scriptConfigVariables::check_setupForValidVariableCountTypes()
 {
     bool success = true;
@@ -266,7 +305,7 @@ bool scriptConfigVariables::check_setupForValidVariableCountTypes()
         bool isValidType = false;
         for(size_t countTypesIdx = 0; countTypesIdx < allowedVariableCountTypes.size(); countTypesIdx++)
         {
-            if(theVariables[variableIdx].get_variableCountType() == allowedVariableCountTypes[countTypesIdx])
+            if(theVariables[variableIdx].get_variableCountType() == allowedVariableCountTypes[countTypesIdx].countType)
             {
                 isValidType = true;
                 break;
@@ -325,6 +364,66 @@ bool scriptConfigVariables::check_setupConflictingVariables()
             }
         }
     }
+    return success;
+}
+
+bool scriptConfigVariables::check_setupLoaderFunctionNames()
+{
+    bool success = true;
+
+    // can't tell if loader functions are valid in that they will be used or not at this point,
+    // but can make sure that if the variableCountTypeAmount is "single" for a given configVariable, that the loaderFunctionName is set to "NA"
+    // can also check to make that if the variableCountTypeAmount is "multiple" for a given configVariable, that the loaderFunctionName is not "" or whitespace
+    // or is a duplicate of another loader function name
+    for(size_t varIdx = 0; varIdx < theVariables.size(); varIdx++)
+    {
+        // first need to find which of the allowedVariableCountTypes the variableCountType is to get access to the right variableCountTypeAmount
+        // because this action is repeated in other places, it was turned into a function
+        std::string currentCountAmount = findCountAmountFromCountType(theVariables[varIdx].get_variableCountType());
+        if(currentCountAmount == "single")
+        {
+            if(theVariables[varIdx].get_loaderFunctionName() != "NA")
+            {
+                printf("variable \"%s\" loaderFunctionName with variableCountType \"%s\" is not \"NA\" even though variableCountType \"%s\" has countAmount \"single\"!\n",theVariables[varIdx].get_variableName().c_str(),theVariables[varIdx].get_variableCountType().c_str(),theVariables[varIdx].get_variableCountType().c_str());
+                success = false;
+            }
+        }
+        if(currentCountAmount == "multiple")
+        {
+            if(theVariables[varIdx].get_loaderFunctionName() == "NA")
+            {
+                printf("variable \"%s\" loaderFunctionName with variableCountType \"%s\" is \"NA\" even though variableCountType \"%s\" has countAmount \"multiple\"!\n",theVariables[varIdx].get_variableName().c_str(),theVariables[varIdx].get_variableCountType().c_str(),theVariables[varIdx].get_variableCountType().c_str());
+                success = false;
+            }
+            if(theVariables[varIdx].get_loaderFunctionName() == "")
+            {
+                printf("variable \"%s\" loaderFunctionName with variableCountType \"%s\" is \"\" even though variableCountType \"%s\" has countAmount \"multiple\"!\n",theVariables[varIdx].get_variableName().c_str(),theVariables[varIdx].get_variableCountType().c_str(),theVariables[varIdx].get_variableCountType().c_str());
+                success = false;
+            }
+            if(theVariables[varIdx].get_loaderFunctionName().substr(0,1) == " ")
+            {
+                printf("variable \"%s\" loaderFunctionName with variableCountType \"%s\" starts with whitespace or is only whitespace!\n",theVariables[varIdx].get_variableName().c_str(),theVariables[varIdx].get_variableCountType().c_str());
+                success = false;
+            }
+        }
+    }
+
+    // now make sure there are no duplicate loadFunctionNames
+    for(size_t i = 0; i < theVariables.size()-1; i++)
+    {
+        for(size_t j = i+1; j < theVariables.size(); j++)
+        {
+            if(theVariables[i].get_loaderFunctionName() != "NA" && theVariables[j].get_loaderFunctionName() != "NA")
+            {
+                if(theVariables[i].get_loaderFunctionName() == theVariables[j].get_loaderFunctionName())
+                {
+                    printf("found duplicate loaderFunctionName \"%s\"!\n",theVariables[i].get_loaderFunctionName().c_str());
+                    success = false;
+                }
+            }
+        }
+    }
+
     return success;
 }
 
@@ -451,3 +550,18 @@ void scriptConfigVariables::calculate_maxVarNameColumnWhitespace()
     }
 }
 /*** end description whitespace and line break calculations, with error checking ***/
+
+/*** utility functions ***/
+std::string scriptConfigVariables::findCountAmountFromCountType(std::string availableCountType)
+{
+    for(size_t countTypesIdx = 0; countTypesIdx < allowedVariableCountTypes.size(); countTypesIdx++)
+    {
+        if(availableCountType == allowedVariableCountTypes[countTypesIdx].countType)
+        {
+            return allowedVariableCountTypes[countTypesIdx].countAmount;
+        }
+    }
+    printf("!!!Error! Couldn't find count amount from count type \"%s\"!\n",availableCountType.c_str());
+    exit(1);
+}
+/*** end utilty functions ***/
