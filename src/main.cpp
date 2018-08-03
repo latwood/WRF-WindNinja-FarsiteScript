@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string.h>
 
-#include "scriptInputs.h"
+#include "inputVariablesHandler.h"
 #include "createIgnitions.h"
 #include "wrfInterpretation.h"
 #include "createFarsiteInputs.h"
@@ -12,7 +12,7 @@ using namespace std;
 
 #define MAX_PATH 512
 
-bool checkCommandLineInput(int argc, char*argv[], scriptInputs *inputs)
+bool checkCommandLineInput(int argc, char*argv[], inputVariablesHandler *inputs)
 {
     if(argc < 2)
     {
@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
 {
     printf("beginning WRF-WindNinja-FarsiteScript\n");
 
-    scriptInputs inputs;
+    inputVariablesHandler inputs;
     createIgnitions ignitions;
     wrfInterpretation wrfInterp;
     createFarsiteInputs farsiteInputs;

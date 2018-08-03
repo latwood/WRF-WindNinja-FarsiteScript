@@ -1,16 +1,16 @@
-#ifndef CONFIGOPTION_H
-#define CONFIGVARIABLE_H
+#ifndef INPUTVARIABLE_INFO_H
+#define INPUTVARIABLE_INFO_H
 
 
 #include <iostream>
 #include <vector>
 
-class configVariable
+class inputVariable_info
 {
 public:
 
     // constructors
-    configVariable(std::string newVariableName,std::string newApplicationUseName,std::string newVariableCountType,
+    inputVariable_info(std::string newVariableName,std::string newApplicationUseName,std::string newVariableCountType,
                    std::vector<std::string> newConflictingVariables,std::string newLoaderFunctionName,std::string newVariableDescription);
 
     // reinit functions (like constructors)
@@ -50,4 +50,4 @@ private:
 
 };
 
-#endif // CONFIGVARIABLE_H
+#endif // INPUTVARIABLE_INFO_H

@@ -1,10 +1,11 @@
-#ifndef SCRIPTCONFIGVARIABLES_H
-#define SCRIPTCONFIGVARIABLES_H
+#ifndef INPUTVARIABLES_INFOSTORAGE_H
+#define INPUTVARIABLES_INFOSTORAGE_H
+
 
 #include <iostream>
 #include <vector>
 
-#include "configVariable.h"
+#include "inputVariable_info.h"
 
 
 // largest configVariable name will have this much space between its end and the description
@@ -16,15 +17,16 @@
 // this should be the maximum number of characters in ubuntu 16.04 terminal line when the terminal is first opened
 #define MAX_DESCRIPTION_LINESIZE 80
 
-class scriptConfigVariables
+
+class inputVariables_infoStorage
 {
 public:
 
     // constructors
-    scriptConfigVariables();
+    inputVariables_infoStorage();
 
     // get value functions
-    std::vector<configVariable> get_theVariables();
+    std::vector<inputVariable_info> get_inputVariableInfo();
     std::string get_maxVarNameColumnWhitespace();
 
 private:
@@ -56,8 +58,10 @@ private:
     // utility functions used by everything else
     std::string findCountAmountFromCountType(std::string availableCountType);
 
-    // data members
-    std::vector<configVariable> theVariables;
+    // class data members
+    std::vector<inputVariable_info> inputVariables;
+
+    // variable info data members
     std::vector<std::string> allowedApplicationUseNames;
     std::vector<std::string> allowedVariableCountAmounts;
         /* start struct type stuff, probs should make this and other parts relating to it to be a class to make it more organized someday */
@@ -72,7 +76,6 @@ private:
     unsigned int descriptionVariableNameColumnSize;
     std::string maxVarNameColumnWhitespace;
 
-
 };
 
-#endif // SCRIPTCONFIGVARIABLES_H
+#endif // INPUTVARIABLES_INFOSTORAGE_H

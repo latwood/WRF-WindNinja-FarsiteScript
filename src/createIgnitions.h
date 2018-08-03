@@ -2,13 +2,13 @@
 #define CREATEIGNITIONS_H
 
 
-#include "scriptInputs.h"
+#include "inputVariablesHandler.h"
 
 class createIgnitions
 {
 public:
     createIgnitions();
-    bool createAllIgnitions(scriptInputs *inputs);
+    bool createAllIgnitions(inputVariablesHandler *inputs);
 };
 
 #endif // CREATEIGNITIONS_H

@@ -5,7 +5,7 @@ createFarsiteInputs::createFarsiteInputs()
 
 }
 
-bool createFarsiteInputs::createAllFarsiteInputs(scriptInputs *inputs, createIgnitions *ignitions, wrfInterpretation *wrfInterp)
+bool createFarsiteInputs::createAllFarsiteInputs(inputVariablesHandler *inputs, createIgnitions *ignitions, wrfInterpretation *wrfInterp)
 {
     bool success = true;
 

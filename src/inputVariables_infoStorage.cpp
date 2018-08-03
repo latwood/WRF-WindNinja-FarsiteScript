@@ -1,9 +1,9 @@
-#include "scriptConfigVariables.h"
+#include "inputVariables_infoStorage.h"
 
 /***** public functions *****/
 
 /*** constructor functions ***/
-scriptConfigVariables::scriptConfigVariables()
+inputVariables_infoStorage::inputVariables_infoStorage()
 {
     bool success = true;
     // for description printing
@@ -74,19 +74,17 @@ scriptConfigVariables::scriptConfigVariables()
     }
     calculate_maxVarNameColumnWhitespace();
 
-    // what level do we reset the option boolean values? Looks like I did it in the config file reader section, which makes sense. So this class is just for setting up the available options and then getting them out once they are needed. Then you use them as you please. Nevermind, the types end up defined and checked in config option
-
 }
 /*** end constructor functions ***/
 
 
 /*** get value functions ***/
-std::vector<configVariable> scriptConfigVariables::get_theVariables()
+std::vector<inputVariable_info> inputVariables_infoStorage::get_inputVariableInfo()
 {
-    return theVariables;
+    return inputVariables;
 }
 
-std::string scriptConfigVariables::get_maxVarNameColumnWhitespace()
+std::string inputVariables_infoStorage::get_maxVarNameColumnWhitespace()
 {
     return maxVarNameColumnWhitespace;
 }
@@ -99,10 +97,10 @@ std::string scriptConfigVariables::get_maxVarNameColumnWhitespace()
 
 
 /*** setup functions ***/
-void scriptConfigVariables::setupAvailableApplicationUseNames()
+void inputVariables_infoStorage::setupAvailableApplicationUseNames()
 {
     // the idea is that each variable is used for different things, and when explaining uses, it is handy to show the applications they are for
-    // another function will verify that the setupAvailableVariables() function only used these types and that they were specified in order of application type, so in this order :)
+    // other functions will verify that the setupAvailableVariables() function only used these types and that they were specified in order of application type, so in this order :)
     allowedApplicationUseNames.push_back("WindNinja only");
     allowedApplicationUseNames.push_back("wrfGetWeather only");
     allowedApplicationUseNames.push_back("wrfGetWeather and WindNinja");
@@ -110,13 +108,13 @@ void scriptConfigVariables::setupAvailableApplicationUseNames()
     allowedApplicationUseNames.push_back("createFarsiteInput");
 }
 
-void scriptConfigVariables::setupAvailableVariableCountAmounts()
+void inputVariables_infoStorage::setupAvailableVariableCountAmounts()
 {
     allowedVariableCountAmounts.push_back("single");
     allowedVariableCountAmounts.push_back("multiple");
 }
 
-void scriptConfigVariables::setupAvailableVariableCountTypes()
+void inputVariables_infoStorage::setupAvailableVariableCountTypes()
 {
     // this is what will be used in the end, don't need to redefine the count types twice
     allowedVariableCountTypes.push_back({"bool","single"});
@@ -128,38 +126,44 @@ void scriptConfigVariables::setupAvailableVariableCountTypes()
     allowedVariableCountTypes.push_back({"count","multiple"});
 }
 
-void scriptConfigVariables::addVariable(std::string newVariableName,std::string newApplicationUseName,std::string newVariableCountType,
+void inputVariables_infoStorage::addVariable(std::string newVariableName,std::string newApplicationUseName,std::string newVariableCountType,
                                         std::vector<std::string> newConflictingVariables,std::string newLoaderFunctionName,std::string newVariableDescription)
 {
-    theVariables.push_back(configVariable(newVariableName,newApplicationUseName,newVariableCountType,newConflictingVariables,newLoaderFunctionName,newVariableDescription));
+    inputVariables.push_back(inputVariable_info(newVariableName,newApplicationUseName,newVariableCountType,newConflictingVariables,newLoaderFunctionName,newVariableDescription));
 }
 
-void scriptConfigVariables::setupAvailableVariables()
+void inputVariables_infoStorage::setupAvailableVariables()
 {
     // add desired variables to be read from the config file. All these will be assumed to be required unless the conflicting options specify otherwise.
-    // whether all these variables are actually used by the program even though they are required and at least the names and counts are read by the input file,
-    // is up to the programmer linking them into the program. But the load function name means that a warning will be given to the user/programmer if a variable is required
-    // as input but has no loading method. Still doesn't mean that it is used, but hopefully this makes deprecation a little less annoying.
+    // whether all these variables are actually used by the program even though they are required; at least the names and counts are read by the input file,
+    // is up to the programmer linking the input variables into the program for whether they will be used. But the load function name means that a warning will be given
+    // if a variable is required as input but has no loading method. Still doesn't necessaily mean that it is used, but hopefully this makes deprecation a little less annoying.
 
+    /* delete this section when done */
     // In fact, the basic needs for each input variable to even check for them are done for all variables, but whether they are even loaded in depends on if there is a load function for the data
     // hmm, makes me realize I should add a function loader name and an is loaded boolean, that way a script can just load all the variables with case or if else checks
     //  to see if the required load function is actually used or not. The end else would set the boolean. Hmm, that doesn't work in time to add as a displayed option to the user.
     //  ahh, I know! keep the function loader name variable, but if it hits the else statement, a print statement saying variable is declared as a possible input, but has no loader function. Brilliant!
+    /* end section needing to delete */
 
     // one big problem with this is that it is tricky to keep it pretty when trying to add in all the stuff. Technically it isn't too bad yet, but especially the description!
     // Fortunately there are some parsing tricks applied using whitespace to hopefully clean up the format of the description so you only need to do a single string for description.
     // If that fails and warnings come a lot, might have to reprogram stuff and manually setup the format of the input variables. If so, wait till all variable names and descriptions
-    // are set or you'll be redoing changes a lot.
+    // are set or you'll be redoing changes a lot. Might be handy to eventually include a bool whether to use this smart whitespace formatting or not. Would still need whitespace, just not line breaks.
 
-	// should have a section for each type of input variables, and include the type or use in the description
+        // should have a section for each type of input variables, and include the type or use in the description
+        // if you need more sections, define section in setupAvailableApplicationUseNames(). Define more types in setupAvailableVariableCountTypes().
+        // just know that additional types will also need an additional load method and other input storage functions in other input classes
+        // the variable names will be greatly dependent on the variable names used throughout the program as well as the loader/parser and variable storage classes
+        // conflicting options might evolve with time, but for now just specify each variable a given variable should not see defined alongside itself
 
-	// WindNinja only variables
+        // WindNinja only variables
     addVariable("diurnal_winds","WindNinja only","bool",{"NA"},"NA",
                 "true or false; the dates, times, temperatures, and cloud covers will be autodetected from the WRF files by WindNinja");
     addVariable("non_neutral_stability","WindNinja only","bool",{"NA"},"NA",
                 "true or false; the dates, times, temperatures, and cloud covers will be autodetected from the WRF files by WindNinja");
 
-	// wrfGetWeather only variables
+        // wrfGetWeather only variables
     addVariable("weather_band_names","wrfGetWeather only","count",{"NA"},"load_weather_band_names",
                 "use gdalinfo on a few of the wrf files to see what band names are useful. Usual examples are like \"T10\"");
     addVariable("use_firearea_average","wrfGetWeather only","bool",{"use_firearea_center"},"NA",
@@ -167,37 +171,37 @@ void scriptConfigVariables::setupAvailableVariables()
     addVariable("use_firearea_center","wrfGetWeather only","bool",{"use_firearea_average"},"NA",
                 "true or false, use the center of the fire location or an average of all the weather data over the whole fire area");
 
-	// wrfGetWeather and WindNinja variables
+        // wrfGetWeather and WindNinja variables
     addVariable("wrf_files","wrfGetWeather and WindNinja","count",{"NA"},"load_wrf_files",
                 "Hourly WRF files from 1 day before the FARSITE_BURN_START variable to the time set by the FARSITE_BURN_END variable");
 
-	// createIgnition variables
+        // createIgnition variables
     addVariable("latlong_position","createIgnition","count",{"NA"},"load_latlong_position",
                 "create an ignition file using the following set of lat long positions, so there are a bunch of point sources and this is the first instance of the fire");
 
-	// createFarsiteInput variables
+        // createFarsiteInput variables
     addVariable("FARSITE_START_TIME","createFarsiteInput","date",{"NA"},"NA",
                 "date of the following format: month day hour. Is the start time for the farsite burn. Make sure wrf files cover at least a day before this date");
 
     // notice that these do NOT include all the possible variables for windninja and farsite, just the ones that will be changing a bunch.
     // So if you need to move needed variables that are just set to be the same thing every time for farsite or windninja, look in
     // wrfInterpretation and createFarsiteInput at what is set to be the same everytime, and create a variable replacement here,
-    // but then you need to adjust how that variable is used in wrfInterpretation and createFarsiteInput :)
+    // but then you need to adjust how that variable is used in wrfInterpretation and createFarsiteInputas well as make changes to the input loader/parser and storage classes :)
 
 }
 /*** end setup functions ***/
 
 /*** check setup functions ***/
-bool scriptConfigVariables::check_setupForDuplicateVariableNames()
+bool inputVariables_infoStorage::check_setupForDuplicateVariableNames()
 {
     bool success = true;
-    for(size_t i = 0; i < theVariables.size()-1; i++)
+    for(size_t firstVarIdx = 0; firstVarIdx < inputVariables.size()-1; firstVarIdx++)
     {
-        for(size_t j = i+1; j < theVariables.size(); j++)
+        for(size_t secondVarIdx = firstVarIdx+1; secondVarIdx < inputVariables.size(); secondVarIdx++)
         {
-            if(theVariables[i].get_variableName() == theVariables[j].get_variableName())
+            if(inputVariables[firstVarIdx].get_variableName() == inputVariables[secondVarIdx].get_variableName())
             {
-                printf("found duplicate variable \"%s\"!\n",theVariables[i].get_variableName().c_str());
+                printf("found duplicate variable \"%s\"!\n",inputVariables[firstVarIdx].get_variableName().c_str());
                 success = false;
             }
         }
@@ -205,15 +209,15 @@ bool scriptConfigVariables::check_setupForDuplicateVariableNames()
     return success;
 }
 
-bool scriptConfigVariables::check_setupForValidApplicationUseNames()
+bool inputVariables_infoStorage::check_setupForValidApplicationUseNames()
 {
     bool success = true;
-    for(size_t variableIdx = 0; variableIdx < theVariables.size(); variableIdx++)
+    for(size_t varIdx = 0; varIdx < inputVariables.size(); varIdx++)
     {
         bool isValidUseName = false;
         for(size_t useNameIdx = 0; useNameIdx < allowedApplicationUseNames.size(); useNameIdx++)
         {
-            if(theVariables[variableIdx].get_applicationUseName() == allowedApplicationUseNames[useNameIdx])
+            if(inputVariables[varIdx].get_applicationUseName() == allowedApplicationUseNames[useNameIdx])
             {
                 isValidUseName = true;
                 break;
@@ -221,29 +225,29 @@ bool scriptConfigVariables::check_setupForValidApplicationUseNames()
         }
         if(isValidUseName == false)
         {
-            printf("application use name \"%s\" for variable \"%s\" is not a valid application use name!\n",theVariables[variableIdx].get_applicationUseName().c_str(),theVariables[variableIdx].get_variableName().c_str());
+            printf("application use name \"%s\" for variable \"%s\" is not a valid application use name!\n",inputVariables[varIdx].get_applicationUseName().c_str(),inputVariables[varIdx].get_variableName().c_str());
             success = false;
         }
     }
     return success;
 }
 
-bool scriptConfigVariables::check_setupForValidOrderingByApplicationUseNames()
+bool inputVariables_infoStorage::check_setupForValidOrderingByApplicationUseNames()
 {
     bool success = true;
 
     // make sure the variable order matches the application use names
     unsigned int applicationUseNameTypeCount = 0;
     bool foundValidApplicationUseName = false;
-    for(size_t varIdx = 0; varIdx < theVariables.size(); varIdx++)
+    for(size_t varIdx = 0; varIdx < inputVariables.size(); varIdx++)
     {
         if(applicationUseNameTypeCount >= allowedApplicationUseNames.size())
         {
-            printf("variables are not ordered by applicationUseName! Found at variable \"%s\"!\n",theVariables[varIdx].get_variableName().c_str());
+            printf("variables are not ordered by applicationUseName! Found at variable \"%s\"!\n",inputVariables[varIdx].get_variableName().c_str());
             success = false;
             break;
         }
-        if(theVariables[varIdx].get_applicationUseName() == allowedApplicationUseNames[applicationUseNameTypeCount])
+        if(inputVariables[varIdx].get_applicationUseName() == allowedApplicationUseNames[applicationUseNameTypeCount])
         {
             foundValidApplicationUseName = true;
         } else
@@ -253,7 +257,7 @@ bool scriptConfigVariables::check_setupForValidOrderingByApplicationUseNames()
                 applicationUseNameTypeCount = applicationUseNameTypeCount + 1;
             } else
             {
-                printf("variables are not ordered by applicationUseName! Found at variable \"%s\"!\n",theVariables[varIdx].get_variableName().c_str());
+                printf("variables are not ordered by applicationUseName! Found at variable \"%s\"!\n",inputVariables[varIdx].get_variableName().c_str());
                 success = false;
                 break;
             }
@@ -274,15 +278,15 @@ bool scriptConfigVariables::check_setupForValidOrderingByApplicationUseNames()
     return success;
 }
 
-bool scriptConfigVariables::check_setupAllowableVariableCountAmounts()
+bool inputVariables_infoStorage::check_setupAllowableVariableCountAmounts()
 {
     bool success = true;
-    for(size_t countTypesIdx = 0; countTypesIdx < allowedVariableCountTypes.size(); countTypesIdx++)
+    for(size_t countTypeIdx = 0; countTypeIdx < allowedVariableCountTypes.size(); countTypeIdx++)
     {
         bool isValidCountAmount = false;
-        for(size_t allowedCountAmountIdx = 0; allowedCountAmountIdx < allowedVariableCountAmounts.size(); allowedCountAmountIdx++)
+        for(size_t countAmountIdx = 0; countAmountIdx < allowedVariableCountAmounts.size(); countAmountIdx++)
         {
-            if(allowedVariableCountTypes[countTypesIdx].countAmount == allowedVariableCountAmounts[allowedCountAmountIdx])
+            if(allowedVariableCountTypes[countTypeIdx].countAmount == allowedVariableCountAmounts[countAmountIdx])
             {
                 isValidCountAmount = true;
                 break;
@@ -290,22 +294,22 @@ bool scriptConfigVariables::check_setupAllowableVariableCountAmounts()
         }
         if(isValidCountAmount == false)
         {
-            printf("variable count amount \"%s\" for variable count type \"%s\" is not a valid variable count amount!\n",allowedVariableCountTypes[countTypesIdx].countAmount.c_str(),allowedVariableCountTypes[countTypesIdx].countType.c_str());
+            printf("variable count amount \"%s\" for variable count type \"%s\" is not a valid variable count amount!\n",allowedVariableCountTypes[countTypeIdx].countAmount.c_str(),allowedVariableCountTypes[countTypeIdx].countType.c_str());
             success = false;
         }
     }
     return success;
 }
 
-bool scriptConfigVariables::check_setupForValidVariableCountTypes()
+bool inputVariables_infoStorage::check_setupForValidVariableCountTypes()
 {
     bool success = true;
-    for(size_t variableIdx = 0; variableIdx < theVariables.size(); variableIdx++)
+    for(size_t varIdx = 0; varIdx < inputVariables.size(); varIdx++)
     {
         bool isValidType = false;
-        for(size_t countTypesIdx = 0; countTypesIdx < allowedVariableCountTypes.size(); countTypesIdx++)
+        for(size_t countTypeIdx = 0; countTypeIdx < allowedVariableCountTypes.size(); countTypeIdx++)
         {
-            if(theVariables[variableIdx].get_variableCountType() == allowedVariableCountTypes[countTypesIdx].countType)
+            if(inputVariables[varIdx].get_variableCountType() == allowedVariableCountTypes[countTypeIdx].countType)
             {
                 isValidType = true;
                 break;
@@ -313,7 +317,7 @@ bool scriptConfigVariables::check_setupForValidVariableCountTypes()
         }
         if(isValidType == false)
         {
-            printf("variable count type \"%s\" for variable \"%s\" is not a valid type!\n",theVariables[variableIdx].get_variableCountType().c_str(),theVariables[variableIdx].get_variableName().c_str());
+            printf("variable count type \"%s\" for variable \"%s\" is not a valid type!\n",inputVariables[varIdx].get_variableCountType().c_str(),inputVariables[varIdx].get_variableName().c_str());
             success = false;
         }
     }
@@ -321,35 +325,35 @@ bool scriptConfigVariables::check_setupForValidVariableCountTypes()
 }
 
 //make sure each conflicting option really does exist as a variable name
-bool scriptConfigVariables::check_setupConflictingVariables()
+bool inputVariables_infoStorage::check_setupConflictingVariables()
 {
     bool success = true;
-    for(size_t variableIdx = 0; variableIdx < theVariables.size(); variableIdx++)
+    for(size_t firstVarIdx = 0; firstVarIdx < inputVariables.size(); firstVarIdx++)
     {
-        std::vector<std::string> currentConflictingVariables = theVariables[variableIdx].get_conflictingVariables();
+        std::vector<std::string> currentConflictingVariables = inputVariables[firstVarIdx].get_conflictingVariables();
         for(size_t conflictVarIdx = 0; conflictVarIdx < currentConflictingVariables.size(); conflictVarIdx++)
         {
             if(currentConflictingVariables[conflictVarIdx] == "NA")
             {
                 if(currentConflictingVariables.size() > 1)
                 {
-                    printf("variable \"%s\" has conflicting variable \"NA\" but size is not 1!\n",theVariables[variableIdx].get_variableName().c_str());
+                    printf("variable \"%s\" has conflicting variable \"NA\" but size is not 1!\n",inputVariables[firstVarIdx].get_variableName().c_str());
                     success = false;
                     break;
                 }
-            } else if(theVariables[variableIdx].get_variableName() == currentConflictingVariables[conflictVarIdx])
+            } else if(inputVariables[firstVarIdx].get_variableName() == currentConflictingVariables[conflictVarIdx])
             {
-                printf("variable \"%s\" specified it's own name as a conflicting variable!\n",theVariables[variableIdx].get_variableName().c_str());
+                printf("variable \"%s\" specified it's own name as a conflicting variable!\n",inputVariables[firstVarIdx].get_variableName().c_str());
                 success = false;
             } else
             {
                 // go through all variables to see if conflicting option exists as one of the other variable names
                 bool foundVariableName = false;
-                for(size_t secondVariableIdx = 0; secondVariableIdx < theVariables.size(); secondVariableIdx++)
+                for(size_t secondvarIdx = 0; secondvarIdx < inputVariables.size(); secondvarIdx++)
                 {
-                    if(secondVariableIdx != variableIdx)
+                    if(secondvarIdx != firstVarIdx)
                     {
-                        if(currentConflictingVariables[conflictVarIdx] == theVariables[secondVariableIdx].get_variableName())
+                        if(currentConflictingVariables[conflictVarIdx] == inputVariables[secondvarIdx].get_variableName())
                         {
                             foundVariableName = true;
                             break;
@@ -358,7 +362,7 @@ bool scriptConfigVariables::check_setupConflictingVariables()
                 }
                 if(foundVariableName == false)
                 {
-                    printf("conflicting option \"%s\" for variable \"%s\" does not exist as another variable name!\n",currentConflictingVariables[conflictVarIdx].c_str(),theVariables[variableIdx].get_variableName().c_str());
+                    printf("conflicting option \"%s\" for variable \"%s\" does not exist as another variable name!\n",currentConflictingVariables[conflictVarIdx].c_str(),inputVariables[firstVarIdx].get_variableName().c_str());
                     success = false;
                 }
             }
@@ -367,7 +371,7 @@ bool scriptConfigVariables::check_setupConflictingVariables()
     return success;
 }
 
-bool scriptConfigVariables::check_setupLoaderFunctionNames()
+bool inputVariables_infoStorage::check_setupLoaderFunctionNames()
 {
     bool success = true;
 
@@ -375,49 +379,50 @@ bool scriptConfigVariables::check_setupLoaderFunctionNames()
     // but can make sure that if the variableCountTypeAmount is "single" for a given configVariable, that the loaderFunctionName is set to "NA"
     // can also check to make that if the variableCountTypeAmount is "multiple" for a given configVariable, that the loaderFunctionName is not "" or whitespace
     // or is a duplicate of another loader function name
-    for(size_t varIdx = 0; varIdx < theVariables.size(); varIdx++)
+    /* does the single or multiple even matter? In the end you have to make a loader function or method for each countType, so technically the loader already knows whether it is single or multiple. I guess I will find out when I get that far, and if this is true, going to get rid of that part of all this */
+    for(size_t varIdx = 0; varIdx < inputVariables.size(); varIdx++)
     {
         // first need to find which of the allowedVariableCountTypes the variableCountType is to get access to the right variableCountTypeAmount
         // because this action is repeated in other places, it was turned into a function
-        std::string currentCountAmount = findCountAmountFromCountType(theVariables[varIdx].get_variableCountType());
+        std::string currentCountAmount = findCountAmountFromCountType(inputVariables[varIdx].get_variableCountType());
         if(currentCountAmount == "single")
         {
-            if(theVariables[varIdx].get_loaderFunctionName() != "NA")
+            if(inputVariables[varIdx].get_loaderFunctionName() != "NA")
             {
-                printf("variable \"%s\" loaderFunctionName with variableCountType \"%s\" is not \"NA\" even though variableCountType \"%s\" has countAmount \"single\"!\n",theVariables[varIdx].get_variableName().c_str(),theVariables[varIdx].get_variableCountType().c_str(),theVariables[varIdx].get_variableCountType().c_str());
+                printf("variable \"%s\" loaderFunctionName with variableCountType \"%s\" is not \"NA\" even though variableCountType \"%s\" has countAmount \"single\"!\n",inputVariables[varIdx].get_variableName().c_str(),inputVariables[varIdx].get_variableCountType().c_str(),inputVariables[varIdx].get_variableCountType().c_str());
                 success = false;
             }
         }
         if(currentCountAmount == "multiple")
         {
-            if(theVariables[varIdx].get_loaderFunctionName() == "NA")
+            if(inputVariables[varIdx].get_loaderFunctionName() == "NA")
             {
-                printf("variable \"%s\" loaderFunctionName with variableCountType \"%s\" is \"NA\" even though variableCountType \"%s\" has countAmount \"multiple\"!\n",theVariables[varIdx].get_variableName().c_str(),theVariables[varIdx].get_variableCountType().c_str(),theVariables[varIdx].get_variableCountType().c_str());
+                printf("variable \"%s\" loaderFunctionName with variableCountType \"%s\" is \"NA\" even though variableCountType \"%s\" has countAmount \"multiple\"!\n",inputVariables[varIdx].get_variableName().c_str(),inputVariables[varIdx].get_variableCountType().c_str(),inputVariables[varIdx].get_variableCountType().c_str());
                 success = false;
             }
-            if(theVariables[varIdx].get_loaderFunctionName() == "")
+            if(inputVariables[varIdx].get_loaderFunctionName() == "")
             {
-                printf("variable \"%s\" loaderFunctionName with variableCountType \"%s\" is \"\" even though variableCountType \"%s\" has countAmount \"multiple\"!\n",theVariables[varIdx].get_variableName().c_str(),theVariables[varIdx].get_variableCountType().c_str(),theVariables[varIdx].get_variableCountType().c_str());
+                printf("variable \"%s\" loaderFunctionName with variableCountType \"%s\" is \"\" even though variableCountType \"%s\" has countAmount \"multiple\"!\n",inputVariables[varIdx].get_variableName().c_str(),inputVariables[varIdx].get_variableCountType().c_str(),inputVariables[varIdx].get_variableCountType().c_str());
                 success = false;
             }
-            if(theVariables[varIdx].get_loaderFunctionName().substr(0,1) == " ")
+            if(inputVariables[varIdx].get_loaderFunctionName().substr(0,1) == " ")
             {
-                printf("variable \"%s\" loaderFunctionName with variableCountType \"%s\" starts with whitespace or is only whitespace!\n",theVariables[varIdx].get_variableName().c_str(),theVariables[varIdx].get_variableCountType().c_str());
+                printf("variable \"%s\" loaderFunctionName with variableCountType \"%s\" starts with whitespace or is only whitespace!\n",inputVariables[varIdx].get_variableName().c_str(),inputVariables[varIdx].get_variableCountType().c_str());
                 success = false;
             }
         }
     }
 
     // now make sure there are no duplicate loadFunctionNames
-    for(size_t i = 0; i < theVariables.size()-1; i++)
+    for(size_t firstVarIdx = 0; firstVarIdx < inputVariables.size()-1; firstVarIdx++)
     {
-        for(size_t j = i+1; j < theVariables.size(); j++)
+        for(size_t secondVarIdx = firstVarIdx+1; secondVarIdx < inputVariables.size(); secondVarIdx++)
         {
-            if(theVariables[i].get_loaderFunctionName() != "NA" && theVariables[j].get_loaderFunctionName() != "NA")
+            if(inputVariables[firstVarIdx].get_loaderFunctionName() != "NA" && inputVariables[secondVarIdx].get_loaderFunctionName() != "NA")
             {
-                if(theVariables[i].get_loaderFunctionName() == theVariables[j].get_loaderFunctionName())
+                if(inputVariables[firstVarIdx].get_loaderFunctionName() == inputVariables[secondVarIdx].get_loaderFunctionName())
                 {
-                    printf("found duplicate loaderFunctionName \"%s\"!\n",theVariables[i].get_loaderFunctionName().c_str());
+                    printf("found duplicate loaderFunctionName \"%s\"!\n",inputVariables[firstVarIdx].get_loaderFunctionName().c_str());
                     success = false;
                 }
             }
@@ -427,16 +432,16 @@ bool scriptConfigVariables::check_setupLoaderFunctionNames()
     return success;
 }
 
-bool scriptConfigVariables::check_setupDescription()
+bool inputVariables_infoStorage::check_setupDescription()
 {
     bool success = true;
 
     // first add up the number of starting characters that are whitespace. If there are any, it is an error so warn
     // and say how many extra characters and there should be no whitespace at the start of a description
-    for(size_t varIdx = 0; varIdx < theVariables.size(); varIdx++)
+    for(size_t varIdx = 0; varIdx < inputVariables.size(); varIdx++)
     {
         unsigned int whiteSpaceCount = 0;
-        std::string currentDescription = theVariables[varIdx].get_variableDescription();
+        std::string currentDescription = inputVariables[varIdx].get_variableDescription();
         for(size_t descriptionVarIdx = 0; descriptionVarIdx < currentDescription.length(); descriptionVarIdx++)
         {
             std::string currentChr = currentDescription.substr(descriptionVarIdx,1);
@@ -450,7 +455,7 @@ bool scriptConfigVariables::check_setupDescription()
         }
         if(whiteSpaceCount > 0)
         {
-            printf("variable \"%s\" description starts with %d white space characters. variable descriptions should not start with whitespace!\n",theVariables[varIdx].get_variableName().c_str(),whiteSpaceCount);
+            printf("variable \"%s\" description starts with %d white space characters. variable descriptions should not start with whitespace!\n",inputVariables[varIdx].get_variableName().c_str(),whiteSpaceCount);
             success = false;
         }
     }
@@ -460,17 +465,17 @@ bool scriptConfigVariables::check_setupDescription()
 /*** end check setup functions ***/
 
 /*** description whitespace and line break calculations, with error checking ***/
-bool scriptConfigVariables::calculateDescriptionWhiteSpace()
+bool inputVariables_infoStorage::calculateDescriptionWhiteSpace()
 {
     bool success = true;
 
     // first calculate the biggest string for the variable names
     unsigned int biggestString = 0;
-    for(size_t varIdx = 0; varIdx < theVariables.size(); varIdx++)
+    for(size_t varIdx = 0; varIdx < inputVariables.size(); varIdx++)
     {
-        if(theVariables[varIdx].get_variableName().size() > biggestString)
+        if(inputVariables[varIdx].get_variableName().size() > biggestString)
         {
-            biggestString = theVariables[varIdx].get_variableName().size();
+            biggestString = inputVariables[varIdx].get_variableName().size();
         }
     }
     descriptionVariableNameColumnSize = biggestString + MIN_VARNAME_WHITESPACE;
@@ -478,30 +483,30 @@ bool scriptConfigVariables::calculateDescriptionWhiteSpace()
     // now calculate variable name whitespace for each variable
     unsigned int neededWhiteSpace = 0;
     std::string createdWhiteSpace = "";
-    for(size_t varIdx = 0; varIdx < theVariables.size(); varIdx++)
+    for(size_t varIdx = 0; varIdx < inputVariables.size(); varIdx++)
     {
-        neededWhiteSpace = descriptionVariableNameColumnSize - theVariables[varIdx].get_variableName().size(); // defined in header file
+        neededWhiteSpace = descriptionVariableNameColumnSize - inputVariables[varIdx].get_variableName().size(); // defined in header file
         createdWhiteSpace = "";
         for(size_t m = 0; m < neededWhiteSpace; m++)
         {
             createdWhiteSpace = createdWhiteSpace + " ";
         }
-        theVariables[varIdx].set_variableNameWhiteSpace(createdWhiteSpace);
+        inputVariables[varIdx].set_variableNameWhiteSpace(createdWhiteSpace);
     }
 
     return success;
 }
 
-bool scriptConfigVariables::calculateDescriptionLineBreaks()
+bool inputVariables_infoStorage::calculateDescriptionLineBreaks()
 {
     bool success = true;
 
-    for(size_t varIdx = 0; varIdx < theVariables.size(); varIdx++)
+    for(size_t varIdx = 0; varIdx < inputVariables.size(); varIdx++)
     {
         std::vector<unsigned int> wordBreaks;
         // first find all whitespace locations in the description
         // notice there were checks which end the program if the description starts with whitespace, so we can assume all whitespace is after the first character of the description
-        std::string currentDescription = theVariables[varIdx].get_variableDescription();
+        std::string currentDescription = inputVariables[varIdx].get_variableDescription();
         bool isWord = true;
         for(size_t descriptionVarIdx = 0; descriptionVarIdx < currentDescription.length(); descriptionVarIdx++)
         {
@@ -522,19 +527,31 @@ bool scriptConfigVariables::calculateDescriptionLineBreaks()
         }
 
         // now find the closest whitespace location before the max column size and add that location to the description line breaks
-        theVariables[varIdx].add_variableDescriptionLineBreaks(0);  // start out with the first break as 0, also avoids breaking problems later
+        inputVariables[varIdx].add_variableDescriptionLineBreaks(0);  // start out with the first break as 0, also avoids breaking problems later
         unsigned int lineCount = 0;
+        unsigned int lineWordCount = 0;
         unsigned int descriptionMaxSize = MAX_DESCRIPTION_LINESIZE - descriptionVariableNameColumnSize;
         for(size_t wordIdx = 0; wordIdx < wordBreaks.size(); wordIdx++)
         {
-            unsigned int currentLineSize = wordBreaks[wordIdx] - theVariables[varIdx].get_variableDescriptionLineBreaks()[lineCount];
+            unsigned int currentLineSize = wordBreaks[wordIdx] - inputVariables[varIdx].get_variableDescriptionLineBreaks()[lineCount];
+            lineWordCount = lineWordCount + 1;
             if(currentLineSize >= descriptionMaxSize)
             {
-                theVariables[varIdx].add_variableDescriptionLineBreaks(wordBreaks[wordIdx-1]);
+                if(currentLineSize > MAX_DESCRIPTION_LINESIZE)
+                {
+                    printf("found description word for variable \"%s\" bigger than MAX_DESCRIPTION_LINESIZE of %d! Need to have programmer revise description!\n This problem will kill program, so exiting program!\n",inputVariables[varIdx].get_variableDescription().c_str(),MAX_DESCRIPTION_LINESIZE);
+                }
+                inputVariables[varIdx].add_variableDescriptionLineBreaks(wordBreaks[wordIdx-1]);
+                if(lineWordCount < MIN_WORDS_PER_DESCRIPTION_LINE)
+                {
+                    printf("added variableDescriptionLineBreak for description line with only \"%d\" words for lineCount \"%d\". MIN_WORDS_PER_DESCRIPTION_LINE is \"%d\"",lineWordCount,lineCount,MIN_WORDS_PER_DESCRIPTION_LINE);
+                }
                 lineCount = lineCount + 1;
+                lineWordCount = 0;
             } else if(wordIdx == wordBreaks.size()-1)
             {
-                theVariables[varIdx].add_variableDescriptionLineBreaks(wordBreaks[wordIdx]);
+                inputVariables[varIdx].add_variableDescriptionLineBreaks(wordBreaks[wordIdx]);
+                // don't care if fewer words per line than MIN_WORDS_PER_DESCRIPTION_LINE for the last line
             }
         }
     }
@@ -542,7 +559,7 @@ bool scriptConfigVariables::calculateDescriptionLineBreaks()
     return success;
 }
 
-void scriptConfigVariables::calculate_maxVarNameColumnWhitespace()
+void inputVariables_infoStorage::calculate_maxVarNameColumnWhitespace()
 {
     for(size_t whitespaceCount = 0; whitespaceCount < descriptionVariableNameColumnSize; whitespaceCount++)
     {
@@ -552,13 +569,13 @@ void scriptConfigVariables::calculate_maxVarNameColumnWhitespace()
 /*** end description whitespace and line break calculations, with error checking ***/
 
 /*** utility functions ***/
-std::string scriptConfigVariables::findCountAmountFromCountType(std::string availableCountType)
+std::string inputVariables_infoStorage::findCountAmountFromCountType(std::string availableCountType)
 {
-    for(size_t countTypesIdx = 0; countTypesIdx < allowedVariableCountTypes.size(); countTypesIdx++)
+    for(size_t countTypeIdx = 0; countTypeIdx < allowedVariableCountTypes.size(); countTypeIdx++)
     {
-        if(availableCountType == allowedVariableCountTypes[countTypesIdx].countType)
+        if(availableCountType == allowedVariableCountTypes[countTypeIdx].countType)
         {
-            return allowedVariableCountTypes[countTypesIdx].countAmount;
+            return allowedVariableCountTypes[countTypeIdx].countAmount;
         }
     }
     printf("!!!Error! Couldn't find count amount from count type \"%s\"!\n",availableCountType.c_str());

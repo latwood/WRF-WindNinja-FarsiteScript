@@ -5,7 +5,7 @@ wrfInterpretation::wrfInterpretation()
 
 }
 
-bool wrfInterpretation::interpretWRFfiles(scriptInputs *inputs)
+bool wrfInterpretation::interpretWRFfiles(inputVariablesHandler *inputs)
 {
     bool success = true;
     /* first take necessary input information and store it somehow, probably validating that it is good in the moment if that isn't already done with scriptInputs loading */

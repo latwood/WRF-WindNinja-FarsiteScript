@@ -2,13 +2,13 @@
 #define WRFINTERPRETATION_H
 
 
-#include "scriptInputs.h"
+#include "inputVariablesHandler.h"
 
 class wrfInterpretation
 {
 public:
     wrfInterpretation();
-    bool interpretWRFfiles(scriptInputs *inputs);
+    bool interpretWRFfiles(inputVariablesHandler *inputs);
 private:
     bool runWindNinja();
     bool getWeatherInfo();

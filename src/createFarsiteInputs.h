@@ -2,7 +2,7 @@
 #define CREATEFARSITEINPUTS_H
 
 
-#include "scriptInputs.h"
+#include "inputVariablesHandler.h"
 #include "createIgnitions.h"
 #include "wrfInterpretation.h"
 
@@ -11,7 +11,7 @@ class createFarsiteInputs
 {
 public:
     createFarsiteInputs();
-    bool createAllFarsiteInputs(scriptInputs *inputs, createIgnitions *ignitions, wrfInterpretation *wrfInterp);
+    bool createAllFarsiteInputs(inputVariablesHandler *inputs, createIgnitions *ignitions, wrfInterpretation *wrfInterp);
 
 private:
 

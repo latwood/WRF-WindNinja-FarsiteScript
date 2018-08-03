@@ -5,7 +5,7 @@ createIgnitions::createIgnitions()
 
 }
 
-bool createIgnitions::createAllIgnitions(scriptInputs *inputs)
+bool createIgnitions::createAllIgnitions(inputVariablesHandler *inputs)
 {
     bool success = true;
 

@@ -47,8 +47,8 @@ else()
 endif()
 
 #file(GLOB_RECURSE SOURCES "src/*")
-set(SOURCES "src/main.cpp" "src/scriptInputs.cpp" "src/createIgnitions.cpp" "src/wrfInterpretation.cpp" "src/createFarsiteInputs.cpp" "src/farsite.cpp"
-    "src/configVariable.cpp" "src/scriptConfigVariables.cpp")
+set(SOURCES "src/main.cpp" "src/inputVariablesHandler.cpp" "src/createIgnitions.cpp" "src/wrfInterpretation.cpp" "src/createFarsiteInputs.cpp" "src/farsite.cpp"
+    "src/inputVariable_info.cpp" "src/inputVariables_infoStorage.cpp" "src/inputVariables_valueStorage.cpp" "src/inputParser.cpp")
 include_directories("include" SYSTEM ${INCLUDE_DIRS})
 link_libraries(${LIBS})
 #add_executable(utahlsm ${SOURCES})

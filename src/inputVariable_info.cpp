@@ -1,16 +1,16 @@
-#include "configVariable.h"
+#include "inputVariable_info.h"
 
 /***** public functions *****/
 
 /*** constructor functions ***/
-configVariable::configVariable(std::string newVariableName,std::string newApplicationUseName,std::string newVariableCountType,
+inputVariable_info::inputVariable_info(std::string newVariableName,std::string newApplicationUseName,std::string newVariableCountType,
                                std::vector<std::string> newConflictingVariables,std::string newLoaderFunctionName,std::string newVariableDescription)
 {
     variableName = newVariableName;
     applicationUseName = newApplicationUseName;
-    // type is allowed to be abstract, so type setting and checking is handled by class that creates a vector of these configVariables
+    // type is allowed to be abstract, so type setting and checking is handled by class that creates or uses a vector of these configVariables
     variableCountType = newVariableCountType;
-    // no initial check on conflictingVariables because value will be a string meaning a reference to another variable. This will be checked by the classes that setup and use bectors of configVariables
+    // no initial check on conflictingVariables because value will be a string meaning a reference to another variable. This will be checked by the classes that setup and use vectors of configVariables
     conflictingVariables = newConflictingVariables;
     loaderFunctionName = newLoaderFunctionName;
     variableDescription = newVariableDescription;
@@ -20,7 +20,7 @@ configVariable::configVariable(std::string newVariableName,std::string newApplic
 /*** end constructor functions ***/
 
 /*** reinit functions ***/
-void configVariable::resetVariable()
+void inputVariable_info::resetVariable()
 {
     isFoundInInputFile = false;
     doesVariableConflict = false;
@@ -34,22 +34,22 @@ void configVariable::resetVariable()
 /*** end reinit functions ***/
 
 /*** set new value functions ***/
-void configVariable::set_isFoundInInputFile(bool newIsFoundInInputFileValue)
+void inputVariable_info::set_isFoundInInputFile(bool newIsFoundInInputFileValue)
 {
     isFoundInInputFile = newIsFoundInInputFileValue;    //note don't need to check because it is already a bool coming in or it fails
 }
 
-void configVariable::set_doesVariableConflict(bool newDoesVariableConflictValue)
+void inputVariable_info::set_doesVariableConflict(bool newDoesVariableConflictValue)
 {
     doesVariableConflict = newDoesVariableConflictValue;  //note don't need to check because it is already a bool coming in or it fails
 }
 
-void configVariable::set_variableNameWhiteSpace(std::string newVariableNameWhiteSpace)
+void inputVariable_info::set_variableNameWhiteSpace(std::string newVariableNameWhiteSpace)
 {
     variableNameWhiteSpace = newVariableNameWhiteSpace;
 }
 
-void configVariable::add_variableDescriptionLineBreaks(unsigned int newVariableDescriptionLineBreak)
+void inputVariable_info::add_variableDescriptionLineBreaks(unsigned int newVariableDescriptionLineBreak)
 {
     variableDescriptionLineBreaks.push_back(newVariableDescriptionLineBreak);
 }
@@ -57,52 +57,52 @@ void configVariable::add_variableDescriptionLineBreaks(unsigned int newVariableD
 
 
 /*** get value functions ***/
-std::string configVariable::get_variableName()
+std::string inputVariable_info::get_variableName()
 {
     return variableName;
 }
 
-std::string configVariable::get_applicationUseName()
+std::string inputVariable_info::get_applicationUseName()
 {
     return applicationUseName;
 }
 
-std::string configVariable::get_variableCountType()
+std::string inputVariable_info::get_variableCountType()
 {
     return variableCountType;
 }
 
-std::vector<std::string> configVariable::get_conflictingVariables()
+std::vector<std::string> inputVariable_info::get_conflictingVariables()
 {
     return conflictingVariables;
 }
 
-std::string configVariable::get_loaderFunctionName()
+std::string inputVariable_info::get_loaderFunctionName()
 {
     return loaderFunctionName;
 }
 
-std::string configVariable::get_variableDescription()
+std::string inputVariable_info::get_variableDescription()
 {
     return variableDescription;
 }
 
-bool configVariable::get_isFoundInInputFile()
+bool inputVariable_info::get_isFoundInInputFile()
 {
     return isFoundInInputFile;
 }
 
-bool configVariable::get_doesVariableConflict()
+bool inputVariable_info::get_doesVariableConflict()
 {
     return doesVariableConflict;
 }
 
-std::string configVariable::get_variableNameWhiteSpace()
+std::string inputVariable_info::get_variableNameWhiteSpace()
 {
     return variableNameWhiteSpace;
 }
 
-std::vector<unsigned int> configVariable::get_variableDescriptionLineBreaks()
+std::vector<unsigned int> inputVariable_info::get_variableDescriptionLineBreaks()
 {
     return variableDescriptionLineBreaks;
 }
@@ -111,5 +111,3 @@ std::vector<unsigned int> configVariable::get_variableDescriptionLineBreaks()
 
 
 /***** private functions *****/
-
-
