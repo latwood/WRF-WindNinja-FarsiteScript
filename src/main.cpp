@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
         printf("using inputFilePath %s\n",inputFilePath);
     }
 
-    if(!inputs.loadScriptInputs())
+    if(!inputs.loadScriptInputs(inputFilePath))
     {
         printf("Error loading script inputs! Exiting program!\n");
         exit(1);
