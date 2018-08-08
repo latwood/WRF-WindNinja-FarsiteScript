@@ -1,6 +1,5 @@
 
 #include <iostream>
-#include <string.h>
 
 #include "inputVariablesHandler.h"
 #include "createIgnitions.h"
@@ -14,16 +13,16 @@ using namespace std;
 
 bool checkCommandLineInput(int argc, char*argv[], inputVariablesHandler *inputs)
 {
-    if(argc < 2)
+    if(argc != 2)
     {
-        printf("WRF-WindNinja-FarsiteScript expects one parameter!\n");
-       inputs->explainInputReqs();
+        printf("WRF-WindNinja-FarsiteScript expects one parameter!\n\n");
+        inputs->explainInputReqs();
         exit(1);
     }
     FILE *cmd = fopen(argv[1], "rt");
     if(!cmd)
     {
-        printf("Error, cannot open %s\n", argv[1]);
+        printf("Error, cannot open %s\n\n", argv[1]);
         inputs->explainInputReqs();
         exit(1);
     }
@@ -33,7 +32,7 @@ bool checkCommandLineInput(int argc, char*argv[], inputVariablesHandler *inputs)
 
 int main(int argc, char* argv[])
 {
-    printf("beginning WRF-WindNinja-FarsiteScript\n");
+    printf("\nbeginning WRF-WindNinja-FarsiteScript\n\n");
 
     inputVariablesHandler inputs;
     createIgnitions ignitions;
@@ -41,12 +40,12 @@ int main(int argc, char* argv[])
     createFarsiteInputs farsiteInputs;
     farsite farsite;
 
-    char inputFilePath[MAX_PATH];
+    std::string inputFilePath;
 
     if(checkCommandLineInput(argc,argv,&inputs))
     {
-        strcpy(argv[1], inputFilePath);
-        printf("using inputFilePath %s\n",inputFilePath);
+        inputFilePath = argv[1];
+        printf("using inputFilePath %s\n",inputFilePath.c_str());
     }
 
     if(!inputs.loadScriptInputs(inputFilePath))
@@ -85,6 +84,6 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
-    printf("finished WRF-WindNinja-FarsiteScript\n");
+    printf("\nfinished WRF-WindNinja-FarsiteScript\n\n");
     return 0;
 }

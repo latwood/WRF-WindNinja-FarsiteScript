@@ -17,11 +17,13 @@ public:
     // functions
     void explainInputReqs();
     bool loadScriptInputs(std::string inputFileName);
+    void printFoundInput();
 
     // will probably have to repeat the functions from the inputVariable_valueStorage class unfortunately.
     // Difference is the values won't be stored in this class, just in the one referenced here
     // get variable value functions
     bool get_inputVariableBoolValue(std::string varName);
+    size_t get_inputVariableSize_tValue(std::string varName);
     int get_inputVariableIntValue(std::string varName);
     double get_inputVariableDoubleValue(std::string varName);
     std::string get_inputVariableStringValue(std::string varName);
@@ -39,7 +41,7 @@ private:
 
     // functions
     void reset();
-    bool checkConflictingOptions();
+    bool checkSetVarNamesForConflictingOptions();
 
     // class data members
     std::vector<inputVariable_info> inputVariableInfo;

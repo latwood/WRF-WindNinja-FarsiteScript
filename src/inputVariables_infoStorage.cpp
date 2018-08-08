@@ -11,7 +11,6 @@ inputVariables_infoStorage::inputVariables_infoStorage()
 
     // first setup all the needed stuff for the variables
     setupAvailableApplicationUseNames();
-    setupAvailableVariableCountAmounts();
     setupAvailableVariableCountTypes();
     setupAvailableVariables();
 
@@ -31,19 +30,9 @@ inputVariables_infoStorage::inputVariables_infoStorage()
         printf("invalid ordering of variables by application use name found during setup!\n");
         success = false;
     }
-    if(check_setupAllowableVariableCountAmounts() == false)
-    {
-        printf("invalid allowed count amount found during setup!\n");
-        success = false;
-    }
     if(check_setupForValidVariableCountTypes() == false)
     {
         printf("non-allowable count type found during setup!\n");
-        success = false;
-    }
-    if(check_setupConflictingVariables() == false)
-    {
-        printf("invalid conflicting variables found during setup!\n");
         success = false;
     }
     if(check_setupLoaderFunctionNames() == false)
@@ -108,79 +97,68 @@ void inputVariables_infoStorage::setupAvailableApplicationUseNames()
     allowedApplicationUseNames.push_back("createFarsiteInput");
 }
 
-void inputVariables_infoStorage::setupAvailableVariableCountAmounts()
-{
-    allowedVariableCountAmounts.push_back("single");
-    allowedVariableCountAmounts.push_back("multiple");
-}
-
 void inputVariables_infoStorage::setupAvailableVariableCountTypes()
 {
     // this is what will be used in the end, don't need to redefine the count types twice
-    allowedVariableCountTypes.push_back({"bool","single"});
-    allowedVariableCountTypes.push_back({"int","single"});
-    allowedVariableCountTypes.push_back({"double","single"});
-    allowedVariableCountTypes.push_back({"string","single"});
-    allowedVariableCountTypes.push_back({"filename","single"});
-    allowedVariableCountTypes.push_back({"date","single"});
-    allowedVariableCountTypes.push_back({"count","multiple"});
+    allowedVariableCountTypes.push_back("bool");
+    allowedVariableCountTypes.push_back("size_t");
+    allowedVariableCountTypes.push_back("int");
+    allowedVariableCountTypes.push_back("double");
+    allowedVariableCountTypes.push_back("string");
+    allowedVariableCountTypes.push_back("filename");
+    allowedVariableCountTypes.push_back("date");
+    allowedVariableCountTypes.push_back("count");
 }
 
 void inputVariables_infoStorage::addVariable(std::string newVariableName,std::string newApplicationUseName,std::string newVariableCountType,
-                                        std::vector<std::string> newConflictingVariables,std::string newLoaderFunctionName,std::string newVariableDescription)
+                                             std::string newLoaderFunctionName,std::string newVariableDescription)
 {
-    inputVariables.push_back(inputVariable_info(newVariableName,newApplicationUseName,newVariableCountType,newConflictingVariables,newLoaderFunctionName,newVariableDescription));
+    inputVariables.push_back(inputVariable_info(newVariableName,newApplicationUseName,newVariableCountType,newLoaderFunctionName,newVariableDescription));
 }
 
 void inputVariables_infoStorage::setupAvailableVariables()
 {
-    // add desired variables to be read from the config file. All these will be assumed to be required unless the conflicting options specify otherwise.
+    // add desired variables to be read from the config file. Set which will be optional or not through the verification in the checkSetVarNamesForConflictingOptions function in the inputVariablesHandler class.
     // whether all these variables are actually used by the program even though they are required; at least the names and counts are read by the input file,
     // is up to the programmer linking the input variables into the program for whether they will be used. But the load function name means that a warning will be given
     // if a variable is required as input but has no loading method. Still doesn't necessaily mean that it is used, but hopefully this makes deprecation a little less annoying.
 
-    /* delete this section when done */
-    // In fact, the basic needs for each input variable to even check for them are done for all variables, but whether they are even loaded in depends on if there is a load function for the data
-    // hmm, makes me realize I should add a function loader name and an is loaded boolean, that way a script can just load all the variables with case or if else checks
-    //  to see if the required load function is actually used or not. The end else would set the boolean. Hmm, that doesn't work in time to add as a displayed option to the user.
-    //  ahh, I know! keep the function loader name variable, but if it hits the else statement, a print statement saying variable is declared as a possible input, but has no loader function. Brilliant!
-    /* end section needing to delete */
-
     // one big problem with this is that it is tricky to keep it pretty when trying to add in all the stuff. Technically it isn't too bad yet, but especially the description!
     // Fortunately there are some parsing tricks applied using whitespace to hopefully clean up the format of the description so you only need to do a single string for description.
     // If that fails and warnings come a lot, might have to reprogram stuff and manually setup the format of the input variables. If so, wait till all variable names and descriptions
-    // are set or you'll be redoing changes a lot. Might be handy to eventually include a bool whether to use this smart whitespace formatting or not. Would still need whitespace, just not line breaks.
+    // are set or you'll be redoing changes a lot. Might be handy to eventually include a bool whether to use this smart whitespace formatting or not.
+    // Would still need whitespace, just not line breaks.
 
         // should have a section for each type of input variables, and include the type or use in the description
         // if you need more sections, define section in setupAvailableApplicationUseNames(). Define more types in setupAvailableVariableCountTypes().
         // just know that additional types will also need an additional load method and other input storage functions in other input classes
         // the variable names will be greatly dependent on the variable names used throughout the program as well as the loader/parser and variable storage classes
-        // conflicting options might evolve with time, but for now just specify each variable a given variable should not see defined alongside itself
+        // variables may be loaded or no, but to verify if optional or no, need to change verification in the checkSetVarNamesForConflictingOptions function in the inputVariablesHandler class.
 
         // WindNinja only variables
-    addVariable("diurnal_winds","WindNinja only","bool",{"NA"},"NA",
+    addVariable("diurnal_winds","WindNinja only","bool","NA",
                 "true or false; the dates, times, temperatures, and cloud covers will be autodetected from the WRF files by WindNinja");
-    addVariable("non_neutral_stability","WindNinja only","bool",{"NA"},"NA",
+    addVariable("non_neutral_stability","WindNinja only","bool","NA",
                 "true or false; the dates, times, temperatures, and cloud covers will be autodetected from the WRF files by WindNinja");
 
         // wrfGetWeather only variables
-    addVariable("weather_band_names","wrfGetWeather only","count",{"NA"},"load_weather_band_names",
+    addVariable("weather_band_names","wrfGetWeather only","count","load_weather_band_names",
                 "use gdalinfo on a few of the wrf files to see what band names are useful. Usual examples are like \"T10\"");
-    addVariable("use_firearea_average","wrfGetWeather only","bool",{"use_firearea_center"},"NA",
+    addVariable("use_firearea_average","wrfGetWeather only","bool","NA",
                 "true or false, use the average of all the weather data over the whole fire area or a single value at the center");
-    addVariable("use_firearea_center","wrfGetWeather only","bool",{"use_firearea_average"},"NA",
+    addVariable("use_firearea_center","wrfGetWeather only","bool","NA",
                 "true or false, use the center of the fire location or an average of all the weather data over the whole fire area");
 
         // wrfGetWeather and WindNinja variables
-    addVariable("wrf_files","wrfGetWeather and WindNinja","count",{"NA"},"load_wrf_files",
+    addVariable("wrf_files","wrfGetWeather and WindNinja","count","load_wrf_files",
                 "Hourly WRF files from 1 day before the FARSITE_BURN_START variable to the time set by the FARSITE_BURN_END variable");
 
         // createIgnition variables
-    addVariable("latlong_position","createIgnition","count",{"NA"},"load_latlong_position",
+    addVariable("latlong_position","createIgnition","count","load_latlong_position",
                 "create an ignition file using the following set of lat long positions, so there are a bunch of point sources and this is the first instance of the fire");
 
         // createFarsiteInput variables
-    addVariable("FARSITE_START_TIME","createFarsiteInput","date",{"NA"},"NA",
+    addVariable("FARSITE_START_TIME","createFarsiteInput","date","NA",
                 "date of the following format: month day hour. Is the start time for the farsite burn. Make sure wrf files cover at least a day before this date");
 
     // notice that these do NOT include all the possible variables for windninja and farsite, just the ones that will be changing a bunch.
@@ -278,29 +256,6 @@ bool inputVariables_infoStorage::check_setupForValidOrderingByApplicationUseName
     return success;
 }
 
-bool inputVariables_infoStorage::check_setupAllowableVariableCountAmounts()
-{
-    bool success = true;
-    for(size_t countTypeIdx = 0; countTypeIdx < allowedVariableCountTypes.size(); countTypeIdx++)
-    {
-        bool isValidCountAmount = false;
-        for(size_t countAmountIdx = 0; countAmountIdx < allowedVariableCountAmounts.size(); countAmountIdx++)
-        {
-            if(allowedVariableCountTypes[countTypeIdx].countAmount == allowedVariableCountAmounts[countAmountIdx])
-            {
-                isValidCountAmount = true;
-                break;
-            }
-        }
-        if(isValidCountAmount == false)
-        {
-            printf("variable count amount \"%s\" for variable count type \"%s\" is not a valid variable count amount!\n",allowedVariableCountTypes[countTypeIdx].countAmount.c_str(),allowedVariableCountTypes[countTypeIdx].countType.c_str());
-            success = false;
-        }
-    }
-    return success;
-}
-
 bool inputVariables_infoStorage::check_setupForValidVariableCountTypes()
 {
     bool success = true;
@@ -309,7 +264,7 @@ bool inputVariables_infoStorage::check_setupForValidVariableCountTypes()
         bool isValidType = false;
         for(size_t countTypeIdx = 0; countTypeIdx < allowedVariableCountTypes.size(); countTypeIdx++)
         {
-            if(inputVariables[varIdx].get_variableCountType() == allowedVariableCountTypes[countTypeIdx].countType)
+            if(inputVariables[varIdx].get_variableCountType() == allowedVariableCountTypes[countTypeIdx])
             {
                 isValidType = true;
                 break;
@@ -324,68 +279,20 @@ bool inputVariables_infoStorage::check_setupForValidVariableCountTypes()
     return success;
 }
 
-//make sure each conflicting option really does exist as a variable name
-bool inputVariables_infoStorage::check_setupConflictingVariables()
-{
-    bool success = true;
-    for(size_t firstVarIdx = 0; firstVarIdx < inputVariables.size(); firstVarIdx++)
-    {
-        std::vector<std::string> currentConflictingVariables = inputVariables[firstVarIdx].get_conflictingVariables();
-        for(size_t conflictVarIdx = 0; conflictVarIdx < currentConflictingVariables.size(); conflictVarIdx++)
-        {
-            if(currentConflictingVariables[conflictVarIdx] == "NA")
-            {
-                if(currentConflictingVariables.size() > 1)
-                {
-                    printf("variable \"%s\" has conflicting variable \"NA\" but size is not 1!\n",inputVariables[firstVarIdx].get_variableName().c_str());
-                    success = false;
-                    break;
-                }
-            } else if(inputVariables[firstVarIdx].get_variableName() == currentConflictingVariables[conflictVarIdx])
-            {
-                printf("variable \"%s\" specified it's own name as a conflicting variable!\n",inputVariables[firstVarIdx].get_variableName().c_str());
-                success = false;
-            } else
-            {
-                // go through all variables to see if conflicting option exists as one of the other variable names
-                bool foundVariableName = false;
-                for(size_t secondvarIdx = 0; secondvarIdx < inputVariables.size(); secondvarIdx++)
-                {
-                    if(secondvarIdx != firstVarIdx)
-                    {
-                        if(currentConflictingVariables[conflictVarIdx] == inputVariables[secondvarIdx].get_variableName())
-                        {
-                            foundVariableName = true;
-                            break;
-                        }
-                    }
-                }
-                if(foundVariableName == false)
-                {
-                    printf("conflicting option \"%s\" for variable \"%s\" does not exist as another variable name!\n",currentConflictingVariables[conflictVarIdx].c_str(),inputVariables[firstVarIdx].get_variableName().c_str());
-                    success = false;
-                }
-            }
-        }
-    }
-    return success;
-}
-
 bool inputVariables_infoStorage::check_setupLoaderFunctionNames()
 {
     bool success = true;
 
     // can't tell if loader functions are valid in that they will be used or not at this point,
-    // but can make sure that if the variableCountTypeAmount is "single" for a given configVariable, that the loaderFunctionName is set to "NA"
-    // can also check to make that if the variableCountTypeAmount is "multiple" for a given configVariable, that the loaderFunctionName is not "" or whitespace
+    // but can make sure that if the variableCountTypeAmount is for a single value (anything but a type "count") for a given configVariable, that the loaderFunctionName is set to "NA"
+    // can also check to make that if the variableCountTypeAmount is a "count" for a given configVariable, that the loaderFunctionName is not "" or whitespace
     // or is a duplicate of another loader function name
-    /* does the single or multiple even matter? In the end you have to make a loader function or method for each countType, so technically the loader already knows whether it is single or multiple. I guess I will find out when I get that far, and if this is true, going to get rid of that part of all this */
     for(size_t varIdx = 0; varIdx < inputVariables.size(); varIdx++)
     {
         // first need to find which of the allowedVariableCountTypes the variableCountType is to get access to the right variableCountTypeAmount
         // because this action is repeated in other places, it was turned into a function
-        std::string currentCountAmount = findCountAmountFromCountType(inputVariables[varIdx].get_variableCountType());
-        if(currentCountAmount == "single")
+        std::string currentCountType = inputVariables[varIdx].get_variableCountType();
+        if(currentCountType != "count")
         {
             if(inputVariables[varIdx].get_loaderFunctionName() != "NA")
             {
@@ -393,7 +300,7 @@ bool inputVariables_infoStorage::check_setupLoaderFunctionNames()
                 success = false;
             }
         }
-        if(currentCountAmount == "multiple")
+        if(currentCountType == "count")
         {
             if(inputVariables[varIdx].get_loaderFunctionName() == "NA")
             {
@@ -567,18 +474,3 @@ void inputVariables_infoStorage::calculate_maxVarNameColumnWhitespace()
     }
 }
 /*** end description whitespace and line break calculations, with error checking ***/
-
-/*** utility functions ***/
-std::string inputVariables_infoStorage::findCountAmountFromCountType(std::string availableCountType)
-{
-    for(size_t countTypeIdx = 0; countTypeIdx < allowedVariableCountTypes.size(); countTypeIdx++)
-    {
-        if(availableCountType == allowedVariableCountTypes[countTypeIdx].countType)
-        {
-            return allowedVariableCountTypes[countTypeIdx].countAmount;
-        }
-    }
-    printf("!!!Error! Couldn't find count amount from count type \"%s\"!\n",availableCountType.c_str());
-    exit(1);
-}
-/*** end utilty functions ***/

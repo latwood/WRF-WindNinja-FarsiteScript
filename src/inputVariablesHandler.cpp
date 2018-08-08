@@ -52,8 +52,8 @@ bool inputVariablesHandler::loadScriptInputs(std::string inputFileName)
         success = false;
     }
 
-    //check conflicting and stop and warn for all conflicts
-    if(checkConflictingOptions() == false)
+    //check for conflicting options and stop and warn for all conflicts
+    if(checkSetVarNamesForConflictingOptions() == false)
     {
         printf("found conflicting options!\n");
         success = false;
@@ -69,9 +69,51 @@ bool inputVariablesHandler::loadScriptInputs(std::string inputFileName)
             printf("problem loading inputs!\n");
             success = false;
         }
+        // comment this out unless debugging
+        printFoundInput();
     }
 
     return success;
+}
+
+void inputVariablesHandler::printFoundInput()
+{
+    printf("\nprinting found input\n\n");
+    for(size_t varIdx = 0; varIdx < inputVariableInfo.size(); varIdx++)
+    {
+        std::string currentVarName = inputVariableInfo[varIdx].get_variableName();
+        std::string currentCountType = inputVariableInfo[varIdx].get_variableCountType();
+        if(currentCountType == "bool")
+        {
+            printf("%s: %d\n",currentVarName.c_str(),get_inputVariableBoolValue(currentVarName));
+        } else if(currentCountType == "size_t")
+        {
+            printf("%s: %zu\n",currentVarName.c_str(),get_inputVariableSize_tValue(currentVarName));
+        } else if(currentCountType == "int")
+        {
+            printf("%s: %d\n",currentVarName.c_str(),get_inputVariableIntValue(currentVarName));
+        } else if(currentCountType == "double")
+        {
+            printf("%s: %f\n",currentVarName.c_str(),get_inputVariableDoubleValue(currentVarName));
+        } else if(currentCountType == "string")
+        {
+            printf("%s: %s\n",currentVarName.c_str(),get_inputVariableStringValue(currentVarName).c_str());
+        } else if(currentCountType == "filename")
+        {
+            printf("%s: %s\n",currentVarName.c_str(),get_inputVariableFilenameValue(currentVarName).c_str());
+        } else if(currentCountType == "date")
+        {
+            printf("%s: %d %d %d %d %d\n",currentVarName.c_str(),get_inputVariableDateValueYear(currentVarName),get_inputVariableDateValueMonth(currentVarName),get_inputVariableDateValueDay(currentVarName),get_inputVariableDateValueHour(currentVarName),get_inputVariableDateValueMinute(currentVarName));
+        } else if(currentCountType == "count")
+        {
+            // hm, this function is revealing the complexities and confusingness of even more input stuff
+            // do I try to repeat all the rest of the inputs checking that WindNinja and Farsite do?
+        } else
+        {
+            printf("count type \"%s\" for variable \"%s\" has not been implemented in the code yet!\n",currentCountType.c_str(),currentVarName.c_str());
+        }
+    }
+    printf("\nfinished printing found input\n\n");
 }
 /*** end  functions ***/
 
@@ -79,6 +121,11 @@ bool inputVariablesHandler::loadScriptInputs(std::string inputFileName)
 bool inputVariablesHandler::get_inputVariableBoolValue(std::string varName)
 {
     return inputVariableValues.get_inputVariableBoolValue(varName);
+}
+
+size_t inputVariablesHandler::get_inputVariableSize_tValue(std::string varName)
+{
+    return inputVariableValues.get_inputVariableSize_tValue(varName);
 }
 
 int inputVariablesHandler::get_inputVariableIntValue(std::string varName)
@@ -154,38 +201,12 @@ void inputVariablesHandler::reset()
 }
 
 // I think super slow cause have to go through every single variable multiple times
-bool inputVariablesHandler::checkConflictingOptions()
+bool inputVariablesHandler::checkSetVarNamesForConflictingOptions()
 {
     bool success = true;
 
-    // go through each variable, then through each conflicting option for each variable, find variable with name matching each conflicting option
-    // and verify bool for said variable for if it is found in input is not true
-    for(size_t firstVarIdx = 0; firstVarIdx < inputVariableInfo.size(); firstVarIdx++)
-    {
-        if(inputVariableInfo[firstVarIdx].get_conflictingVariables()[0] != "NA" && inputVariableInfo[firstVarIdx].get_isFoundInInputFile() == true)
-        {
-            for(size_t conflictVarIdx = 0; conflictVarIdx < inputVariableInfo[firstVarIdx].get_conflictingVariables().size(); conflictVarIdx++)
-            {
-                for(size_t secondVarIdx = 0; secondVarIdx < inputVariableInfo.size(); secondVarIdx++)
-                {
-                    if(firstVarIdx != secondVarIdx)
-                    {
-                        if(inputVariableInfo[firstVarIdx].get_conflictingVariables()[conflictVarIdx] == inputVariableInfo[secondVarIdx].get_variableName())
-                        {
-                            if(inputVariableInfo[secondVarIdx].get_isFoundInInputFile() == true)
-                            {
-                                // hm, don't actually need doesOptionConflict boolean! All this goes in one step without quitting till all conflicting options are checked
-                                // I guess let's finish all the input parsing and stuff before throwing out said variable to make sure everything works
-                                inputVariableInfo[firstVarIdx].set_doesVariableConflict(true);
-                                inputVariableInfo[secondVarIdx].set_doesVariableConflict(true);
-                                printf("variables \"%s\" and \"%s\" found in input file when only one is allowed!\n",inputVariableInfo[firstVarIdx].get_variableName().c_str(),inputVariableInfo[secondVarIdx].get_variableName().c_str());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+    // setup whatever you need to set if input variables are optional or not, or how they are optional or required
+
 
     return success;
 }

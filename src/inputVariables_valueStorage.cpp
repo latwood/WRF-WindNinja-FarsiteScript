@@ -31,6 +31,10 @@ void inputVariables_valueStorage::resetVariables()
     {
         boolValues[boolVarIdx].variableValue = defaultBoolValue;
     }
+    for(size_t size_tVarIdx = 0; size_tVarIdx < size_tValues.size(); size_tVarIdx++)
+    {
+        size_tValues[size_tVarIdx].variableValue = defaultSize_tValue;
+    }
     for(size_t intVarIdx = 0; intVarIdx < intValues.size(); intVarIdx++)
     {
         intValues[intVarIdx].variableValue = defaultIntValue;
@@ -102,6 +106,30 @@ bool inputVariables_valueStorage::set_inputVariableBoolValue(std::string varName
     return success;
 }
 
+bool inputVariables_valueStorage::set_inputVariableSize_tValue(std::string varName, size_t newSize_tValue)
+{
+    bool success = true;
+
+    bool foundVarName = false;
+    for(size_t varIdx = 0; varIdx < size_tValues.size(); varIdx++)
+    {
+        if(size_tValues[varIdx].variableName == varName)
+        {
+            size_tValues[varIdx].variableValue = newSize_tValue;
+            foundVarName = true;
+            break;
+        }
+    }
+
+    if(foundVarName == false)
+    {
+        printf("could not set size_t value \"%zu\" for variable name \"%s\", variableName \%s\" does not exist in size_t value storage!",newSize_tValue,varName.c_str(),varName.c_str());
+        success = false;
+    }
+
+    return success;
+}
+
 bool inputVariables_valueStorage::set_inputVariableIntValue(std::string varName, int newIntValue)
 {
     bool success = true;
@@ -125,6 +153,7 @@ bool inputVariables_valueStorage::set_inputVariableIntValue(std::string varName,
 
     return success;
 }
+
 bool inputVariables_valueStorage::set_inputVariableDoubleValue(std::string varName, double newDoubleValue)
 {
     bool success = true;
@@ -254,6 +283,30 @@ bool inputVariables_valueStorage::get_inputVariableBoolValue(std::string varName
     if(foundVarName == false)
     {
         printf("could not get bool value for variable name \"%s\", variableName \%s\" does not exist in bool value storage!",varName.c_str(),varName.c_str());
+        exit(1);
+    }
+
+    return outputValue;
+}
+
+size_t inputVariables_valueStorage::get_inputVariableSize_tValue(std::string varName)
+{
+    size_t outputValue = defaultSize_tValue;
+
+    bool foundVarName = false;
+    for(size_t varIdx = 0; varIdx < size_tValues.size(); varIdx++)
+    {
+        if(size_tValues[varIdx].variableName == varName)
+        {
+            outputValue = size_tValues[varIdx].variableValue;
+            foundVarName = true;
+            break;
+        }
+    }
+
+    if(foundVarName == false)
+    {
+        printf("could not get size_t value for variable name \"%s\", variableName \%s\" does not exist in size_t value storage!",varName.c_str(),varName.c_str());
         exit(1);
     }
 
@@ -522,6 +575,9 @@ bool inputVariables_valueStorage::sortInputVariableInfo()
         if(inputVariableInfo[varIdx].get_variableCountType() == "bool")
         {
             boolValues.push_back({inputVariableInfo[varIdx].get_variableName(),defaultBoolValue});
+        } else if(inputVariableInfo[varIdx].get_variableCountType() == "size_t")
+        {
+            size_tValues.push_back({inputVariableInfo[varIdx].get_variableName(),defaultSize_tValue});
         } else if(inputVariableInfo[varIdx].get_variableCountType() == "int")
         {
             intValues.push_back({inputVariableInfo[varIdx].get_variableName(),defaultIntValue});
@@ -539,21 +595,7 @@ bool inputVariables_valueStorage::sortInputVariableInfo()
             dateValues.push_back({inputVariableInfo[varIdx].get_variableName(),defaultYearValue,defaultMonthValue,defaultDayValue,defaultHourValue,defaultMinuteValue});
         } else if(inputVariableInfo[varIdx].get_variableCountType() == "count")
         {
-            /* wait, probably don't even need to do anything in this section, the names won't be important for this section.
-             * Unless of coarse all count related data types also get defined to have a variable name, which is not a very bad idea */
-            /*// now need to filter through and setup all the loader functions
-            if(inputVariableInfo[varIdx].get_loaderFunctionName() == "load_wrf_files")
-            {
-                if(load_wrf_files() == false)
-                {
-                    printf("failed to run load_wrf_files loader function during input parsing!\n");
-                    success = false;
-                }
-            } else
-            {
-                printf("loader function \"%s\" for variable \"%s\" which has countType \"count\" has not been implemented yet!\n",inputVariableInfo[varIdx].get_loaderFunctionName().c_str(),inputVariableInfo[varIdx].get_variableName().c_str());
-                success = false;
-            }*/
+            // nothing needed here as far as I can tell, at least as far as I can tell
         } else
         {
             printf("count type \"%s\" for variable \"%s\" has not implemented in code yet!",inputVariableInfo[varIdx].get_variableCountType().c_str(),inputVariableInfo[varIdx].get_variableName().c_str());

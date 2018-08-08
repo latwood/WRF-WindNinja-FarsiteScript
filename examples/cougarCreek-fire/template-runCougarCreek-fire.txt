@@ -1,0 +1,53 @@
+######################
+######## basic idea here is I need to figure out what inputs are necessary and what format they need to have
+####  So list out all the required and optional inputs and figure out their format and dependencies or if optional, what would need to be checked against
+
+
+### WindNinja only variables
+
+# diurnal_winds is true or false, no dependencies
+diurnal_winds: true
+
+# non_neutral_stability is true or false, no dependencies
+non_neutral_stability: true
+
+
+
+### wrfGetWeather only variables
+
+# weather_band_names are string names for the needed bands in the wrf files, no dependencies
+weather_band_names: 1
+T10
+
+# use_firearea_average is true or false, choose only one: use_firearea_average or use_firearea_center
+use_firearea_average: true
+# use fire_area_center is true or false, choose only one: use_firearea_average or use_firearea_center
+use_firearea_center: false
+
+
+
+### wrfGetWeather and WindNinja variables
+
+# wrf_files are paths to each of the wrf files, dates verified against the start and end simulation dates, no dependencies
+wrf_files: 2
+/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/WRFdata/wrfout_d3.2015080912/wrfout_d3.2015080912.f12.0000
+/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/WRFdata/wrfout_d3.2015080912/wrfout_d3.2015080912.f13.0000
+
+
+
+### createIgnition variables
+
+# latlong_position is a list of desired lat long positions for an ignition from one or more point sources
+latlong_position: 1
+46.134 -121.374
+
+
+
+### createFarsiteInput variables
+
+# start_date is like FARSITE_START_TIME but it includes a full date and is used to get and compare times across everything as the ignition start time
+start_date: 2015 08 11 12 00
+
+# FARSITE_START_TIME will end up gone replaced by start_date
+FARSITE_START_TIME: 04 26 1200
+

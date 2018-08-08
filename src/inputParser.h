@@ -24,14 +24,15 @@ public:
 private:
 
     // parsing utility functions
-    bool doesFileExist(std::string fileName);
+    bool doesFileExist(std::string fileName, bool suppressWarnings);
     void removeLeadingWhitespace(std::string &inputString);
     void removeEndingWhitespace(std::string &inputString);
     void removeSeparator(std::string &inputString, std::string &varNamePart);   // returns varName and whatever is to the right of the separator
-    bool variableNameAndCountFinder(std::ifstream &inputFile, std::string varName, std::string &varCountString, size_t &varNameLine);
+    bool variableNameAndCountFinder(std::ifstream &inputFile, std::string varName, std::string &varCountString, size_t &varNameLine);   // might not need varNameLine after all :)
 
     // typechecker functions
     bool isBool(std::string inputString);
+    bool isSize_t(std::string inputString);
     bool isInt(std::string inputString);
     bool isDlb(std::string inputString);
     bool isPureString(std::string inputString);
@@ -40,12 +41,13 @@ private:
 
     // type conversion functions
     bool strToBool(std::string inputString, bool &conversionSuccess);
+    size_t strToSize_t(std::string inputString, bool &conversionSuccess);
     int strToInt(std::string inputString, bool &conversionSuccess);
     double strToDbl(std::string inputString, bool &conversionSuccess);
     bool strToDate(std::string inputString, int &currentYear, int &currentMonth, int &currentDay, int &currentHour, int &currentMinute);
 
     // type count loader functions
-    bool load_wrf_files(std::ifstream &inputFile, int varCount, size_t varNameLine);
+    bool load_wrf_files(std::ifstream &inputFile, size_t varCount, size_t varNameLine);
 
     // class related data members
     inputVariables_valueStorage* inputVariableValueStorage;
@@ -64,7 +66,6 @@ private:
         int minute_max = 59;
     };
     dateInfo validDates;
-
 
 };
 

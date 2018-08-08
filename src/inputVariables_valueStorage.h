@@ -30,6 +30,7 @@ public:
 
     // set variable value functions
     bool set_inputVariableBoolValue(std::string varName, bool newBoolValue);
+    bool set_inputVariableSize_tValue(std::string varName, size_t newSize_tValue);
     bool set_inputVariableIntValue(std::string varName, int newIntValue);
     bool set_inputVariableDoubleValue(std::string varName, double newDoubleValue);
     bool set_inputVariableStringValue(std::string varName, std::string newStringValue);
@@ -42,6 +43,7 @@ public:
 
     // get variable value functions
     bool get_inputVariableBoolValue(std::string varName);
+    size_t get_inputVariableSize_tValue(std::string varName);
     int get_inputVariableIntValue(std::string varName);
     double get_inputVariableDoubleValue(std::string varName);
     std::string get_inputVariableStringValue(std::string varName);
@@ -72,6 +74,15 @@ private:
     };
     bool defaultBoolValue = false;
     std::vector<boolValue> boolValues;
+
+    // size_t variable value struct and vector of this struct
+    struct size_tValue
+    {
+        std::string variableName;
+        size_t variableValue;
+    };
+    size_t defaultSize_tValue = 0;
+    std::vector<size_tValue> size_tValues;
 
     // int variable value struct and vector of this struct
     struct intValue

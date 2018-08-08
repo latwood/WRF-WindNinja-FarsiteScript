@@ -25,7 +25,7 @@ bool inputParser::findVariableNames(std::string inputFileName)
 
     std::ifstream fzInput;   // input file stream, using pointer to a FILE was not accepted by std::getline
     // run does file exist function on inputFileName. If not, warning is in function so exit. If so, open this input file as the file to pass around to all the loader functions
-    if(doesFileExist(inputFileName) == false)
+    if(doesFileExist(inputFileName,false) == false)
     {
         printf("failed to open input file!\n");
         success = false;
@@ -48,7 +48,7 @@ bool inputParser::findVariableNames(std::string inputFileName)
             if(variableNameAndCountFinder(fzInput,currentVarName,currentVarCountString,varNameLine) == true)
             {
                 inputVariablesInfo[varIdx].set_isFoundInInputFile(true);
-            }
+            }   // no else, cause this lets all be optional. The checkSetVarNamesForConflictingOptions function in inputVariablesHandler is for actually choosing if is optional or not
         }
     }
 
@@ -66,7 +66,7 @@ bool inputParser::loadAllInputs(std::string inputFileName)
 
     std::ifstream fzInput;  // input file stream, using pointer to a FILE was not accepted by std::getline
     // run does file exist function on inputFileName. If not, warning is in function so exit. If so, open this input file as the file to pass around to all the loader functions
-    if(doesFileExist(inputFileName) == false)
+    if(doesFileExist(inputFileName,false) == false)
     {
         printf("failed to open input file!\n");
         success = false;
@@ -102,6 +102,14 @@ bool inputParser::loadAllInputs(std::string inputFileName)
                         if(conversionSuccess == false || inputVariableValueStorage->set_inputVariableBoolValue(currentVarName,currentVarCount) == false)
                         {
                             printf("couldn't set bool value \"%d\" to variable \"%s\"!\n",currentVarCount,currentVarName.c_str());
+                            success = false;
+                        }
+                    } else if(currentCountType == "size_t")
+                    {
+                        size_t currentVarCount = strToSize_t(currentVarCountString,conversionSuccess);
+                        if(conversionSuccess == false || inputVariableValueStorage->set_inputVariableSize_tValue(currentVarName,currentVarCount) == false)
+                        {
+                            printf("couldn't set size_t value \"%zu\" to variable \"%s\"!\n",currentVarCount,currentVarName.c_str());
                             success = false;
                         }
                     } else if(currentCountType == "int")
@@ -154,10 +162,10 @@ bool inputParser::loadAllInputs(std::string inputFileName)
                         // a side effect of the variableNameAndCountFinder function is that it left with a getline of the last location, the variable name line
                         // so the loader functions should just be able to continue on reading the input file where that function left off
                         std::string currentLoaderFunction = inputVariablesInfo[varIdx].get_loaderFunctionName();
-                        int currentVarCount = strToInt(currentVarCountString,conversionSuccess);
+                        size_t currentVarCount = strToSize_t(currentVarCountString,conversionSuccess);
                         if(conversionSuccess == false)
                         {
-                            printf("variable count value \"%s\" for variable \"%s\" of count type \"count\" is not an int!\n",currentVarCountString.c_str(),currentVarName.c_str());
+                            printf("variable count value \"%s\" for variable \"%s\" of count type \"count\" is not a size_t type!\n",currentVarCountString.c_str(),currentVarName.c_str());
                             success = false;
                         } else
                         {
@@ -198,12 +206,12 @@ bool inputParser::loadAllInputs(std::string inputFileName)
 
 
 /*** parsing utility functions ***/
-bool inputParser::doesFileExist(std::string fileName)
+bool inputParser::doesFileExist(std::string fileName, bool suppressWarnings)
 {
     bool success = true;
 
     FILE *fzTemp = fopen(fileName.c_str(),"r");    // use "w" for write
-    if( fzTemp == NULL )
+    if( fzTemp == NULL && suppressWarnings == false)
     {
         printf("file \"%s\" could not be opened!\n",fileName.c_str());
         success = false;
@@ -298,13 +306,6 @@ bool inputParser::variableNameAndCountFinder(std::ifstream &inputFile, std::stri
         lineCount = lineCount + 1;
     }
 
-    // normally would have some kind of foundVarName bool checker, but since some variables can be optional, that isn't necessary here
-    // hmm, conflicting options checker is NOT enough to verify if all the variables were filled as needed.
-    // Maybe should add an optional tag, so a fill checker first sees if included, if no, is optional?, if is optional, would option conflict?
-    // So need an additional would option conflict function. Maybe this could be the original does option conflict function?
-    // no cause fill checker should say if yes is included, does option conflict? So I guess I was right all along that the conflicting options function should just fill booleans,
-    // or that should be when the does option conflict function needs called, not in between other spots
-
     return foundVar;
 }
 /*** end parsing utility functions ***/
@@ -326,6 +327,38 @@ bool inputParser::isBool(std::string inputString)
     } else
     {
         conversionSuccess = false;
+    }
+
+    return conversionSuccess;
+}
+
+bool inputParser::isSize_t(std::string inputString)
+{
+    bool conversionSuccess = true;
+
+    removeLeadingWhitespace(inputString);   // just in case
+    removeEndingWhitespace(inputString);    // just in case
+
+    size_t digitCounter = 0;
+    for(size_t charIdx = 0; charIdx < inputString.length(); charIdx++)
+    {
+        std::string currentChr = inputString.substr(charIdx,1);
+        if(currentChr >= "0" || currentChr <= "9")
+        {
+            digitCounter = digitCounter + 1;
+        } else
+        {
+            conversionSuccess = false; // only numbers allowed at this point
+            break;
+        }
+    }
+
+    if(conversionSuccess == true)
+    {
+        if(digitCounter <= 0)
+        {
+            conversionSuccess = false;  // got to this point somehow, but there wasn't actually any number stuff in the string
+        }
     }
 
     return conversionSuccess;
@@ -475,7 +508,7 @@ bool inputParser::isValidFilename(std::string inputString)
     } else
     {
         // now see if it can open as a filename
-        if(doesFileExist(inputString) == false)
+        if(doesFileExist(inputString,true) == false)
         {
             conversionSuccess = false;
         }
@@ -559,6 +592,26 @@ bool inputParser::strToBool(std::string inputString, bool &conversionSuccess)
     {
         conversionSuccess = false;
         printf("inputString \"%s\" is not a bool value!\n",inputString.c_str());
+    }
+
+    return outputValue;
+}
+
+size_t inputParser::strToSize_t(std::string inputString, bool &conversionSuccess)
+{
+    size_t outputValue = 0;
+    conversionSuccess = true;
+
+    removeLeadingWhitespace(inputString);   // just in case
+    removeEndingWhitespace(inputString);    // just in case
+
+    if(isSize_t(inputString) == true)
+    {
+        outputValue = atoi(inputString.c_str());
+    } else
+    {
+        conversionSuccess = false;
+        printf("inputString \"%s\" is not a size_t value!\n",inputString.c_str());
     }
 
     return outputValue;
@@ -672,7 +725,7 @@ bool inputParser::strToDate(std::string inputString, int &currentYear, int &curr
 /*** end type conversion functions ***/
 
 /*** type count loader functions ***/
-bool inputParser::load_wrf_files(std::ifstream &inputFile, int varCount, size_t varNameLine)
+bool inputParser::load_wrf_files(std::ifstream &inputFile, size_t varCount, size_t varNameLine)
 {
     bool success = true;
 
