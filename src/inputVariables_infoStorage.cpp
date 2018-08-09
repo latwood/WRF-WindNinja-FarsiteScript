@@ -90,11 +90,15 @@ void inputVariables_infoStorage::setupAvailableApplicationUseNames()
 {
     // the idea is that each variable is used for different things, and when explaining uses, it is handy to show the applications they are for
     // other functions will verify that the setupAvailableVariables() function only used these types and that they were specified in order of application type, so in this order :)
+    allowedApplicationUseNames.push_back("application specific input");
+    allowedApplicationUseNames.push_back("lcpDownloader");
+    allowedApplicationUseNames.push_back("createIgnition");
+    allowedApplicationUseNames.push_back("wrfGetWeather and WindNinja");
     allowedApplicationUseNames.push_back("WindNinja only");
     allowedApplicationUseNames.push_back("wrfGetWeather only");
-    allowedApplicationUseNames.push_back("wrfGetWeather and WindNinja");
-    allowedApplicationUseNames.push_back("createIgnition");
     allowedApplicationUseNames.push_back("createFarsiteInput");
+    allowedApplicationUseNames.push_back("debugging related");
+    allowedApplicationUseNames.push_back("optional WindNinja output settings");
 }
 
 void inputVariables_infoStorage::setupAvailableVariableCountTypes()
@@ -104,9 +108,17 @@ void inputVariables_infoStorage::setupAvailableVariableCountTypes()
     allowedVariableCountTypes.push_back("size_t");
     allowedVariableCountTypes.push_back("int");
     allowedVariableCountTypes.push_back("double");
+    allowedVariableCountTypes.push_back("positive double");
+    allowedVariableCountTypes.push_back("signless percent");
     allowedVariableCountTypes.push_back("string");
-    allowedVariableCountTypes.push_back("filename");
+    allowedVariableCountTypes.push_back("filepath");
+    allowedVariableCountTypes.push_back("lcp filename");
+    allowedVariableCountTypes.push_back("shape filename");
+    allowedVariableCountTypes.push_back("lat");
+    allowedVariableCountTypes.push_back("long");
+    allowedVariableCountTypes.push_back("lat_long_point");
     allowedVariableCountTypes.push_back("date");
+    allowedVariableCountTypes.push_back("hour_min");
     allowedVariableCountTypes.push_back("count");
 }
 
@@ -129,37 +141,226 @@ void inputVariables_infoStorage::setupAvailableVariables()
     // are set or you'll be redoing changes a lot. Might be handy to eventually include a bool whether to use this smart whitespace formatting or not.
     // Would still need whitespace, just not line breaks.
 
+    // an interesting thing is that the strings need additional and very specific verification, kind of like the loader functions.
+    // So if adding a string value usually turn it into a separate type
+    // but if that is not possible, just do the verification a bit later
+
         // should have a section for each type of input variables, and include the type or use in the description
         // if you need more sections, define section in setupAvailableApplicationUseNames(). Define more types in setupAvailableVariableCountTypes().
         // just know that additional types will also need an additional load method and other input storage functions in other input classes
         // the variable names will be greatly dependent on the variable names used throughout the program as well as the loader/parser and variable storage classes
         // variables may be loaded or no, but to verify if optional or no, need to change verification in the checkSetVarNamesForConflictingOptions function in the inputVariablesHandler class.
 
-        // WindNinja only variables
-    addVariable("diurnal_winds","WindNinja only","bool","NA",
-                "true or false; the dates, times, temperatures, and cloud covers will be autodetected from the WRF files by WindNinja");
-    addVariable("non_neutral_stability","WindNinja only","bool","NA",
-                "true or false; the dates, times, temperatures, and cloud covers will be autodetected from the WRF files by WindNinja");
+        // application specific variables
+    addVariable("createInputs_path","application specific input","filepath","NA",
+                "The path where files created by createIgnitions, WindNinja, wrfGetWeather, and createFarsiteInputs go. "
+                "createInputs folder Will contain separate folders for each of these outputs");
+    addVariable("finalOutput_path","application specific input","filepath","NA",
+                "The path where farsite run outputs will be generated");
+    addVariable("overwrite_past_outputs","application specific input","bool","NA",
+                "A boolean specifying whether the output files found in createdInputs and finalOutputs folders should be overwritten. "
+                "If these output folders exist in createInputs_path or finalOutputs_path and overwrite_past_outputs is true, folders aren't deleted, "
+                "just if names are the same they will be overwritten. If overwrite_past_outputs is false and these folders exist, "
+                "a search for either createInputs-# or finalOutputs-# will determine the highest # value, add one to it, and use that as the new output. "
+                "Default value is false");
+    addVariable("createIgnition_output_units","application specific input","string","NA",
+                "A string specifying the types of units to be used by all files outputted by createIgnitions during the script. "
+                "Values can be english, metric, or input where input is the default value");
+    addVariable("wrfGetWeather_output_units","application specific input","string","NA",
+                "A string specifying the types of units to be used by all files outputted by wrfGetWeather during the script. "
+                "Values can be english, or metric where metric is the default value");
+    addVariable("WindNinja_required_output_units","application specific input","string","NA",
+                "A string specifying the types of units to be used by all files required for later use outputted by WindNinja during the script. "
+                "Values can be english or metric where metric is the default value. output_wind_height is 20 ft for english and 10 m for metric");
+    addVariable("farsite_output_units","application specific input","string","NA",
+                "A string specifying the types of units to be used by all files output by farsite at the very end. "
+                "I suspect this isn't actually allowable yet, so it might just be whatever units are used coming in, or default to english, but we shall see. "
+                "Values can be english or metric");
+    addVariable("use_native_timezone_for_WindNinja_to_final","application specific input","bool","NA",
+                "A boolean specifying whether the timezone should be native to the area or GMT for all created inputs and final output files. "
+                "Default is false so that the GMT timezone is used by default");
 
-        // wrfGetWeather only variables
-    addVariable("weather_band_names","wrfGetWeather only","count","load_weather_band_names",
-                "use gdalinfo on a few of the wrf files to see what band names are useful. Usual examples are like \"T10\"");
-    addVariable("use_firearea_average","wrfGetWeather only","bool","NA",
-                "true or false, use the average of all the weather data over the whole fire area or a single value at the center");
-    addVariable("use_firearea_center","wrfGetWeather only","bool","NA",
-                "true or false, use the center of the fire location or an average of all the weather data over the whole fire area");
-
-        // wrfGetWeather and WindNinja variables
-    addVariable("wrf_files","wrfGetWeather and WindNinja","count","load_wrf_files",
-                "Hourly WRF files from 1 day before the FARSITE_BURN_START variable to the time set by the FARSITE_BURN_END variable");
+        // lcp download variables (WindNinja related)
+    addVariable("automate_lcp_download","lcpDownloader","bool","NA",
+                "A boolean to know whether the lcp should follow automated features for downloading. "
+                "lcp_download_to_fire_perim_scale_factor is used to increase the lcp bounding box size by a multiple of the largest ignition fire perimeter. "
+                "Only one of automate_lcp_download, use_past_lcp, and specify_lcp_download can be true and the default to be true if none are specified is automate_lcp_download");
+    addVariable("lcp_download_to_fire_perim_scale_factor","lcpDownloader","size_t","NA",
+                "A positive integer y used as a scaling factor for the lcp bounding box to make it x*y bigger than the largest ignition fire perimeter, "
+                "where x is 200 for ignitions that are basically a single point and 200 for all other ignitions. Default value for y is 1 if not specified "
+                "and should only be specified if automate_lcp_download is set to true");
+    addVariable("use_past_lcp","lcpDownloader","bool","NA",
+                "A boolean to know whether lcp downloading should be avoided by using an already predownloaded lcp file. "
+                "If this is true, need to also specify lcp_file_path. Only one of automate_lcp_download, use_past_lcp, "
+                "and specify_lcp_download can be true and the default to be true if none are specified is automate_lcp_download");
+    addVariable("lcp_file_path","lcpDownloader","lcp filename","NA",
+                "A path to a predownloaded lcp file to use instead of downloading a new one. Use if use_past_lcp set to true. "
+                "File name extension is verified to be .lcp and file is verified to be openable by gdal. Second file with same path and name "
+                "but .prj extension is also verified to exist. Specify only if use_past_lcp is set to true");
+    addVariable("specify_lcp_download","lcpDownloader","bool","NA",
+                "For doing a WindNinja style lat/long point and buffer zone or lat/long box lcp download. "
+                "If this is true, need to specify all the following: lcp_download_lat_long_point, lcp_download_northsouth_buffer, "
+                "lcp_download_westeast_buffer, lcp_download_buffer_units OR lcp_download_north_lat_bound, lcp_download_south_lat_bound, "
+                "lcp_download_east_long_bound, lcp_download_west_long_bound. Only one of automate_lcp_download, use_past_lcp, "
+                "and specify_lcp_download can be true and the default to be true if none are specified is automate_lcp_download");
+    addVariable("lcp_download_lat_long_point","lcpDownloader","lat_long_point","NA",
+                "A lat long point of format (lat long) and is the center point of a box used for lcp downloading in WindNinja. "
+                "Specify only if use_past_lcp is set to true, with conditions as explained for that variable");
+    addVariable("lcp_download_northsouth_buffer","lcpDownloader","positive double","NA",
+                "Half the height of the box with lcp_download_lat_long_point as the center of the box. "
+                "Specify only if use_past_lcp is set to true, with conditions as explained for that variable");
+    addVariable("lcp_download_westeast_buffer","lcpDownloader","positive double","NA",
+                "Half the width of the box with lcp_download_lat_long_point as the center of the box. "
+                "Specify only if use_past_lcp is set to true, with conditions as explained for that variable");
+    addVariable("lcp_download_buffer_units","lcpDownloader","string","NA",
+                "The units of the buffer box width and height. Can be kilometers or miles. "
+                "Specify only if use_past_lcp is set to true, with conditions as explained for that variable");
+    addVariable("lcp_download_north_lat_bound","lcpDownloader","lat","NA",
+                "The north latitude coordinate for an lcp download of a box with no center. "
+                "Is a decimal point value. Specify only if use_past_lcp is set to true, with conditions as explained for that variable");
+    addVariable("lcp_download_south_lat_bound","lcpDownloader","lat","NA",
+                "The south latitude coordinate for an lcp download of a box with no center. "
+                "Is a decimal point value. Specify only if use_past_lcp is set to true, with conditions as explained for that variable. "
+                "Checks to make sure is less than lcp_download_north_lat_bound");
+    addVariable("lcp_download_east_long_bound","lcpDownloader","long","NA",
+                "The east latitude coordinate for an lcp download of a box with no center. Is a decimal point value. "
+                "Specify only if use_past_lcp is set to true, with conditions as explained for that variable. "
+                "Checks to make sure is less than lcp_download_west_long_bound");
+    addVariable("lcp_download_west_long_bound","lcpDownloader","long","NA",
+                "The west latitude coordinate for an lcp download of a box with no center. Is a decimal point value. "
+                "Specify only if use_past_lcp is set to true, with conditions as explained for that variable");
 
         // createIgnition variables
-    addVariable("latlong_position","createIgnition","count","load_latlong_position",
-                "create an ignition file using the following set of lat long positions, so there are a bunch of point sources and this is the first instance of the fire");
+    addVariable("burn_start_time","createIgnition","date","NA",
+                "Needs to be a single date of format (month day year hour:minute). hour:minute goes from 00:00 to 23:59");
+    addVariable("burn_end_time","createIgnition","date","NA",
+                "Needs to be a single date of format (month day year hour:minute). hour:minute goes from 00:00 to 23:59. "
+                "Will be checked to make sure it is after burn_start_time");
+    addVariable("create_ignition_from_latlong_locations","createIgnition","count","load_create_ignition_from_latlong_locations",
+                "Consists of a list of lat long locations from which a single ignition file will be created of format (lat long). "
+                "Need at least one of create_ignition_from_latlong_locations, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, "
+                "or farsite_output_fire_perimeter_files ignition types to run");
+    addVariable("polygon_ignit_shape_files","createIgnition","count","load_polygon_ignit_shape_files",
+                "Consists of a list of precreated ignition shape files (so can be past ones created of any other type). "
+                "Format of ignition shape files are still checked. Checked to make sure file extension is .shp and that file can be read by ogr/gdal. "
+                "Need at least one of create_ignition_from_latlong_locations, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, "
+                "or farsite_output_fire_perimeter_files ignition types to run");
+    addVariable("GeoMAC_fire_perimeter_files","createIgnition","count","load_GeoMAC_fire_perimeter_files",
+                "Consists of a list of GeoMAC fire perimeters to be used as input ignitions. "
+                "New versions of these files are created that are in the necessary projection coordinates as the original files "
+                "will not work in Farsite without preprocessing. Files are checked to make sure file extension is .shp and that files can be read by ogr/gdal. "
+                "Need at least one of create_ignition_from_latlong_locations, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, "
+                "or farsite_output_fire_perimeter_files ignition types to run");
+    addVariable("farsite_output_fire_perimeter_files","createIgnition","count","load_farsite_output_fire_perimeter_files",
+                "Consists of a list of past farsite run output fire perimeter files to use as ignitions for a new farsite run. "
+                "These cannot be read by the current version of farsite, so new versions of these files are created by grabbing all fires that occur "
+                "at the last output fire perimeter date/time. The new date/time for these fire perimeters is assumed to be the burn_start_time value. "
+                "Files are checked to make sure file extension is .shp and that files can be read by ogr/gdal. "
+                "Need at least one of create_ignition_from_latlong_locations, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, "
+                "or farsite_output_fire_perimeter_files ignition types to run");
+    addVariable("fire_perimeter_widening_factor","createIgnition","bool","NA",
+                "An integer used to shrink or expand fire perimeters of all created ignition files by multiplying each point in the geometry by this integer. "
+                "Defaults to a value of 1 unless specified. May need to make this specific to each ignition file if needed long term. "
+                "Or can get rid of and if any perimeter is less than say 30 m, just stretch it to that size as that is the default farsite distance res");
+
+        // wrfGetWeather and WindNinja variables
+    addVariable("extend_wrf_data","wrfGetWeather and WindNinja","bool","NA",
+                "A boolean telling the application whether it should duplicate the wrf data acquired from the earliest and latest wrf files to extend wind "
+                "and weather data to the required start and end times for the simulation. But only to a maximum of 24 hours each way. "
+                "Hm, should this be a days worth of data instead of a single data to extend? Need more thought to do something like that");
+    addVariable("wrf_files","wrfGetWeather and WindNinja","count","load_wrf_files",
+                "Consists of a list of paths to each of the WRF files used as wind and weather start points for the application. "
+                "Internal WRF file times will be checked to make sure they are sorted by date and hour, where they begin 24 hrs before burn_start_time and end at burn_end_time. "
+                "So if burn_start_time is 08 11 2015, 12:00 and burn_end_time is 08 13 2015, 12:00 then the first WRF file should be for 08 10 2015, 12:00 "
+                "and the last WRF file should be for 08 13 2015, 12:00. This comes out to be 72 WRF files. Files are assumed to be of timezone UTZ so GMT. "
+                "If extend_wrf_date is set to true, then the wrf data acquired from the earliest wrf file will be duplicated to fill to the needed start time "
+                "and the same goes for the latest wrf file data duplicated to fill to the needed end time");
+
+        // WindNinja only variables
+    addVariable("WindNinja_number_of_threads","WindNinja only","size_t","NA",
+                "The number of threads to use for WindNinja simulations. If you specify a greater number than exist, will use max. Default is 8");
+    addVariable("WindNinja_mesh_choice","WindNinja only","string","NA",
+                "A string specifying the type of WindNinja mesh desired for all simulations. Choices are coarse, medium, or fine. "
+                "Default is fine if both WindNinja_mesh_choice and WindNinja_mesh_resolution are not specified");
+    addVariable("WindNinja_mesh_resolution","WindNinja only","positive double","NA",
+                "A positive double value specifying the exact desired mesh resolution. "
+                "If this is specified instead of WindNinja_mesh_choice, need to also specify WindNinja_mesh_res_units. "
+                "Warning! If this is a lot smaller than what is selected by WindNinja_mesh_choice of fine, could make simulations take a TON longer");
+    addVariable("WindNinja_mesh_res_units","WindNinja only","string","NA",
+                "A string specifying the units of WindNinja_mesh_resolution and has to be either ft or m. Default is m if WindNinja_mesh_resolution is specified but this is not");
+    addVariable("diurnal_winds","WindNinja only","bool","NA",
+                "A boolean used to know whether WindNinja should be run with the diurnal wind thermal parameter. Default value is false");
+    addVariable("non_neutral_stability","WindNinja only","bool","NA",
+                "A boolean used to know whether WindNinja should be run with the stability thermal parameter. Default value is false");
+
+        // wrfGetWeather only variables
+    addVariable("use_weather_from_ignition_center","wrfGetWeather only","bool","NA",
+                "A boolean to know whether weather data should be pulled from the WRF files by using the average of all ignition centers");
+    addVariable("use_weather_from_full_ignition_area","wrfGetWeather only","bool","NA",
+                "A boolean to know whether weather data should be pulled from the WRF files by using the average of all points in the ignition perimeters");
+    addVariable("use_weather_from_wrf_center","wrfGetWeather only","bool","NA",
+                "A boolean to know whether weather data should be pulled from the WRF files by using the center of the WRF file and is the initially preferred method of the three options");
 
         // createFarsiteInput variables
-    addVariable("FARSITE_START_TIME","createFarsiteInput","date","NA",
-                "date of the following format: month day hour. Is the start time for the farsite burn. Make sure wrf files cover at least a day before this date");
+    addVariable("farsite_barrier_shapefile","createFarsiteInput","shape filename","NA",
+                "A path to a barrier file to use with each farsite run. Is an optional input. Checks to make sure file has .shp extension and is openable by ogr/gdal");
+    // # farsite_distance_res and farsite_perimeter_res will be 60 meters and 30 meters for now with farsite_min_ignition_vertex_distance and farsite_spot_grid_resolution
+    //      as half the farsite_perimeter_res with farsite_minimum_spot_distance the same value as farsite_perimeter_res
+    // # farsite_time_step will be 60 minutes for now, and is dependent on the wrf files
+    addVariable("farsite_spot_probability","createFarsiteInput","signless percent","NA",
+                "A percentage given with the % sign missing. The default value is 0.05 so 0.05%");
+    addVariable("farsite_spot_ignition_delay","createFarsiteInput","size_t","NA",
+                "A time in minutes to give a short time delay to when spotting calculations occur. Default value is 0");
+    addVariable("farsite_spotting_seed","createFarsiteInput","size_t","NA",
+                "A tally number for the assumed starting possible number of spotting embers to be generated at a given time. The default value is 1000");
+    addVariable("farsite_earliest_burn_hour","createFarsiteInput","hour_min","NA",
+                "A time used for setting the farsite_burn_periods, so the earliest time during a day that fires can burn. "
+                "Format is (hour:minute) which can range from 00:00 to 23:59. The default value is 0800");
+    addVariable("farsite_latest_burn_hour","createFarsiteInput","hour_min","NA",
+                "A time used for setting the farsite_burn_periods, so the latest time during a day that fires can burn. "
+                "This is usually set with the assumption that fires don't burn well at night. "
+                "Format is (hour:minute) which can range from 00:00 to 23:59. The default value is 1959");
+    addVariable("farsite_foliar_moisture_content","createFarsiteInput","signless percent","NA",
+                "A percentage given with the % sign missing. The default value is 70 so 70%. Can play a large role in crown fire spread");
+    addVariable("farsite_crown_fire_method","createFarsiteInput","string","NA",
+                "A string specifying the crown fire method used in farsite. "
+                "Options are Finney or Reinhart where Finney is the default if farsite_crown_fire_method is not specified");
+
+        // debugging related variables
+    addVariable("report_largest_ignition_bounds","debugging related","bool","NA",
+                "A boolean that specifies whether to output the lat_long bounding box that contains the smallest and largest lat long coordinates that have ignitions in them. "
+                "May not be used as an optional debugging statement, probably just output it as looking through the different ignition locations. "
+                "Fun, have to do ignitions before and after the lcp download lol");
+    addVariable("report_found_inputs","debugging related","bool","NA",
+                "A boolean that specifies whether to output what the input file is seen to be by the code. Defaults to false if not specified");
+
+        // optional WindNinja output settings, may not even add these options
+    addVariable("additional_WindNinja_outputs_google","optional WindNinja output settings","count","load_additional_WindNinja_outputs_google",
+                "A list specifying all runs that want additional google output files written by using wrf_files. "
+                "Format is (wrf_file_name write_wx_model_goog_output write_goog_output goog_out_resolution units_goog_out_resolution goog_out_color_scheme goog_out_vector_scaling) "
+                "where you can see what each of these mean looking at WindNinja help. "
+                "The default for any wrf_file_names not specified is everything needed to disallow these outputs, "
+                "so can piecemeal choose to have these additional outputs for separate WindNinja runs. "
+                "Checked to make sure each specified wrf_file exists in list of wrf_files. "
+                "Warning! If even a few of these are to be outputted, will make simulations take a TON longer, especially the wx_file_outputs");
+    addVariable("additional_WindNinja_outputs_shapefile","optional WindNinja output settings","count","load_additional_WindNinja_outputs_shapefile",
+                "A list specifying all runs that want additional shapefile output files written by using wrf_files. "
+                "Format is (wrf_file_name write_wx_model_shapefile_output write_shapefile_output shape_out_resolution units_shape_out_resolution) "
+                "where you can see what each of these mean looking at WindNinja help. "
+                "The default for any wrf_file_names not specified is everything needed to disallow these outputs, "
+                "so can piecemeal choose to have these additional outputs for separate WindNinja runs. "
+                "Checked to make sure each specified wrf_file exists in list of wrf_files. "
+                "Warning! If even a few of these are to be outputted, will make simulations take a TON longer, especially the wx_file_outputs");
+    // ## all the ascii fire behavior files will be output as these are required output
+    addVariable("additional_WindNinja_outputs_pdf","optional WindNinja output settings","count","load_additional_WindNinja_outputs_pdf",
+                "A list specifying all runs that want additional shapefile output files written by using wrf_files. "
+                "Format is (wrf_file_name write_pdf_output pdf_out_resolution units_pdf_out_resolution pdf_linewidth pdf_basemap pdf_height pdf_width pdf_size) "
+                "where you can see what each of these mean looking at WindNinja help. "
+                "The default for any wrf_file_names not specified is everything needed to disallow these outputs, "
+                "so can piecemeal choose to have these additional outputs for separate WindNinja runs. "
+                "Checked to make sure each specified wrf_file exists in list of wrf_files. "
+                "Warning! If even a few of these are to be outputted, will make simulations take a TON longer, especially the wx_file_outputs");
+
 
     // notice that these do NOT include all the possible variables for windninja and farsite, just the ones that will be changing a bunch.
     // So if you need to move needed variables that are just set to be the same thing every time for farsite or windninja, look in
