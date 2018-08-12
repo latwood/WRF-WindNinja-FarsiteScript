@@ -17,7 +17,8 @@ public:
     void resetVariable();     //kind of a reusable constructor/destructor
 
     // set new value functions
-    void set_isFoundInInputFile(bool newIsFoundInInputFileValue);
+    void set_isFoundInInputFile(bool newIsFoundInInputFileValue, size_t newInputFileVariableCountLine);
+    void set_wantDefaultValue(bool newWantDefaultValue);
     void set_variableNameWhiteSpace(std::string newVariableNameWhiteSpace);
     void add_variableDescriptionLineBreaks(unsigned int newVariableDescriptionLineBreak);
 
@@ -28,6 +29,8 @@ public:
     std::string get_loaderFunctionName();
     std::string get_variableDescription();
     bool get_isFoundInInputFile();
+    bool get_wantDefaultValue();
+    size_t get_inputFileVariableCountLine();
     std::string get_variableNameWhiteSpace();
     std::vector<unsigned int> get_variableDescriptionLineBreaks();
 
@@ -40,6 +43,8 @@ private:
     std::string loaderFunctionName;
     std::string variableDescription;
     bool isFoundInInputFile;
+    bool wantDefaultValue;
+    size_t inputFileVariableCountLine;
     std::string variableNameWhiteSpace;
     std::vector<unsigned int> variableDescriptionLineBreaks;
 

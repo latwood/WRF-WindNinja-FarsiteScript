@@ -14,6 +14,8 @@ inputVariable_info::inputVariable_info(std::string newVariableName,std::string n
     loaderFunctionName = newLoaderFunctionName;
     variableDescription = newVariableDescription;
     isFoundInInputFile = false;
+    wantDefaultValue = false;
+    inputFileVariableCountLine = 0;
 }
 /*** end constructor functions ***/
 
@@ -21,6 +23,8 @@ inputVariable_info::inputVariable_info(std::string newVariableName,std::string n
 void inputVariable_info::resetVariable()
 {
     isFoundInInputFile = false;
+    wantDefaultValue = false;
+    inputFileVariableCountLine = 0;
     variableNameWhiteSpace = "";
     while(!variableDescriptionLineBreaks.empty())
     {
@@ -31,9 +35,15 @@ void inputVariable_info::resetVariable()
 /*** end reinit functions ***/
 
 /*** set new value functions ***/
-void inputVariable_info::set_isFoundInInputFile(bool newIsFoundInInputFileValue)
+void inputVariable_info::set_isFoundInInputFile(bool newIsFoundInInputFileValue, size_t newInputFileVariableCountLine)
 {
     isFoundInInputFile = newIsFoundInInputFileValue;    //note don't need to check because it is already a bool coming in or it fails
+    inputFileVariableCountLine = newInputFileVariableCountLine;
+}
+
+void inputVariable_info::set_wantDefaultValue(bool newWantDefaultValue)
+{
+    wantDefaultValue = newWantDefaultValue;
 }
 
 void inputVariable_info::set_variableNameWhiteSpace(std::string newVariableNameWhiteSpace)
@@ -77,6 +87,16 @@ std::string inputVariable_info::get_variableDescription()
 bool inputVariable_info::get_isFoundInInputFile()
 {
     return isFoundInInputFile;
+}
+
+bool inputVariable_info::get_wantDefaultValue()
+{
+    return wantDefaultValue;
+}
+
+size_t inputVariable_info::get_inputFileVariableCountLine()
+{
+    return inputFileVariableCountLine;
 }
 
 std::string inputVariable_info::get_variableNameWhiteSpace()

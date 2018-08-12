@@ -9,9 +9,9 @@
 
 
 // largest configVariable name will have this much space between its end and the description
-#define MIN_VARNAME_WHITESPACE 4
+#define MIN_VARNAME_WHITESPACE 3
 // minimum allowable words per line for a description
-#define MIN_WORDS_PER_DESCRIPTION_LINE 5
+#define MIN_WORDS_PER_DESCRIPTION_LINE 1    // I'm having trouble here cause variable names are big enough to be one line on the description
 // largest allowed variable name and MIN_VARNAME_WHITESPACE size, to allow enough room for the description
 #define DESCRIPTION_VARIABLENAME_COLUMNSIZEMAX 30
 // this should be the maximum number of characters in ubuntu 16.04 terminal line when the terminal is first opened

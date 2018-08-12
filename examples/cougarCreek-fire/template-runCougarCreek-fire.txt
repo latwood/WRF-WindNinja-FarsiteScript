@@ -6,6 +6,9 @@
 
 ### application specific variables
 
+# run_base_name is the base name for all created files, so example run_base_name is cougarCreek, all files will be cougarCreek.lcp cougarCreek_ignit.shp so stuff like this. If use_past_lcp is set, this value will be set to the found base name of the lcp file specified in lcp_file_path
+#run_base_name: cougarCreek
+
 # createInputs_path is the path where files created by createIgnitions, WindNinja, wrfGetWeather, and createFarsiteInputs go. createInputs folder Will contain separate folders for each of these outputs
 createInputs_path: /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire
 
@@ -19,7 +22,7 @@ overwrite_past_outputs: false
 createIgnition_output_units: input
 
 # wrfGetWeather_output_units is a string specifying the types of units to be used by all files outputted by wrfGetWeather during the script. Values can be english, or metric where metric is the default value
-wrfGetWeather_output_units: input
+wrfGetWeather_output_units: english
 
 # WindNinja_required_output_units is a string specifying the types of units to be used by all files required for later use outputted by WindNinja during the script. Values can be english or metric where metric is the default value. output_wind_height is 20 ft for english and 10 m for metric
 WindNinja_required_output_units: metric
@@ -27,18 +30,18 @@ WindNinja_required_output_units: metric
 # farsite_output_units is a string specifying the types of units to be used by all files output by farsite at the very end. I suspect this isn't actually allowable yet, so it might just be whatever units are used coming in, or default to english, but we shall see. Values can be english or metric
 farsite_output_units: metric
 
-# use_native_timezone_for_WindNinja_to_final is a boolean specifying whether the timezone should be native to the area or GMT for all created inputs and final output files. Default is false so that the GMT timezone is used by default
-use_native_timezone_for_WindNinja_to_final: false
+# use_native_timezone is a boolean specifying whether the timezone should be native to the area or GMT for all created inputs and final output files. Default is false so that the GMT timezone is used by default
+use_native_timezone: false
 
 
 ### lcp download variables (WindNinja related)
 
 ## choose only one: automate_lcp_download, use_past_lcp, specify_lcp_download
-# automate_lcp_download is a boolean to know whether the lcp should follow automated features for downloading. lcp_download_to_fire_perim_scale_factor is used to increase the lcp bounding box size by a multiple of the largest ignition fire perimeter. Only one of automate_lcp_download, use_past_lcp, and specify_lcp_download can be true and the default to be true if none are specified is automate_lcp_download
+# automate_lcp_download is a boolean to know whether the lcp should follow automated features for downloading. fireperim_to_lcp_scalefactor is used to increase the lcp bounding box size by a multiple of the largest ignition fire perimeter. Only one of automate_lcp_download, use_past_lcp, and specify_lcp_download can be true and the default to be true if none are specified is automate_lcp_download
 automate_lcp_download: false
 
-# lcp_download_to_fire_perim_scale_factor is a positive integer y used as a scaling factor for the lcp bounding box to make it x*y bigger than the largest ignition fire perimeter, where x is 200 for ignitions that are basically a single point and 200 for all other ignitions. Default value for y is 1 if not specified and should only be specified if automate_lcp_download is set to true
-#lcp_download_to_fire_perim_scale_factor: 1
+# fireperim_to_lcp_scalefactor is a positive integer y used as a scaling factor for the lcp bounding box to make it x*y bigger than the largest ignition fire perimeter, where x is 200 for ignitions that are basically a single point and 200 for all other ignitions. Default value for y is 1 if not specified and should only be specified if automate_lcp_download is set to true
+#fireperim_to_lcp_scalefactor: 1
 
 # use_past_lcp is a boolean to know whether lcp downloading should be avoided by using an already predownloaded lcp file. If this is true, need to also specify lcp_file_path. Only one of automate_lcp_download, use_past_lcp, and specify_lcp_download can be true and the default to be true if none are specified is automate_lcp_download
 use_past_lcp: true
@@ -82,25 +85,25 @@ specify_lcp_download: false
 burn_start_time: 08 09 2015 12:00
 
 # burn_end_time needs to be a single date of format (month day year hour:minute). hour:minute goes from 00:00 to 23:59. Will be checked to make sure it is after burn_start_time
-burn_end_time: 08 10 2015 12:00
+burn_end_time: 08 10 2015 12:0
 
-# create_ignition_from_latlong_locations consists of a list of lat long locations from which a single ignition file will be created of format (lat long). Need at least one of create_ignition_from_latlong_locations, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, or farsite_output_fire_perimeter_files ignition types to run
-create_ignition_from_latlong_locations: 1
+# create_ignition_from_latlongs consists of a list of lat long locations from which a single ignition file will be created of format (lat long). Need at least one of create_ignition_from_latlongs, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, or farsite_output_fire_perimeter_files ignition types to run
+create_ignition_from_latlongs: 1
 46.134 -121.374
 
-# polygon_ignit_shape_files consists of a list of precreated ignition shape files (so can be past ones created of any other type). Format of ignition shape files are still checked. Checked to make sure file extension is .shp and that file can be read by ogr/gdal. Need at least one of create_ignition_from_latlong_locations, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, or farsite_output_fire_perimeter_files ignition types to run
+# polygon_ignit_shape_files consists of a list of precreated ignition shape files (so can be past ones created of any other type). Format of ignition shape files are still checked. Checked to make sure file extension is .shp and that file can be read by ogr/gdal. Need at least one of create_ignition_from_latlongs, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, or farsite_output_fire_perimeter_files ignition types to run
 polygon_ignit_shape_files: 3
 /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/5a-cougarCreek-pointIgnit.shp
 /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/7a-cougarCreek-polygonIgnit.shp
 /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/8a-cougarCreek-3polygonIgnit.shp
 
-# GeoMAC_fire_perimeter_files consists of a list of GeoMAC fire perimeters to be used as input ignitions. New versions of these files are created that are in the necessary projection coordinates as the original files will not work in Farsite without preprocessing. Files are checked to make sure file extension is .shp and that files can be read by ogr/gdal. Need at least one of create_ignition_from_latlong_locations, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, or farsite_output_fire_perimeter_files ignition types to run
+# GeoMAC_fire_perimeter_files consists of a list of GeoMAC fire perimeters to be used as input ignitions. New versions of these files are created that are in the necessary projection coordinates as the original files will not work in Farsite without preprocessing. Files are checked to make sure file extension is .shp and that files can be read by ogr/gdal. Need at least one of create_ignition_from_latlongs, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, or farsite_output_fire_perimeter_files ignition types to run
 GeoMAC_fire_perimeter_files: 2
 /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/day1-wa_cougar_creek_20150811_2300_dd83/wa_cougar_creek_20150811_2300_dd83.shp
 /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/day10-wa_cougar_creek_20150815_2300_dd83/wa_cougar_creek_20150815_2300_dd83.shp
 
-# farsite_output_fire_perimeter_files consists of a list of past farsite run output fire perimeter files to use as ignitions for a new farsite run. These cannot be read by the current version of farsite, so new versions of these files are created by grabbing all fires that occur at the last output fire perimeter date/time. The new date/time for these fire perimeters is assumed to be the burn_start_time value. Files are checked to make sure file extension is .shp and that files can be read by ogr/gdal. Need at least one of create_ignition_from_latlong_locations, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, or farsite_output_fire_perimeter_files ignition types to run
-farsite_output_fire_perimeter_files: 3
+# farsite_output_fire_perimeter_files consists of a list of past farsite run output fire perimeter files to use as ignitions for a new farsite run. These cannot be read by the current version of farsite, so new versions of these files are created by grabbing all fires that occur at the last output fire perimeter date/time. The new date/time for these fire perimeters is assumed to be the burn_start_time value. Files are checked to make sure file extension is .shp and that files can be read by ogr/gdal. Need at least one of create_ignition_from_latlongs, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, or farsite_output_fire_perimeter_files ignition types to run
+farsite_output_fire_perimeter_files: 4
 /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/11a-cougarCreekFire_Perimeters.shp
 /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/13a-cougarCreek-pointIgnit-perimeters-firelaborg.shp
 /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/17a-cougarCreek-polygonIgnit-perimeters-firelaborg.shp
@@ -197,11 +200,11 @@ farsite_spot_ignition_delay: 0
 # farsite_spotting_seed is a tally number for the assumed starting possible number of spotting embers to be generated at a given time. The default value is 1000
 farsite_spotting_seed: 1000
 
-# farsite_earliest_burn_hour is a time used for setting the farsite_burn_periods, so the earliest time during a day that fires can burn. Format is (hour:minute) which can range from 00:00 to 23:59. The default value is 0800
-farsite_earliest_burn_hour: 0800
+# farsite_earliest_burn_hour is a time used for setting the farsite_burn_periods, so the earliest time during a day that fires can burn. Format is (hour:minute) which can range from 00:00 to 23:59. The default value is 08:00
+farsite_earliest_burn_hour: 08:00
 
-# farsite_latest_burn_hour is a time used for setting the farsite_burn_periods, so the latest time during a day that fires can burn. This is usually set with the assumption that fires don't burn well at night. Format is (hour:minute) which can range from 00:00 to 23:59. The default value is 1959
-farsite_latest_burn_hour: 1800
+# farsite_latest_burn_hour is a time used for setting the farsite_burn_periods, so the latest time during a day that fires can burn. This is usually set with the assumption that fires don't burn well at night. Format is (hour:minute) which can range from 00:00 to 23:59. The default value is 19:59
+farsite_latest_burn_hour: 18:00
 
 # farsite_foliar_moisture_content is a percentage given with the % sign missing. The default value is 70 so 70%. Can play a large role in crown fire spread
 farsite_foliar_moisture_content: 70
@@ -213,7 +216,7 @@ farsite_crown_fire_method: Finney
 ### debugging related variables
 
 # report_largest_ignition_bounds is a boolean that specifies whether to output the lat_long bounding box that contains the smallest and largest lat long coordinates that have ignitions in them. May not be used as an optional debugging statement, probably just output it as looking through the different ignition locations. Fun, have to do ignitions before and after the lcp download lol
-report_largest_ignition_bounds: true
+report_largest_ignition_bounds: true       
 
 # report_found_inputs is a boolean that specifies whether to output what the input file is seen to be by the code. Defaults to false if not specified
 report_found_inputs: true

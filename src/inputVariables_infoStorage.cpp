@@ -111,11 +111,11 @@ void inputVariables_infoStorage::setupAvailableVariableCountTypes()
     allowedVariableCountTypes.push_back("positive double");
     allowedVariableCountTypes.push_back("signless percent");
     allowedVariableCountTypes.push_back("string");
-    allowedVariableCountTypes.push_back("filepath");
+    allowedVariableCountTypes.push_back("pathname");
     allowedVariableCountTypes.push_back("lcp filename");
     allowedVariableCountTypes.push_back("shape filename");
-    allowedVariableCountTypes.push_back("lat");
-    allowedVariableCountTypes.push_back("long");
+    allowedVariableCountTypes.push_back("lat_coord");
+    allowedVariableCountTypes.push_back("long_coord");
     allowedVariableCountTypes.push_back("lat_long_point");
     allowedVariableCountTypes.push_back("date");
     allowedVariableCountTypes.push_back("hour_min");
@@ -143,7 +143,10 @@ void inputVariables_infoStorage::setupAvailableVariables()
 
     // an interesting thing is that the strings need additional and very specific verification, kind of like the loader functions.
     // So if adding a string value usually turn it into a separate type
-    // but if that is not possible, just do the verification a bit later
+    // but if that is not possible, just do the verification a bit later, editing inputParser::isValidString()
+
+    // another fun part is that setting default values for anything non-generic immediately becomes a specialized need.
+    // specify any specialized need default starting values in inputVariables_valueStorage::setSpecializedDefaults().
 
         // should have a section for each type of input variables, and include the type or use in the description
         // if you need more sections, define section in setupAvailableApplicationUseNames(). Define more types in setupAvailableVariableCountTypes().
@@ -152,10 +155,13 @@ void inputVariables_infoStorage::setupAvailableVariables()
         // variables may be loaded or no, but to verify if optional or no, need to change verification in the checkSetVarNamesForConflictingOptions function in the inputVariablesHandler class.
 
         // application specific variables
-    addVariable("createInputs_path","application specific input","filepath","NA",
+    addVariable("run_base_name","application specific input","string","NA",
+                "The base name for all created files, so example run_base_name is cougarCreek, all files will be cougarCreek.lcp cougarCreek_ignit.shp so stuff like this. "
+                "If use_past_lcp is set, this value will be set to the found base name of the lcp file specified in lcp_file_path");
+    addVariable("createInputs_path","application specific input","pathname","NA",
                 "The path where files created by createIgnitions, WindNinja, wrfGetWeather, and createFarsiteInputs go. "
                 "createInputs folder Will contain separate folders for each of these outputs");
-    addVariable("finalOutput_path","application specific input","filepath","NA",
+    addVariable("finalOutput_path","application specific input","pathname","NA",
                 "The path where farsite run outputs will be generated");
     addVariable("overwrite_past_outputs","application specific input","bool","NA",
                 "A boolean specifying whether the output files found in createdInputs and finalOutputs folders should be overwritten. "
@@ -176,16 +182,16 @@ void inputVariables_infoStorage::setupAvailableVariables()
                 "A string specifying the types of units to be used by all files output by farsite at the very end. "
                 "I suspect this isn't actually allowable yet, so it might just be whatever units are used coming in, or default to english, but we shall see. "
                 "Values can be english or metric");
-    addVariable("use_native_timezone_for_WindNinja_to_final","application specific input","bool","NA",
+    addVariable("use_native_timezone","application specific input","bool","NA",
                 "A boolean specifying whether the timezone should be native to the area or GMT for all created inputs and final output files. "
                 "Default is false so that the GMT timezone is used by default");
 
         // lcp download variables (WindNinja related)
     addVariable("automate_lcp_download","lcpDownloader","bool","NA",
                 "A boolean to know whether the lcp should follow automated features for downloading. "
-                "lcp_download_to_fire_perim_scale_factor is used to increase the lcp bounding box size by a multiple of the largest ignition fire perimeter. "
+                "fireperim_to_lcp_scalefactor is used to increase the lcp bounding box size by a multiple of the largest ignition fire perimeter. "
                 "Only one of automate_lcp_download, use_past_lcp, and specify_lcp_download can be true and the default to be true if none are specified is automate_lcp_download");
-    addVariable("lcp_download_to_fire_perim_scale_factor","lcpDownloader","size_t","NA",
+    addVariable("fireperim_to_lcp_scalefactor","lcpDownloader","size_t","NA",
                 "A positive integer y used as a scaling factor for the lcp bounding box to make it x*y bigger than the largest ignition fire perimeter, "
                 "where x is 200 for ignitions that are basically a single point and 200 for all other ignitions. Default value for y is 1 if not specified "
                 "and should only be specified if automate_lcp_download is set to true");
@@ -215,18 +221,18 @@ void inputVariables_infoStorage::setupAvailableVariables()
     addVariable("lcp_download_buffer_units","lcpDownloader","string","NA",
                 "The units of the buffer box width and height. Can be kilometers or miles. "
                 "Specify only if use_past_lcp is set to true, with conditions as explained for that variable");
-    addVariable("lcp_download_north_lat_bound","lcpDownloader","lat","NA",
+    addVariable("lcp_download_north_lat_bound","lcpDownloader","lat_coord","NA",
                 "The north latitude coordinate for an lcp download of a box with no center. "
                 "Is a decimal point value. Specify only if use_past_lcp is set to true, with conditions as explained for that variable");
-    addVariable("lcp_download_south_lat_bound","lcpDownloader","lat","NA",
+    addVariable("lcp_download_south_lat_bound","lcpDownloader","lat_coord","NA",
                 "The south latitude coordinate for an lcp download of a box with no center. "
                 "Is a decimal point value. Specify only if use_past_lcp is set to true, with conditions as explained for that variable. "
                 "Checks to make sure is less than lcp_download_north_lat_bound");
-    addVariable("lcp_download_east_long_bound","lcpDownloader","long","NA",
+    addVariable("lcp_download_east_long_bound","lcpDownloader","long_coord","NA",
                 "The east latitude coordinate for an lcp download of a box with no center. Is a decimal point value. "
                 "Specify only if use_past_lcp is set to true, with conditions as explained for that variable. "
                 "Checks to make sure is less than lcp_download_west_long_bound");
-    addVariable("lcp_download_west_long_bound","lcpDownloader","long","NA",
+    addVariable("lcp_download_west_long_bound","lcpDownloader","long_coord","NA",
                 "The west latitude coordinate for an lcp download of a box with no center. Is a decimal point value. "
                 "Specify only if use_past_lcp is set to true, with conditions as explained for that variable");
 
@@ -236,29 +242,29 @@ void inputVariables_infoStorage::setupAvailableVariables()
     addVariable("burn_end_time","createIgnition","date","NA",
                 "Needs to be a single date of format (month day year hour:minute). hour:minute goes from 00:00 to 23:59. "
                 "Will be checked to make sure it is after burn_start_time");
-    addVariable("create_ignition_from_latlong_locations","createIgnition","count","load_create_ignition_from_latlong_locations",
+    addVariable("create_ignition_from_latlongs","createIgnition","count","load_create_ignition_from_latlongs",
                 "Consists of a list of lat long locations from which a single ignition file will be created of format (lat long). "
-                "Need at least one of create_ignition_from_latlong_locations, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, "
+                "Need at least one of create_ignition_from_latlongs, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, "
                 "or farsite_output_fire_perimeter_files ignition types to run");
     addVariable("polygon_ignit_shape_files","createIgnition","count","load_polygon_ignit_shape_files",
                 "Consists of a list of precreated ignition shape files (so can be past ones created of any other type). "
                 "Format of ignition shape files are still checked. Checked to make sure file extension is .shp and that file can be read by ogr/gdal. "
-                "Need at least one of create_ignition_from_latlong_locations, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, "
+                "Need at least one of create_ignition_from_latlongs, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, "
                 "or farsite_output_fire_perimeter_files ignition types to run");
     addVariable("GeoMAC_fire_perimeter_files","createIgnition","count","load_GeoMAC_fire_perimeter_files",
                 "Consists of a list of GeoMAC fire perimeters to be used as input ignitions. "
                 "New versions of these files are created that are in the necessary projection coordinates as the original files "
                 "will not work in Farsite without preprocessing. Files are checked to make sure file extension is .shp and that files can be read by ogr/gdal. "
-                "Need at least one of create_ignition_from_latlong_locations, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, "
+                "Need at least one of create_ignition_from_latlongs, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, "
                 "or farsite_output_fire_perimeter_files ignition types to run");
     addVariable("farsite_output_fire_perimeter_files","createIgnition","count","load_farsite_output_fire_perimeter_files",
                 "Consists of a list of past farsite run output fire perimeter files to use as ignitions for a new farsite run. "
                 "These cannot be read by the current version of farsite, so new versions of these files are created by grabbing all fires that occur "
                 "at the last output fire perimeter date/time. The new date/time for these fire perimeters is assumed to be the burn_start_time value. "
                 "Files are checked to make sure file extension is .shp and that files can be read by ogr/gdal. "
-                "Need at least one of create_ignition_from_latlong_locations, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, "
+                "Need at least one of create_ignition_from_latlongs, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, "
                 "or farsite_output_fire_perimeter_files ignition types to run");
-    addVariable("fire_perimeter_widening_factor","createIgnition","bool","NA",
+    addVariable("fire_perimeter_widening_factor","createIgnition","size_t","NA",
                 "An integer used to shrink or expand fire perimeters of all created ignition files by multiplying each point in the geometry by this integer. "
                 "Defaults to a value of 1 unless specified. May need to make this specific to each ignition file if needed long term. "
                 "Or can get rid of and if any perimeter is less than say 30 m, just stretch it to that size as that is the default farsite distance res");
@@ -266,7 +272,7 @@ void inputVariables_infoStorage::setupAvailableVariables()
         // wrfGetWeather and WindNinja variables
     addVariable("extend_wrf_data","wrfGetWeather and WindNinja","bool","NA",
                 "A boolean telling the application whether it should duplicate the wrf data acquired from the earliest and latest wrf files to extend wind "
-                "and weather data to the required start and end times for the simulation. But only to a maximum of 24 hours each way. "
+                "and weather data to the required start and end times for the simulation. But only to a maximum of 24 hours each way. Default value is false"
                 "Hm, should this be a days worth of data instead of a single data to extend? Need more thought to do something like that");
     addVariable("wrf_files","wrfGetWeather and WindNinja","count","load_wrf_files",
                 "Consists of a list of paths to each of the WRF files used as wind and weather start points for the application. "
@@ -315,11 +321,11 @@ void inputVariables_infoStorage::setupAvailableVariables()
                 "A tally number for the assumed starting possible number of spotting embers to be generated at a given time. The default value is 1000");
     addVariable("farsite_earliest_burn_hour","createFarsiteInput","hour_min","NA",
                 "A time used for setting the farsite_burn_periods, so the earliest time during a day that fires can burn. "
-                "Format is (hour:minute) which can range from 00:00 to 23:59. The default value is 0800");
+                "Format is (hour:minute) which can range from 00:00 to 23:59. The default value is 08:00");
     addVariable("farsite_latest_burn_hour","createFarsiteInput","hour_min","NA",
                 "A time used for setting the farsite_burn_periods, so the latest time during a day that fires can burn. "
                 "This is usually set with the assumption that fires don't burn well at night. "
-                "Format is (hour:minute) which can range from 00:00 to 23:59. The default value is 1959");
+                "Format is (hour:minute) which can range from 00:00 to 23:59. The default value is 19:59");
     addVariable("farsite_foliar_moisture_content","createFarsiteInput","signless percent","NA",
                 "A percentage given with the % sign missing. The default value is 70 so 70%. Can play a large role in crown fire spread");
     addVariable("farsite_crown_fire_method","createFarsiteInput","string","NA",
@@ -652,7 +658,7 @@ bool inputVariables_infoStorage::calculateDescriptionLineBreaks()
                 inputVariables[varIdx].add_variableDescriptionLineBreaks(wordBreaks[wordIdx-1]);
                 if(lineWordCount < MIN_WORDS_PER_DESCRIPTION_LINE)
                 {
-                    printf("added variableDescriptionLineBreak for description line with only \"%d\" words for lineCount \"%d\". MIN_WORDS_PER_DESCRIPTION_LINE is \"%d\"",lineWordCount,lineCount,MIN_WORDS_PER_DESCRIPTION_LINE);
+                    printf("added variableDescriptionLineBreak for description line with only \"%d\" words for lineCount \"%d\". MIN_WORDS_PER_DESCRIPTION_LINE is \"%d\"\n",lineWordCount,lineCount,MIN_WORDS_PER_DESCRIPTION_LINE);
                 }
                 lineCount = lineCount + 1;
                 lineWordCount = 0;
