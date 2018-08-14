@@ -168,7 +168,7 @@ bool inputVariables_valueStorage::set_inputVariableBoolValue(std::string varName
 
     if(foundVarName == false)
     {
-        printf("could not set bool value \"%d\" for variable name \"%s\", variableName \%s\" does not exist in bool value storage!",newBoolValue,varName.c_str(),varName.c_str());
+        printf("could not set bool value \"%d\" for variable name \"%s\", variableName \%s\" does not exist in bool value storage!\n",newBoolValue,varName.c_str(),varName.c_str());
         success = false;
     }
 
@@ -193,7 +193,7 @@ bool inputVariables_valueStorage::set_inputVariableSize_tValue(std::string varNa
 
     if(foundVarName == false)
     {
-        printf("could not set size_t value \"%zu\" for variable name \"%s\", variableName \%s\" does not exist in size_t value storage!",newSize_tValue,varName.c_str(),varName.c_str());
+        printf("could not set size_t value \"%zu\" for variable name \"%s\", variableName \%s\" does not exist in size_t value storage\n!",newSize_tValue,varName.c_str(),varName.c_str());
         success = false;
     }
 
@@ -218,7 +218,7 @@ bool inputVariables_valueStorage::set_inputVariableIntValue(std::string varName,
 
     if(foundVarName == false)
     {
-        printf("could not set int value \"%d\" for variable name \"%s\", variableName \%s\" does not exist in int value storage!",newIntValue,varName.c_str(),varName.c_str());
+        printf("could not set int value \"%d\" for variable name \"%s\", variableName \%s\" does not exist in int value storage!\n",newIntValue,varName.c_str(),varName.c_str());
         success = false;
     }
 
@@ -243,7 +243,7 @@ bool inputVariables_valueStorage::set_inputVariableDoubleValue(std::string varNa
 
     if(foundVarName == false)
     {
-        printf("could not set double value \"%f\" for variable name \"%s\", variableName \%s\" does not exist in double value storage!",newDoubleValue,varName.c_str(),varName.c_str());
+        printf("could not set double value \"%f\" for variable name \"%s\", variableName \%s\" does not exist in double value storage!\n",newDoubleValue,varName.c_str(),varName.c_str());
         success = false;
     }
 
@@ -268,7 +268,7 @@ bool inputVariables_valueStorage::set_inputVariableStringValue(std::string varNa
 
     if(foundVarName == false)
     {
-        printf("could not set string value \"%s\" for variable name \"%s\", variableName \%s\" does not exist in string value storage!",newStringValue.c_str(),varName.c_str(),varName.c_str());
+        printf("could not set string value \"%s\" for variable name \"%s\", variableName \%s\" does not exist in string value storage!\n",newStringValue.c_str(),varName.c_str(),varName.c_str());
         success = false;
     }
 
@@ -293,7 +293,7 @@ bool inputVariables_valueStorage::set_inputVariablePathnameValue(std::string var
 
     if(foundVarName == false)
     {
-        printf("could not set pathname value \"%s\" for variable name \"%s\", variableName \%s\" does not exist in pathname value storage!",newPathnameValue.c_str(),varName.c_str(),varName.c_str());
+        printf("could not set pathname value \"%s\" for variable name \"%s\", variableName \%s\" does not exist in pathname value storage!\n",newPathnameValue.c_str(),varName.c_str(),varName.c_str());
         success = false;
     }
 
@@ -318,7 +318,7 @@ bool inputVariables_valueStorage::set_inputVariableFilenameValue(std::string var
 
     if(foundVarName == false)
     {
-        printf("could not set filename value \"%s\" for variable name \"%s\", variableName \%s\" does not exist in filename value storage!",newFilenameValue.c_str(),varName.c_str(),varName.c_str());
+        printf("could not set filename value \"%s\" for variable name \"%s\", variableName \%s\" does not exist in filename value storage!\n",newFilenameValue.c_str(),varName.c_str(),varName.c_str());
         success = false;
     }
 
@@ -345,7 +345,7 @@ bool inputVariables_valueStorage::set_inputVariableLat_Long_PointValue(std::stri
 
     if(foundVarName == false)
     {
-        printf("could not set lat_long_point value \"%f %f\" (lat long) for variable name \"%s\", variableName \%s\" does not exist in lat_long_point value storage!",newLat_CoordValue,newLong_CoordValue,varName.c_str(),varName.c_str());
+        printf("could not set lat_long_point value \"%f %f\" (lat long) for variable name \"%s\", variableName \%s\" does not exist in lat_long_point value storage!\n",newLat_CoordValue,newLong_CoordValue,varName.c_str(),varName.c_str());
         success = false;
     }
 
@@ -374,7 +374,7 @@ bool inputVariables_valueStorage::set_inputVariableDateValue(std::string varName
 
     if(foundVarName == false)
     {
-        printf("could not set date value \"%d %d %d %d %d\" (year month day hour minute) for variable name \"%s\", variableName \%s\" does not exist in date value storage!",newYearValue,newMonthValue,newDayValue,newHourValue,newMinuteValue,varName.c_str(),varName.c_str());
+        printf("could not set date value \"%d %d %d %d %d\" (year month day hour minute) for variable name \"%s\", variableName \%s\" does not exist in date value storage!\n",newYearValue,newMonthValue,newDayValue,newHourValue,newMinuteValue,varName.c_str(),varName.c_str());
         success = false;
     }
 
@@ -400,7 +400,7 @@ bool inputVariables_valueStorage::set_inputVariableHour_MinValue(std::string var
 
     if(foundVarName == false)
     {
-        printf("could not set hour_min value \"%d %d\" (hour minute) for variable name \"%s\", variableName \%s\" does not exist in hour_min value storage!",newHourValue,newMinuteValue,varName.c_str(),varName.c_str());
+        printf("could not set hour_min value \"%d %d\" (hour minute) for variable name \"%s\", variableName \%s\" does not exist in hour_min value storage!\n",newHourValue,newMinuteValue,varName.c_str(),varName.c_str());
         success = false;
     }
 
@@ -484,10 +484,10 @@ void inputVariables_valueStorage::add_wrf_file(std::string new_wrf_file)
 }
 
 void inputVariables_valueStorage::add_additional_WindNinja_outputs_googleValues(std::string new_wrf_file_name, bool new_write_wx_model_goog_output, bool new_write_goog_output,
-                                                                                int new_goog_out_resolution, std::string new_units_goog_out_resolution,
+                                                                                double new_goog_out_resolution, std::string new_units_goog_out_resolution,
                                                                                 std::string new_goog_out_color_scheme, bool new_goog_out_vector_scaling)
 {
-    printf("adding additional_WindNinja_outputs_google \"%s %d %d %d %s %s %d\" (wrf_file_name write_wx_model_goog_output write_goog_output goog_out_resolution units_goog_out_resolution "
+    printf("adding additional_WindNinja_outputs_google \"%s %d %d %f %s %s %d\" (wrf_file_name write_wx_model_goog_output write_goog_output goog_out_resolution units_goog_out_resolution "
            "goog_out_color_scheme goog_out_vector_scaling) to additional_WindNinja_outputs_googleValues variable\n", new_wrf_file_name.c_str(), new_write_wx_model_goog_output,
            new_write_goog_output, new_goog_out_resolution, new_units_goog_out_resolution.c_str(), new_goog_out_color_scheme.c_str(), new_goog_out_vector_scaling);
     additional_WindNinja_outputs_googleValues.push_back({new_wrf_file_name, new_write_wx_model_goog_output, new_write_goog_output, new_goog_out_resolution,
@@ -495,20 +495,20 @@ void inputVariables_valueStorage::add_additional_WindNinja_outputs_googleValues(
 }
 
 void inputVariables_valueStorage::add_additional_WindNinja_outputs_shapefileValues(std::string new_wrf_file_name, bool new_write_wx_model_shapefile_output, bool new_write_shapefile_output,
-                                                                                   int new_shape_out_resolution, std::string new_units_shape_out_resolution)
+                                                                                   double new_shape_out_resolution, std::string new_units_shape_out_resolution)
 {
-    printf("adding additional_WindNinja_outputs_shapefile \"%s %d %d %d %s\" (wrf_file_name write_wx_model_shapefile_output write_shapefile_output shape_out_resolution "
+    printf("adding additional_WindNinja_outputs_shapefile \"%s %d %d %f %s\" (wrf_file_name write_wx_model_shapefile_output write_shapefile_output shape_out_resolution "
            "units_shape_out_resolution) to additional_WindNinja_outputs_shapefileValues variable\n",new_wrf_file_name.c_str(), new_write_wx_model_shapefile_output,
            new_write_shapefile_output, new_shape_out_resolution, new_units_shape_out_resolution.c_str());
     additional_WindNinja_outputs_shapefileValues.push_back({new_wrf_file_name, new_write_wx_model_shapefile_output, new_write_shapefile_output, new_shape_out_resolution,
                                                             new_units_shape_out_resolution});
 }
 
-void inputVariables_valueStorage::add_additional_WindNinja_outputs_pdfValues(std::string new_wrf_file_name, bool new_write_pdf_output, int new_pdf_out_resolution,
-                                                                             std::string new_units_pdf_out_resolution, size_t new_pdf_linewidth, std::string new_pdf_basemap,
+void inputVariables_valueStorage::add_additional_WindNinja_outputs_pdfValues(std::string new_wrf_file_name, bool new_write_pdf_output, double new_pdf_out_resolution,
+                                                                             std::string new_units_pdf_out_resolution, double new_pdf_linewidth, std::string new_pdf_basemap,
                                                                              double new_pdf_height, double new_pdf_width, std::string new_pdf_size)
 {
-    printf("adding additional_WindNinja_outputs_pdf \"%s %d %d %s %zu %s %f %f %s\" (wrf_file_name write_pdf_output pdf_out_resolution units_pdf_out_resolution pdf_linewidth "
+    printf("adding additional_WindNinja_outputs_pdf \"%s %d %f %s %f %s %f %f %s\" (wrf_file_name write_pdf_output pdf_out_resolution units_pdf_out_resolution pdf_linewidth "
            "pdf_basemap pdf_height pdf_width pdf_size) to additional_WindNinja_outputs_pdfValues variable\n",new_wrf_file_name.c_str(), new_write_pdf_output, new_pdf_out_resolution,
            new_units_pdf_out_resolution.c_str(), new_pdf_linewidth, new_pdf_basemap.c_str(), new_pdf_height, new_pdf_width, new_pdf_size.c_str());
     additional_WindNinja_outputs_pdfValues.push_back({new_wrf_file_name, new_write_pdf_output, new_pdf_out_resolution, new_units_pdf_out_resolution, new_pdf_linewidth,
@@ -534,7 +534,7 @@ bool inputVariables_valueStorage::get_inputVariableBoolValue(std::string varName
 
     if(foundVarName == false)
     {
-        printf("could not get bool value for variable name \"%s\", variableName \%s\" does not exist in bool value storage!",varName.c_str(),varName.c_str());
+        printf("could not get bool value for variable name \"%s\", variableName \%s\" does not exist in bool value storage!\n",varName.c_str(),varName.c_str());
         exit(1);
     }
 
@@ -558,7 +558,7 @@ size_t inputVariables_valueStorage::get_inputVariableSize_tValue(std::string var
 
     if(foundVarName == false)
     {
-        printf("could not get size_t value for variable name \"%s\", variableName \%s\" does not exist in size_t value storage!",varName.c_str(),varName.c_str());
+        printf("could not get size_t value for variable name \"%s\", variableName \%s\" does not exist in size_t value storage!\n",varName.c_str(),varName.c_str());
         exit(1);
     }
 
@@ -582,7 +582,7 @@ int inputVariables_valueStorage::get_inputVariableIntValue(std::string varName)
 
     if(foundVarName == false)
     {
-        printf("could not get int value for variable name \"%s\", variableName \%s\" does not exist in int value storage!",varName.c_str(),varName.c_str());
+        printf("could not get int value for variable name \"%s\", variableName \%s\" does not exist in int value storage!\n",varName.c_str(),varName.c_str());
         exit(1);
     }
 
@@ -606,7 +606,7 @@ double inputVariables_valueStorage::get_inputVariableDoubleValue(std::string var
 
     if(foundVarName == false)
     {
-        printf("could not get double value for variable name \"%s\", variableName \%s\" does not exist in double value storage!",varName.c_str(),varName.c_str());
+        printf("could not get double value for variable name \"%s\", variableName \%s\" does not exist in double value storage!\n",varName.c_str(),varName.c_str());
         exit(1);
     }
 
@@ -630,7 +630,12 @@ std::string inputVariables_valueStorage::get_inputVariableStringValue(std::strin
 
     if(foundVarName == false)
     {
-        printf("could not get string value for variable name \"%s\", variableName \%s\" does not exist in string value storage!",varName.c_str(),varName.c_str());
+        printf("could not get string value for variable name \"%s\", variableName \%s\" does not exist in string value storage!\n",varName.c_str(),varName.c_str());
+        printf("possible values are:\n");
+        for(size_t varIdx = 0; varIdx < stringValues.size(); varIdx++)
+        {
+            printf("\"%s\"\n",stringValues[varIdx].variableName.c_str());
+        }
         exit(1);
     }
 
@@ -654,7 +659,7 @@ std::string inputVariables_valueStorage::get_inputVariablePathnameValue(std::str
 
     if(foundVarName == false)
     {
-        printf("could not get pathname value for variable name \"%s\", variableName \%s\" does not exist in pathname value storage!",varName.c_str(),varName.c_str());
+        printf("could not get pathname value for variable name \"%s\", variableName \%s\" does not exist in pathname value storage!\n",varName.c_str(),varName.c_str());
         exit(1);
     }
 
@@ -678,7 +683,7 @@ std::string inputVariables_valueStorage::get_inputVariableFilenameValue(std::str
 
     if(foundVarName == false)
     {
-        printf("could not get filename value for variable name \"%s\", variableName \%s\" does not exist in filename value storage!",varName.c_str(),varName.c_str());
+        printf("could not get filename value for variable name \"%s\", variableName \%s\" does not exist in filename value storage!\n",varName.c_str(),varName.c_str());
         exit(1);
     }
 
@@ -702,7 +707,7 @@ dateValue inputVariables_valueStorage::get_inputVariableDateValue(std::string va
 
     if(foundVarName == false)
     {
-        printf("could not get date value for variable name \"%s\", variableName \%s\" does not exist in date value storage!",varName.c_str(),varName.c_str());
+        printf("could not get date value for variable name \"%s\", variableName \%s\" does not exist in date value storage!\n",varName.c_str(),varName.c_str());
         exit(1);
     }
 
@@ -726,7 +731,7 @@ double inputVariables_valueStorage::get_inputVariableLat_Long_PointValueLat_Coor
 
     if(foundVarName == false)
     {
-        printf("could not get lat_long_point lat_coord value for variable name \"%s\", variableName \%s\" does not exist in lat_long_point value storage!",varName.c_str(),varName.c_str());
+        printf("could not get lat_long_point lat_coord value for variable name \"%s\", variableName \%s\" does not exist in lat_long_point value storage!\n",varName.c_str(),varName.c_str());
         exit(1);
     }
 
@@ -750,7 +755,7 @@ double inputVariables_valueStorage::get_inputVariableLat_Long_PointValueLong_Coo
 
     if(foundVarName == false)
     {
-        printf("could not get lat_long_point long_coord value for variable name \"%s\", variableName \%s\" does not exist in lat_long_point value storage!",varName.c_str(),varName.c_str());
+        printf("could not get lat_long_point long_coord value for variable name \"%s\", variableName \%s\" does not exist in lat_long_point value storage!\n",varName.c_str(),varName.c_str());
         exit(1);
     }
 
@@ -774,7 +779,7 @@ int inputVariables_valueStorage::get_inputVariableDateValueYear(std::string varN
 
     if(foundVarName == false)
     {
-        printf("could not get date year value for variable name \"%s\", variableName \%s\" does not exist in date value storage!",varName.c_str(),varName.c_str());
+        printf("could not get date year value for variable name \"%s\", variableName \%s\" does not exist in date value storage!\n",varName.c_str(),varName.c_str());
         exit(1);
     }
 
@@ -798,7 +803,7 @@ int inputVariables_valueStorage::get_inputVariableDateValueMonth(std::string var
 
     if(foundVarName == false)
     {
-        printf("could not get date month value for variable name \"%s\", variableName \%s\" does not exist in date value storage!",varName.c_str(),varName.c_str());
+        printf("could not get date month value for variable name \"%s\", variableName \%s\" does not exist in date value storage!\n",varName.c_str(),varName.c_str());
         exit(1);
     }
 
@@ -822,7 +827,7 @@ int inputVariables_valueStorage::get_inputVariableDateValueDay(std::string varNa
 
     if(foundVarName == false)
     {
-        printf("could not get date day value for variable name \"%s\", variableName \%s\" does not exist in date value storage!",varName.c_str(),varName.c_str());
+        printf("could not get date day value for variable name \"%s\", variableName \%s\" does not exist in date value storage!\n",varName.c_str(),varName.c_str());
         exit(1);
     }
 
@@ -846,7 +851,7 @@ int inputVariables_valueStorage::get_inputVariableDateValueHour(std::string varN
 
     if(foundVarName == false)
     {
-        printf("could not get date hour value for variable name \"%s\", variableName \%s\" does not exist in date value storage!",varName.c_str(),varName.c_str());
+        printf("could not get date hour value for variable name \"%s\", variableName \%s\" does not exist in date value storage!\n",varName.c_str(),varName.c_str());
         exit(1);
     }
 
@@ -870,7 +875,7 @@ int inputVariables_valueStorage::get_inputVariableDateValueMinute(std::string va
 
     if(foundVarName == false)
     {
-        printf("could not get date minute value for variable name \"%s\", variableName \%s\" does not exist in date value storage!",varName.c_str(),varName.c_str());
+        printf("could not get date minute value for variable name \"%s\", variableName \%s\" does not exist in date value storage!\n",varName.c_str(),varName.c_str());
         exit(1);
     }
 
@@ -894,7 +899,7 @@ int inputVariables_valueStorage::get_inputVariableHour_MinValueHour(std::string 
 
     if(foundVarName == false)
     {
-        printf("could not get hour_min hour value for variable name \"%s\", variableName \%s\" does not exist in hour_min value storage!",varName.c_str(),varName.c_str());
+        printf("could not get hour_min hour value for variable name \"%s\", variableName \%s\" does not exist in hour_min value storage!\n",varName.c_str(),varName.c_str());
         exit(1);
     }
 
@@ -918,7 +923,7 @@ int inputVariables_valueStorage::get_inputVariableHour_MinValueMinute(std::strin
 
     if(foundVarName == false)
     {
-        printf("could not get hour_min minute value for variable name \"%s\", variableName \%s\" does not exist in hour_min value storage!",varName.c_str(),varName.c_str());
+        printf("could not get hour_min minute value for variable name \"%s\", variableName \%s\" does not exist in hour_min value storage!\n",varName.c_str(),varName.c_str());
         exit(1);
     }
 
@@ -1046,9 +1051,9 @@ bool inputVariables_valueStorage::get_write_goog_output(std::string wrf_file_nam
     }
 }
 
-int inputVariables_valueStorage::get_goog_out_resolution(std::string wrf_file_name)
+double inputVariables_valueStorage::get_goog_out_resolution(std::string wrf_file_name)
 {
-    int outputValue = defaultIntValue;
+    double outputValue = defaultDoubleValue;
 
     bool foundVar = false;
     for(size_t fileIdx = 0; fileIdx < additional_WindNinja_outputs_googleValues.size(); fileIdx++)
@@ -1190,9 +1195,9 @@ bool inputVariables_valueStorage::get_write_shapefile_output(std::string wrf_fil
     }
 }
 
-int inputVariables_valueStorage::get_shape_out_resolution(std::string wrf_file_name)
+double inputVariables_valueStorage::get_shape_out_resolution(std::string wrf_file_name)
 {
-    int outputValue = defaultIntValue;
+    double outputValue = defaultDoubleValue;
 
     bool foundVar = false;
     for(size_t fileIdx = 0; fileIdx < additional_WindNinja_outputs_shapefileValues.size(); fileIdx++)
@@ -1268,9 +1273,9 @@ bool inputVariables_valueStorage::get_write_pdf_output(std::string wrf_file_name
     }
 }
 
-int inputVariables_valueStorage::get_pdf_out_resolution(std::string wrf_file_name)
+double inputVariables_valueStorage::get_pdf_out_resolution(std::string wrf_file_name)
 {
-    int outputValue = defaultIntValue;
+    double outputValue = defaultDoubleValue;
 
     bool foundVar = false;
     for(size_t fileIdx = 0; fileIdx < additional_WindNinja_outputs_pdfValues.size(); fileIdx++)
@@ -1312,9 +1317,9 @@ std::string inputVariables_valueStorage::get_units_pdf_out_resolution(std::strin
     }
 }
 
-size_t inputVariables_valueStorage::get_pdf_linewidth(std::string wrf_file_name)
+double inputVariables_valueStorage::get_pdf_linewidth(std::string wrf_file_name)
 {
-    size_t outputValue = defaultSize_tValue;
+    double outputValue = defaultDoubleValue;
 
     bool foundVar = false;
     for(size_t fileIdx = 0; fileIdx < additional_WindNinja_outputs_pdfValues.size(); fileIdx++)
@@ -1541,7 +1546,7 @@ bool inputVariables_valueStorage::setSpecializedDefaults()
     {
         success = false;
     }
-    if(set_inputVariableSize_tValue("fireperim_to_lcp_scalefactor",1) == false)
+    if(set_inputVariableDoubleValue("fireperim_to_lcp_scalefactor",1.0) == false)
     {
         success = false;
     }
@@ -1555,7 +1560,7 @@ bool inputVariables_valueStorage::setSpecializedDefaults()
     }
 
         // createIgnition variables
-    if(set_inputVariableSize_tValue("fire_perimeter_widening_factor",1) == false)
+    if(set_inputVariableDoubleValue("fire_perimeter_widening_factor",1.0) == false)
     {
         success = false;
     }

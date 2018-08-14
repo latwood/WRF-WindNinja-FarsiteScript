@@ -11,6 +11,7 @@
 
 #include "gdal.h"
 #include "cpl_conv.h"   // for CPLMalloc()
+#include "gdal_priv.h"
 
 
 class inputParser

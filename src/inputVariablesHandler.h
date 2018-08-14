@@ -22,6 +22,8 @@ public:
     void explainInputReqs();
     bool loadScriptInputs(std::string inputFileName);
     void printFoundInput();
+    std::string get_actualCreateInputs_path();
+    std::string get_actualFinalOutput_path();
 
     // will probably have to repeat the functions from the inputVariable_valueStorage class unfortunately.
     // Difference is the values won't be stored in this class, just in the one referenced here
@@ -55,7 +57,7 @@ public:
     std::vector<std::string> get_additional_WindNinja_outputs_googleValues_wrf_file_names();
     bool get_write_wx_model_goog_output(std::string wrf_file_name);
     bool get_write_goog_output(std::string wrf_file_name);
-    int get_goog_out_resolution(std::string wrf_file_name);
+    double get_goog_out_resolution(std::string wrf_file_name);
     std::string get_units_goog_out_resolution(std::string wrf_file_name);
     std::string get_goog_out_color_scheme(std::string wrf_file_name);
     bool get_goog_out_vector_scaling(std::string wrf_file_name);
@@ -63,14 +65,14 @@ public:
     std::vector<std::string> get_additional_WindNinja_outputs_shapefileValues_wrf_file_names();
     bool get_write_wx_model_shapefile_output(std::string wrf_file_name);
     bool get_write_shapefile_output(std::string wrf_file_name);
-    int get_shape_out_resolution(std::string wrf_file_name);
+    double get_shape_out_resolution(std::string wrf_file_name);
     std::string get_units_shape_out_resolution(std::string wrf_file_name);
     // additional_WindNinja_outputs_pdf get functions
     std::vector<std::string> get_additional_WindNinja_outputs_pdfValues_wrf_file_names();
     bool get_write_pdf_output(std::string wrf_file_name);
-    int get_pdf_out_resolution(std::string wrf_file_name);
+    double get_pdf_out_resolution(std::string wrf_file_name);
     std::string get_units_pdf_out_resolution(std::string wrf_file_name);
-    size_t get_pdf_linewidth(std::string wrf_file_name);
+    double get_pdf_linewidth(std::string wrf_file_name);
     std::string get_pdf_basemap(std::string wrf_file_name);
     double get_pdf_height(std::string wrf_file_name);
     double get_pdf_width(std::string wrf_file_name);
@@ -81,11 +83,17 @@ private:
     // functions
     bool reset();
     bool verifyFoundInputCombinations();
+    bool doesFolderExist(std::string pathName);
+    bool findActualCreateInputsAndFinalOutputsPaths();
 
     // class data members
     std::vector<inputVariable_info> inputVariableInfo;
     inputVariables_valueStorage inputVariableValues;
     inputParser theInputParser;
+
+    // important for file management
+    std::string actualCreateInputs_path;
+    std::string actualFinalOutput_path;
 
 };
 

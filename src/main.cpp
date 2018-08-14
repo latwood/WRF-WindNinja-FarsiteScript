@@ -7,6 +7,8 @@
 #include "createFarsiteInputs.h"
 #include "farsite.h"
 
+#include <chrono>
+
 using namespace std;
 
 #define MAX_PATH 512
@@ -30,9 +32,32 @@ bool checkCommandLineInput(int argc, char*argv[], inputVariablesHandler *inputs)
     return true;    // only other way to return is by exiting
 }
 
+bool doesFolderExist(std::string pathName)
+{
+    bool exists = true;
+
+    struct stat info;
+    if( stat( pathName.c_str(), &info ) != 0 )
+    {
+        //printf( "cannot access %s\n", inputString.c_str() );
+        exists = false;
+    } else if( info.st_mode & S_IFDIR )  // S_ISDIR() doesn't exist on my windows
+    {
+        //printf( "%s is a directory\n", inputString.c_str() );
+        exists = true;
+    } else
+    {
+        //printf( "%s is no directory\n", inputString.c_str() );
+        exists = false;
+    }
+
+    return exists;
+}
+
 int main(int argc, char* argv[])
 {
     printf("\nbeginning WRF-WindNinja-FarsiteScript\n\n");
+    auto start = std::chrono::high_resolution_clock::now(); // start recording execution time
 
     inputVariablesHandler inputs;
     createIgnitions ignitions;
@@ -52,6 +77,26 @@ int main(int argc, char* argv[])
     {
         printf("Error loading script inputs! Exiting program!\n");
         exit(1);
+    }
+
+    // create main output folders if needed. overwrite outputs will already be checked to get the right paths
+    if(doesFolderExist(inputs.get_actualCreateInputs_path()) == false)
+    {
+            //force temp dir to DEM location (is this even necessary?)
+        CPLSetConfigOption("CPL_TMPDIR", CPLGetDirname(inputs.get_actualCreateInputs_path().c_str()));
+        CPLSetConfigOption("CPLTMPDIR", CPLGetDirname(inputs.get_actualCreateInputs_path().c_str()));
+        CPLSetConfigOption("TEMP", CPLGetDirname(inputs.get_actualCreateInputs_path().c_str()));
+            // now make the directory
+        VSIMkdir( inputs.get_actualCreateInputs_path().c_str(), 0777 );
+    }
+    if(doesFolderExist(inputs.get_actualFinalOutput_path()) == false)
+    {
+            //force temp dir to DEM location (is this even necessary?)
+        CPLSetConfigOption("CPL_TMPDIR", CPLGetDirname(inputs.get_actualFinalOutput_path().c_str()));
+        CPLSetConfigOption("CPLTMPDIR", CPLGetDirname(inputs.get_actualFinalOutput_path().c_str()));
+        CPLSetConfigOption("TEMP", CPLGetDirname(inputs.get_actualFinalOutput_path().c_str()));
+            // now make the directory
+        VSIMkdir( inputs.get_actualFinalOutput_path().c_str(), 0777 );
     }
 
     if(!ignitions.createAllIgnitions(&inputs))
@@ -83,6 +128,10 @@ int main(int argc, char* argv[])
         printf("Error generating extra farsite inputs! Exiting program!\n");
         exit(1);
     }
+
+    auto finish = std::chrono::high_resolution_clock::now();  // finish recording execution time
+    std::chrono::duration<double> elapsed = finish - start;
+    printf("Elapsed time: %f seconds\n",elapsed.count());   // print out elapsed execution time
 
     printf("\nfinished WRF-WindNinja-FarsiteScript\n\n");
     return 0;

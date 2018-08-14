@@ -905,7 +905,7 @@ bool inputParser::isValidString(std::string inputString, std::string varName)
         }
     } else if(varName == "WindNinja_mesh_choice")
     {
-        if(inputString != "coarse" && inputString != "medium" && inputString != "fine")
+        if(inputString != "coarse" && inputString != "medium" && inputString != "fine" && inputString != "custom")
         {
             conversionSuccess = false;
         }
@@ -1246,7 +1246,7 @@ bool inputParser::isValidNetCDFFilename(std::string inputString, bool suppressWa
     removeEndingWhitespace(inputString);    // just in case
 
     GDALDatasetH  hDataset;
-    std::string netCDFFileString = "NETCDF:\"" + inputString;
+    std::string netCDFFileString = "NETCDF:\"" + inputString + "\"";
     CPLPushErrorHandler(&CPLQuietErrorHandler);
     hDataset = GDALOpen( netCDFFileString.c_str(), GA_ReadOnly );
     CPLPopErrorHandler();
@@ -1322,7 +1322,157 @@ bool inputParser::isValidNetCDFFilename(std::string inputString, bool suppressWa
         // end closing dataset
 
         / end tutorial stuff */
+    }
+    GDALClose(hDataset);
 
+    if(conversionSuccess == true)
+    {
+        /* WindNinja wrfSurfInitialization::checkForValidData() stuff */
+
+        // important info about wrf files: https://www.ncl.ucar.edu/Applications/wrfnetcdf.shtml, http://www.openwfm.org/wiki/How_to_interpret_WRF_variables,
+        //   http://www.meteo.unican.es/wiki/cordexwrf/OutputVariables, https://wiki.ucar.edu/display/acme/WRF+Ingest
+
+        // setup desired variables from netcdf file list
+        std::vector<std::string> wrf_var_list;
+        wrf_var_list.push_back("T2"); // 2 m temperature, T by itself is all air temperatures in 3D space. Units are K.
+        wrf_var_list.push_back("Q2"); // 2 m specific humidity. Units are 1, so I guess unitless. QVAPOR is the specific humidity for all 3D space
+        wrf_var_list.push_back("RAINC"); // hourly precipitation in kg/(m^2*s), RAINC is ACCUMULATED TOTAL CUMULUS PRECIPITATION, RAINNC is ACCUMULATED TOTAL GRID SCALE PRECIPITATION so I think I need to add both to get total precipitation? Sounds like all the different precips from each different physics model technically need added together for this. For now just use RAINC. Also, accumulated is the right type?
+        wrf_var_list.push_back("RAINNC");   // sounds like usually you get RAINC and RAINNC and add them both to get total hourly precip. No information on what RAINSH is, but might be another component, but not used so much so let's ignore it for now
+        // technically don't need each of these RAINC and RAINNC, just if they exist or not, for now assume need both
+        wrf_var_list.push_back("QCLOUD"); // WindNinja says this is the cloud water mixing ratio but uses it for the cloud cover grid. http://www.meteo.unican.es/wiki/cordexwrf/OutputVariables says it is the Column liquid water content?
+
+        GDALDataset *srcDS;
+        for(size_t wrfVarIdx = 0; wrfVarIdx < wrf_var_list.size(); wrfVarIdx++)
+        {
+            netCDFFileString = "NETCDF:\"" + inputString + "\":" + wrf_var_list[wrfVarIdx];
+            CPLPushErrorHandler(&CPLQuietErrorHandler);
+            srcDS = (GDALDataset*)GDALOpen( netCDFFileString.c_str(), GA_ReadOnly );
+            CPLPopErrorHandler();
+            if(srcDS == NULL)
+            {
+                if(suppressWarnings == false)
+                {
+                    printf("netcdf file \"%s\" does not have data of name \"%s\"!\n",inputString.c_str(),wrf_var_list[wrfVarIdx].c_str());
+                }
+                conversionSuccess = false;
+            } else
+            {
+                //Get total bands (time steps)
+                int nBands = srcDS->GetRasterCount();
+                int nXSize = srcDS->GetRasterXSize();
+                int nYSize = srcDS->GetRasterYSize();
+
+                GDALRasterBand *poBand;
+                double *padfScanline;
+                //loop over all bands for this variable (bands are time steps)
+                for(size_t bandIdx = 1; bandIdx <= nBands; bandIdx++)
+                {
+                    poBand = srcDS->GetRasterBand(bandIdx);
+
+                    int pbSuccess = 0;
+                    double dfNoData = poBand->GetNoDataValue( &pbSuccess );
+
+                    bool noDataValueExists = false;
+                    bool noDataIsNan = false;
+                    if( pbSuccess == false )
+                        noDataValueExists = false;
+                    else
+                    {
+                        noDataValueExists = true;
+                        noDataIsNan = CPLIsNan(dfNoData);
+                    }
+
+                    //set the data
+                    padfScanline = new double[nXSize*nYSize];
+                    poBand->RasterIO(GF_Read, 0, 0, nXSize, nYSize, padfScanline,
+                                     nXSize, nYSize, GDT_Float64, 0, 0);
+                    for(size_t dataIdx = 0; dataIdx < nXSize*nYSize; dataIdx++)
+                    {
+                        //Check if value is no data (if no data value was defined in file)
+                        if(noDataValueExists == true)
+                        {
+                            if(noDataIsNan == true)
+                            {
+                                if(CPLIsNan(padfScanline[dataIdx]))
+                                {
+                                    if(suppressWarnings == false)
+                                    {
+                                        printf("netcdf file \"%s\" contains no_data values for data of name \"%s\"!\n",inputString.c_str(),wrf_var_list[wrfVarIdx].c_str());
+                                    }
+                                    conversionSuccess = false;
+                                }
+                            } else
+                            {
+                                if(padfScanline[dataIdx] == dfNoData)
+                                {
+                                    if(suppressWarnings == false)
+                                    {
+                                        printf("netcdf file \"%s\" contains no_data values for data of name \"%s\"!\n",inputString.c_str(),wrf_var_list[wrfVarIdx].c_str());
+                                    }
+                                    conversionSuccess = false;
+                                }
+                            }
+                        }
+                        if( wrf_var_list[wrfVarIdx] == "T2" )   //units are Kelvin
+                        {
+                            if(padfScanline[dataIdx] < 180.0 || padfScanline[dataIdx] > 340.0)  //these are near the most extreme temperatures ever recored on earth
+                            {
+                                if(suppressWarnings == false)
+                                {
+                                    printf("temperature is out of range for netcdf file \"%s\"!\n",inputString.c_str());
+                                }
+                                conversionSuccess = false;
+                            }
+                        } else if( wrf_var_list[wrfVarIdx] == "Q2" )  //units are unitless
+                        {
+                            if(padfScanline[dataIdx] < -0.0001 || padfScanline[dataIdx] > 100.0)
+                            {
+                                if(suppressWarnings == false)
+                                {
+                                    printf("specific humidity is out of range for netcdf file \"%s\"!\n",inputString.c_str());
+                                }
+                                conversionSuccess = false;
+                            }
+                        } else if( wrf_var_list[wrfVarIdx] == "RAINC" )  //units are kg/(m^2*s)
+                        {
+                            if(padfScanline[dataIdx] < -0.0001 || padfScanline[dataIdx] > 100.0)
+                            {
+                                if(suppressWarnings == false)
+                                {
+                                    printf("cumulus precipitation is out of range for netcdf file \"%s\"!\n",inputString.c_str());
+                                }
+                                conversionSuccess = false;
+                            }
+                        } else if( wrf_var_list[wrfVarIdx] == "RAINNC" )  //units are kg/(m^2*s)
+                        {
+                            if(padfScanline[dataIdx] < -0.0001 || padfScanline[dataIdx] > 100.0)
+                            {
+                                if(suppressWarnings == false)
+                                {
+                                    printf("grid scale precipitation is out of range for netcdf file \"%s\"!\n",inputString.c_str());
+                                }
+                                conversionSuccess = false;
+                            }
+                        } else if( wrf_var_list[wrfVarIdx] == "QCLOUD" )  //units are kg/kg
+                        {
+                            if(padfScanline[dataIdx] < -0.0001 || padfScanline[dataIdx] > 100.0)
+                            {
+                                if(suppressWarnings == false)
+                                {
+                                    printf("total cloud cover is out of range for netcdf file \"%s\"!\n",inputString.c_str());
+                                }
+                                conversionSuccess = false;
+                            }
+                        }
+                    }
+
+                    delete [] padfScanline;
+                }
+            }
+            GDALClose((GDALDatasetH) srcDS );
+        }
+
+        /* end WindNinja wrfSurfInitialization::checkForValidData() stuff */
     }
 
     return conversionSuccess;
@@ -2428,7 +2578,7 @@ bool inputParser::load_additional_WindNinja_outputs_google(std::string inputFile
                 std::string found_wrf_file_name = "";
                 bool found_write_wx_model_goog_output = false;
                 bool found_write_goog_output = false;
-                int found_goog_out_resolution = 0;
+                double found_goog_out_resolution = 0;
                 std::string found_units_goog_out_resolution = "";
                 std::string found_goog_out_color_scheme = "";
                 bool found_goog_out_vector_scaling = false;
@@ -2482,15 +2632,28 @@ bool inputParser::load_additional_WindNinja_outputs_google(std::string inputFile
                         }
                         conversionSuccess = false;
                     }
-                    bool isInt = false;
-                    found_goog_out_resolution = strToInt(foundValues[3],isInt);
-                    if(isInt == false)
+                    bool isDouble = false;
+                    found_goog_out_resolution = strToDbl(foundValues[3],isDouble);
+                    if(isDouble == false)
                     {
                         if(lineCount < varCount)    // only error if is a valid line as loop goes one extra to check for extra files
                         {
-                            printf("problem converting \"%s\" value to int!\n",foundValues[3].c_str());
+                            printf("problem converting \"%s\" value to double!\n",foundValues[3].c_str());
                         }
                         conversionSuccess = false;
+                    } else
+                    {
+                        if(found_goog_out_resolution < 0)
+                        {
+                            if(foundValues[3] != "-1")
+                            {
+                                if(lineCount < varCount)    // only error if is a valid line as loop goes one extra to check for extra files
+                                {
+                                    printf("goog_out_resolution \"%s\" is negative but not of value \"-1\"!\n",foundValues[3].c_str());
+                                }
+                                conversionSuccess = false;
+                            }
+                        }
                     }
                     bool isGoodString = isValidString(foundValues[4],"units_goog_out_resolution");
                     if(isGoodString == false)
@@ -2644,7 +2807,7 @@ bool inputParser::load_additional_WindNinja_outputs_shapefile(std::string inputF
                 std::string found_wrf_file_name = "";
                 bool found_write_wx_model_shapefile_output = false;
                 bool found_write_shapefile_output = false;
-                int found_shape_out_resolution = 0;
+                double found_shape_out_resolution = 0;
                 std::string found_units_shape_out_resolution = "";
                 bool conversionSuccess = true;
                 if(foundValues.size() != 5)
@@ -2696,15 +2859,28 @@ bool inputParser::load_additional_WindNinja_outputs_shapefile(std::string inputF
                         }
                         conversionSuccess = false;
                     }
-                    bool isInt = false;
-                    found_shape_out_resolution = strToInt(foundValues[3],isInt);
-                    if(isInt == false)
+                    bool isDouble = false;
+                    found_shape_out_resolution = strToDbl(foundValues[3],isDouble);
+                    if(isDouble == false)
                     {
                         if(lineCount < varCount)    // only error if is a valid line as loop goes one extra to check for extra files
                         {
-                            printf("problem converting \"%s\" value to int!\n",foundValues[3].c_str());
+                            printf("problem converting \"%s\" value to double!\n",foundValues[3].c_str());
                         }
                         conversionSuccess = false;
+                    } else
+                    {
+                        if(found_shape_out_resolution < 0)
+                        {
+                            if(foundValues[3] != "-1")
+                            {
+                                if(lineCount < varCount)    // only error if is a valid line as loop goes one extra to check for extra files
+                                {
+                                    printf("found_shape_out_resolution \"%s\" is negative but not of value \"-1\"!\n",foundValues[3].c_str());
+                                }
+                                conversionSuccess = false;
+                            }
+                        }
                     }
                     bool isGoodString = isValidString(foundValues[4],"units_shape_out_resolution");
                     if(isGoodString == false)
@@ -2834,9 +3010,9 @@ bool inputParser::load_additional_WindNinja_outputs_pdf(std::string inputFileNam
                 printf("\n\n");*/
                 std::string found_wrf_file_name = "";
                 bool found_write_pdf_output = false;
-                int found_pdf_out_resolution = 0;
+                double found_pdf_out_resolution = 0;
                 std::string found_units_pdf_out_resolution = "";
-                size_t found_pdf_linewidth = 0;
+                double found_pdf_linewidth = 0;
                 std::string found_pdf_basemap = "";
                 double found_pdf_height = 0.0;
                 double found_pdf_width = 0.0;
@@ -2881,15 +3057,28 @@ bool inputParser::load_additional_WindNinja_outputs_pdf(std::string inputFileNam
                         }
                         conversionSuccess = false;
                     }
-                    bool isInt = false;
-                    found_pdf_out_resolution = strToInt(foundValues[2],isInt);
-                    if(isInt == false)
+                    bool isDouble = false;
+                    found_pdf_out_resolution = strToInt(foundValues[2],isDouble);
+                    if(isDouble == false)
                     {
                         if(lineCount < varCount)    // only error if is a valid line as loop goes one extra to check for extra files
                         {
-                            printf("problem converting \"%s\" value to int!\n",foundValues[2].c_str());
+                            printf("problem converting \"%s\" value to double!\n",foundValues[2].c_str());
                         }
                         conversionSuccess = false;
+                    } else
+                    {
+                        if(found_pdf_out_resolution < 0)
+                        {
+                            if(foundValues[2] != "-1")
+                            {
+                                if(lineCount < varCount)    // only error if is a valid line as loop goes one extra to check for extra files
+                                {
+                                    printf("found_pdf_out_resolution \"%s\" is negative but not of value \"-1\"!\n",foundValues[2].c_str());
+                                }
+                                conversionSuccess = false;
+                            }
+                        }
                     }
                     bool isGoodString = isValidString(foundValues[3],"units_pdf_out_resolution");
                     if(isGoodString == false)
@@ -2903,13 +3092,13 @@ bool inputParser::load_additional_WindNinja_outputs_pdf(std::string inputFileNam
                     {
                         found_units_pdf_out_resolution = foundValues[3];
                     }
-                    bool isSize_t = false;
-                    found_pdf_linewidth = strToSize_t(foundValues[4],isSize_t);
-                    if(isSize_t == false)
+                    bool isPositiveDouble = false;
+                    found_pdf_linewidth = strToPositiveDbl(foundValues[4],isPositiveDouble);
+                    if(isPositiveDouble == false)
                     {
                         if(lineCount < varCount)    // only error if is a valid line as loop goes one extra to check for extra files
                         {
-                            printf("problem converting \"%s\" value to size_t!\n",foundValues[4].c_str());
+                            printf("problem converting \"%s\" value to positive double!\n",foundValues[4].c_str());
                         }
                         conversionSuccess = false;
                     }
@@ -2926,7 +3115,7 @@ bool inputParser::load_additional_WindNinja_outputs_pdf(std::string inputFileNam
                     {
                         found_pdf_basemap = foundValues[5];
                     }
-                    bool isPositiveDouble = false;
+                    isPositiveDouble = false;
                     found_pdf_height = strToPositiveDbl(foundValues[6],isPositiveDouble);
                     if(isPositiveDouble == false)
                     {

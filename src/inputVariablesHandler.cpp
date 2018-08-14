@@ -97,6 +97,16 @@ bool inputVariablesHandler::loadScriptInputs(std::string inputFileName)
         printFoundInput();
     }
 
+    // now get the actual output paths for use by everything
+    if(success == true)
+    {
+        if(findActualCreateInputsAndFinalOutputsPaths() == false)
+        {
+            printf("problem finding actual output paths!\n");
+            success = false;
+        }
+    }
+
     return success;
 }
 
@@ -212,7 +222,7 @@ void inputVariablesHandler::printFoundInput()
                 for(size_t countVarIdx = 0; countVarIdx < current_wrf_files.size(); countVarIdx++)
                 {
                     std::string wrfFile = current_wrf_files[countVarIdx];
-                    printf("%s %d %d %d %s %s %d\n",wrfFile.c_str(),get_write_wx_model_goog_output(wrfFile),get_write_goog_output(wrfFile),get_goog_out_resolution(wrfFile),get_units_goog_out_resolution(wrfFile).c_str(),get_goog_out_color_scheme(wrfFile).c_str(),get_goog_out_vector_scaling(wrfFile));
+                    printf("%s %d %d %f %s %s %d\n",wrfFile.c_str(),get_write_wx_model_goog_output(wrfFile),get_write_goog_output(wrfFile),get_goog_out_resolution(wrfFile),get_units_goog_out_resolution(wrfFile).c_str(),get_goog_out_color_scheme(wrfFile).c_str(),get_goog_out_vector_scaling(wrfFile));
                 }
             } else if(currentLoaderFunction == "load_additional_WindNinja_outputs_shapefile")
             {
@@ -220,7 +230,7 @@ void inputVariablesHandler::printFoundInput()
                 for(size_t countVarIdx = 0; countVarIdx < current_wrf_files.size(); countVarIdx++)
                 {
                     std::string wrfFile = current_wrf_files[countVarIdx];
-                    printf("%s %d %d %d %s\n",wrfFile.c_str(),get_write_wx_model_shapefile_output(wrfFile),get_write_shapefile_output(wrfFile),get_shape_out_resolution(wrfFile),get_units_shape_out_resolution(wrfFile).c_str());
+                    printf("%s %d %d %f %s\n",wrfFile.c_str(),get_write_wx_model_shapefile_output(wrfFile),get_write_shapefile_output(wrfFile),get_shape_out_resolution(wrfFile),get_units_shape_out_resolution(wrfFile).c_str());
                 }
             } else if(currentLoaderFunction == "load_additional_WindNinja_outputs_pdf")
             {
@@ -228,7 +238,7 @@ void inputVariablesHandler::printFoundInput()
                 for(size_t countVarIdx = 0; countVarIdx < current_wrf_files.size(); countVarIdx++)
                 {
                     std::string wrfFile = current_wrf_files[countVarIdx];
-                    printf("%s %d %d %s %zu %s %f %f %s\n",wrfFile.c_str(),get_write_pdf_output(wrfFile),get_pdf_out_resolution(wrfFile),get_units_pdf_out_resolution(wrfFile).c_str(),get_pdf_linewidth(wrfFile),get_pdf_basemap(wrfFile).c_str(),get_pdf_height(wrfFile),get_pdf_width(wrfFile),get_pdf_size(wrfFile).c_str());
+                    printf("%s %d %f %s %f %s %f %f %s\n",wrfFile.c_str(),get_write_pdf_output(wrfFile),get_pdf_out_resolution(wrfFile),get_units_pdf_out_resolution(wrfFile).c_str(),get_pdf_linewidth(wrfFile),get_pdf_basemap(wrfFile).c_str(),get_pdf_height(wrfFile),get_pdf_width(wrfFile),get_pdf_size(wrfFile).c_str());
                 }
             } else
             {
@@ -240,6 +250,16 @@ void inputVariablesHandler::printFoundInput()
         }
     }
     printf("\nfinished printing found input\n\n");
+}
+
+std::string inputVariablesHandler::get_actualCreateInputs_path()
+{
+    return actualCreateInputs_path;
+}
+
+std::string inputVariablesHandler::get_actualFinalOutput_path()
+{
+    return actualFinalOutput_path;
 }
 /*** end  functions ***/
 
@@ -372,7 +392,7 @@ bool inputVariablesHandler::get_write_goog_output(std::string wrf_file_name)
     return inputVariableValues.get_write_goog_output(wrf_file_name);
 }
 
-int inputVariablesHandler::get_goog_out_resolution(std::string wrf_file_name)
+double inputVariablesHandler::get_goog_out_resolution(std::string wrf_file_name)
 {
     return inputVariableValues.get_goog_out_resolution(wrf_file_name);
 }
@@ -409,7 +429,7 @@ bool inputVariablesHandler::get_write_shapefile_output(std::string wrf_file_name
     return inputVariableValues.get_write_shapefile_output(wrf_file_name);
 }
 
-int inputVariablesHandler::get_shape_out_resolution(std::string wrf_file_name)
+double inputVariablesHandler::get_shape_out_resolution(std::string wrf_file_name)
 {
     return inputVariableValues.get_shape_out_resolution(wrf_file_name);
 }
@@ -431,7 +451,7 @@ bool inputVariablesHandler::get_write_pdf_output(std::string wrf_file_name)
     return inputVariableValues.get_write_pdf_output(wrf_file_name);
 }
 
-int inputVariablesHandler::get_pdf_out_resolution(std::string wrf_file_name)
+double inputVariablesHandler::get_pdf_out_resolution(std::string wrf_file_name)
 {
     return inputVariableValues.get_pdf_out_resolution(wrf_file_name);
 }
@@ -441,7 +461,7 @@ std::string inputVariablesHandler::get_units_pdf_out_resolution(std::string wrf_
     return inputVariableValues.get_units_pdf_out_resolution(wrf_file_name);
 }
 
-size_t inputVariablesHandler::get_pdf_linewidth(std::string wrf_file_name)
+double inputVariablesHandler::get_pdf_linewidth(std::string wrf_file_name)
 {
     return inputVariableValues.get_pdf_linewidth(wrf_file_name);
 }
@@ -479,6 +499,10 @@ std::string inputVariablesHandler::get_pdf_size(std::string wrf_file_name)
 bool inputVariablesHandler::reset()
 {
     bool success = true;
+
+    actualCreateInputs_path = "";
+    actualFinalOutput_path = "";
+
     for(size_t varIdx = 0; varIdx < inputVariableInfo.size(); varIdx++)
     {
         inputVariableInfo[varIdx].resetVariable();
@@ -493,7 +517,87 @@ bool inputVariablesHandler::verifyFoundInputCombinations()
     bool success = true;
 
     // setup whatever you need to set if input variables are optional or not, or how they are optional or required
+    // set_wantDefaultValue
+    // I would keep the order of these checkers as close to the input variable list order as possible to keep it hopefully less confusing
 
+
+
+
+    return success;
+}
+
+bool inputVariablesHandler::doesFolderExist(std::string pathName)
+{
+    bool exists = true;
+
+    struct stat info;
+    if( stat( pathName.c_str(), &info ) != 0 )
+    {
+        //printf( "cannot access %s\n", inputString.c_str() );
+        exists = false;
+    } else if( info.st_mode & S_IFDIR )  // S_ISDIR() doesn't exist on my windows
+    {
+        //printf( "%s is a directory\n", inputString.c_str() );
+        exists = true;
+    } else
+    {
+        //printf( "%s is no directory\n", inputString.c_str() );
+        exists = false;
+    }
+
+    return exists;
+}
+
+bool inputVariablesHandler::findActualCreateInputsAndFinalOutputsPaths()
+{
+    bool success = true;
+
+    if(inputVariableValues.get_inputVariableBoolValue("overwrite_past_outputs") == false)
+    {
+        actualCreateInputs_path = inputVariableValues.get_inputVariablePathnameValue("createInputs_path");
+        actualFinalOutput_path = inputVariableValues.get_inputVariablePathnameValue("finalOutput_path");
+    } else
+    {
+        std::string currentCreateInputsPath = inputVariableValues.get_inputVariablePathnameValue("createInputs_path");
+        std::string currentFinalOutputPath = inputVariableValues.get_inputVariablePathnameValue("finalOutput_path");
+
+        size_t createInputsCount = 0;
+        while(doesFolderExist(currentCreateInputsPath) == true)
+        {
+            currentCreateInputsPath = std::to_string(createInputsCount) + "_" + inputVariableValues.get_inputVariablePathnameValue("createInputs_path");
+            createInputsCount = createInputsCount + 1;
+        }
+
+        size_t finalOutputsCount = 0;
+        while(doesFolderExist(currentFinalOutputPath) == true)
+        {
+            currentFinalOutputPath = std::to_string(finalOutputsCount) + "_" + inputVariableValues.get_inputVariablePathnameValue("finalOutput_path");
+            finalOutputsCount = finalOutputsCount + 1;
+        }
+
+        if(createInputsCount == 0 && finalOutputsCount == 0)
+        {
+            actualCreateInputs_path = currentCreateInputsPath;
+            actualFinalOutput_path = currentFinalOutputPath;
+        } else if(createInputsCount >= finalOutputsCount)
+        {
+            actualCreateInputs_path = std::to_string(createInputsCount) + "_" + inputVariableValues.get_inputVariablePathnameValue("createInputs_path");
+            actualFinalOutput_path = std::to_string(createInputsCount) + "_" + inputVariableValues.get_inputVariablePathnameValue("finalOutput_path");
+        } else
+        {
+            actualCreateInputs_path = std::to_string(finalOutputsCount) + "_" + inputVariableValues.get_inputVariablePathnameValue("createInputs_path");
+            actualFinalOutput_path = std::to_string(finalOutputsCount) + "_" + inputVariableValues.get_inputVariablePathnameValue("finalOutput_path");
+        }
+    }
+
+    if(actualCreateInputs_path.substr(actualCreateInputs_path.length()-1,actualCreateInputs_path.length()) == "/")
+    {
+        actualCreateInputs_path = actualCreateInputs_path.substr(0,actualCreateInputs_path.length()-1);
+    }
+    if(actualFinalOutput_path.substr(actualFinalOutput_path.length()-1,actualFinalOutput_path.length()) == "/")
+    {
+        actualFinalOutput_path = actualFinalOutput_path.substr(0,actualFinalOutput_path.length()-1);
+    }
 
     return success;
 }

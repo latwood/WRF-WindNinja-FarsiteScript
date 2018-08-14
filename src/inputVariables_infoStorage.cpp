@@ -172,12 +172,12 @@ void inputVariables_infoStorage::setupAvailableVariables()
     addVariable("createIgnition_output_units","application specific input","string","NA",
                 "A string specifying the types of units to be used by all files outputted by createIgnitions during the script. "
                 "Values can be english, metric, or input where input is the default value");
-    addVariable("wrfGetWeather_output_units","application specific input","string","NA",
-                "A string specifying the types of units to be used by all files outputted by wrfGetWeather during the script. "
-                "Values can be english, or metric where metric is the default value");
     addVariable("WindNinja_required_output_units","application specific input","string","NA",
                 "A string specifying the types of units to be used by all files required for later use outputted by WindNinja during the script. "
                 "Values can be english or metric where metric is the default value. output_wind_height is 20 ft for english and 10 m for metric");
+    addVariable("wrfGetWeather_output_units","application specific input","string","NA",
+                "A string specifying the types of units to be used by all files outputted by wrfGetWeather during the script. "
+                "Values can be english, or metric where metric is the default value");
     addVariable("farsite_output_units","application specific input","string","NA",
                 "A string specifying the types of units to be used by all files output by farsite at the very end. "
                 "I suspect this isn't actually allowable yet, so it might just be whatever units are used coming in, or default to english, but we shall see. "
@@ -191,9 +191,9 @@ void inputVariables_infoStorage::setupAvailableVariables()
                 "A boolean to know whether the lcp should follow automated features for downloading. "
                 "fireperim_to_lcp_scalefactor is used to increase the lcp bounding box size by a multiple of the largest ignition fire perimeter. "
                 "Only one of automate_lcp_download, use_past_lcp, and specify_lcp_download can be true and the default to be true if none are specified is automate_lcp_download");
-    addVariable("fireperim_to_lcp_scalefactor","lcpDownloader","size_t","NA",
+    addVariable("fireperim_to_lcp_scalefactor","lcpDownloader","positive double","NA",
                 "A positive integer y used as a scaling factor for the lcp bounding box to make it x*y bigger than the largest ignition fire perimeter, "
-                "where x is 200 for ignitions that are basically a single point and 200 for all other ignitions. Default value for y is 1 if not specified "
+                "where x is 200 for ignitions that are basically a single point and 200 for all other ignitions. Default value for y is 1.0 if not specified "
                 "and should only be specified if automate_lcp_download is set to true");
     addVariable("use_past_lcp","lcpDownloader","bool","NA",
                 "A boolean to know whether lcp downloading should be avoided by using an already predownloaded lcp file. "
@@ -264,9 +264,9 @@ void inputVariables_infoStorage::setupAvailableVariables()
                 "Files are checked to make sure file extension is .shp and that files can be read by ogr/gdal. "
                 "Need at least one of create_ignition_from_latlongs, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, "
                 "or farsite_output_fire_perimeter_files ignition types to run");
-    addVariable("fire_perimeter_widening_factor","createIgnition","size_t","NA",
+    addVariable("fire_perimeter_widening_factor","createIgnition","positive double","NA",
                 "An integer used to shrink or expand fire perimeters of all created ignition files by multiplying each point in the geometry by this integer. "
-                "Defaults to a value of 1 unless specified. May need to make this specific to each ignition file if needed long term. "
+                "Defaults to a value of 1.0 unless specified. May need to make this specific to each ignition file if needed long term. "
                 "Or can get rid of and if any perimeter is less than say 30 m, just stretch it to that size as that is the default farsite distance res");
 
         // wrfGetWeather and WindNinja variables
@@ -286,11 +286,10 @@ void inputVariables_infoStorage::setupAvailableVariables()
     addVariable("WindNinja_number_of_threads","WindNinja only","size_t","NA",
                 "The number of threads to use for WindNinja simulations. If you specify a greater number than exist, will use max. Default is 8");
     addVariable("WindNinja_mesh_choice","WindNinja only","string","NA",
-                "A string specifying the type of WindNinja mesh desired for all simulations. Choices are coarse, medium, or fine. "
-                "Default is fine if both WindNinja_mesh_choice and WindNinja_mesh_resolution are not specified");
+                "A string specifying the type of WindNinja mesh desired for all simulations. Choices are coarse, medium, fine, or custom. "
+                "Default is fine if WindNinja_mesh_choice is not specified");
     addVariable("WindNinja_mesh_resolution","WindNinja only","positive double","NA",
-                "A positive double value specifying the exact desired mesh resolution. "
-                "If this is specified instead of WindNinja_mesh_choice, need to also specify WindNinja_mesh_res_units. "
+                "A positive double value specifying the exact desired mesh resolution. Only specify this is WindNinja_mesh_choice has a value of custom. "
                 "Warning! If this is a lot smaller than what is selected by WindNinja_mesh_choice of fine, could make simulations take a TON longer");
     addVariable("WindNinja_mesh_res_units","WindNinja only","string","NA",
                 "A string specifying the units of WindNinja_mesh_resolution and has to be either ft or m. Default is m if WindNinja_mesh_resolution is specified but this is not");

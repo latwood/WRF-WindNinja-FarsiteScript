@@ -33,7 +33,7 @@ struct additional_WindNinja_outputs_googleValue
     std::string wrf_file_name;
     bool write_wx_model_goog_output;
     bool write_goog_output;
-    int goog_out_resolution;
+    double goog_out_resolution;
     std::string units_goog_out_resolution;
     std::string goog_out_color_scheme;
     bool goog_out_vector_scaling;
@@ -44,7 +44,7 @@ struct additional_WindNinja_outputs_shapefileValue
     std::string wrf_file_name;
     bool write_wx_model_shapefile_output;
     bool write_shapefile_output;
-    int shape_out_resolution;
+    double shape_out_resolution;
     std::string units_shape_out_resolution;
 };
 
@@ -52,9 +52,9 @@ struct additional_WindNinja_outputs_pdfValue
 {
     std::string wrf_file_name;
     bool write_pdf_output;
-    int pdf_out_resolution;
+    double pdf_out_resolution;
     std::string units_pdf_out_resolution;
-    size_t pdf_linewidth;
+    double pdf_linewidth;
     std::string pdf_basemap;
     double pdf_height;
     double pdf_width;
@@ -95,12 +95,12 @@ public:
     void add_GeoMAC_fire_perimeter_file(std::string new_GeoMAC_fire_perimeter_file);
     void add_farsite_output_fire_perimeter_file(std::string new_farsite_output_fire_perimeter_file);
     void add_wrf_file(std::string new_wrf_file);
-    void add_additional_WindNinja_outputs_googleValues(std::string new_wrf_file_name, bool new_write_wx_model_goog_output, bool new_write_goog_output, int new_goog_out_resolution,
+    void add_additional_WindNinja_outputs_googleValues(std::string new_wrf_file_name, bool new_write_wx_model_goog_output, bool new_write_goog_output, double new_goog_out_resolution,
                                                        std::string new_units_goog_out_resolution, std::string new_goog_out_color_scheme, bool new_goog_out_vector_scaling);
     void add_additional_WindNinja_outputs_shapefileValues(std::string new_wrf_file_name, bool new_write_wx_model_shapefile_output, bool new_write_shapefile_output,
-                                                          int new_shape_out_resolution, std::string new_units_shape_out_resolution);
-    void add_additional_WindNinja_outputs_pdfValues(std::string new_wrf_file_name, bool new_write_pdf_output, int new_pdf_out_resolution, std::string new_units_pdf_out_resolution,
-                                                    size_t new_pdf_linewidth, std::string new_pdf_basemap, double new_pdf_height, double new_pdf_width, std::string new_pdf_size);
+                                                          double new_shape_out_resolution, std::string new_units_shape_out_resolution);
+    void add_additional_WindNinja_outputs_pdfValues(std::string new_wrf_file_name, bool new_write_pdf_output, double new_pdf_out_resolution, std::string new_units_pdf_out_resolution,
+                                                    double new_pdf_linewidth, std::string new_pdf_basemap, double new_pdf_height, double new_pdf_width, std::string new_pdf_size);
 
     // get variable value functions for single values
     bool get_inputVariableBoolValue(std::string varName);
@@ -133,7 +133,7 @@ public:
     std::vector<std::string> get_additional_WindNinja_outputs_googleValues_wrf_file_names();
     bool get_write_wx_model_goog_output(std::string wrf_file_name);
     bool get_write_goog_output(std::string wrf_file_name);
-    int get_goog_out_resolution(std::string wrf_file_name);
+    double get_goog_out_resolution(std::string wrf_file_name);
     std::string get_units_goog_out_resolution(std::string wrf_file_name);
     std::string get_goog_out_color_scheme(std::string wrf_file_name);
     bool get_goog_out_vector_scaling(std::string wrf_file_name);
@@ -141,14 +141,14 @@ public:
     std::vector<std::string> get_additional_WindNinja_outputs_shapefileValues_wrf_file_names();
     bool get_write_wx_model_shapefile_output(std::string wrf_file_name);
     bool get_write_shapefile_output(std::string wrf_file_name);
-    int get_shape_out_resolution(std::string wrf_file_name);
+    double get_shape_out_resolution(std::string wrf_file_name);
     std::string get_units_shape_out_resolution(std::string wrf_file_name);
     // additional_WindNinja_outputs_pdf get functions
     std::vector<std::string> get_additional_WindNinja_outputs_pdfValues_wrf_file_names();
     bool get_write_pdf_output(std::string wrf_file_name);
-    int get_pdf_out_resolution(std::string wrf_file_name);
+    double get_pdf_out_resolution(std::string wrf_file_name);
     std::string get_units_pdf_out_resolution(std::string wrf_file_name);
-    size_t get_pdf_linewidth(std::string wrf_file_name);
+    double get_pdf_linewidth(std::string wrf_file_name);
     std::string get_pdf_basemap(std::string wrf_file_name);
     double get_pdf_height(std::string wrf_file_name);
     double get_pdf_width(std::string wrf_file_name);
