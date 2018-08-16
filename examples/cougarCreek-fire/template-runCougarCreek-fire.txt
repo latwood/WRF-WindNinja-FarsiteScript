@@ -17,7 +17,7 @@ createInputs_path: /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-Fars
 finalOutput_path: /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire
 
 # overwrite_past_outputs is a boolean specifying whether the output files found in createdInputs and finalOutputs folders should be overwritten. If these output folders exist in createInputs_path or finalOutputs_path and overwrite_past_outputs is true, folders aren't deleted, just if names are the same they will be overwritten. If overwrite_past_outputs is false and these folders exist, a search for either createInputs-# or finalOutputs-# will determine the highest # value, add one to it, and use that as the new output. Default value is false
-overwrite_past_outputs: false
+overwrite_past_outputs: true
 
 # createIgnition_output_units is a string specifying the types of units to be used by all files outputted by createIgnitions during the script. Values can be english, metric, or input where input is the default value
 createIgnition_output_units: input

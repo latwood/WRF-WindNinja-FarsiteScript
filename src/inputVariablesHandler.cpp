@@ -552,51 +552,48 @@ bool inputVariablesHandler::findActualCreateInputsAndFinalOutputsPaths()
 {
     bool success = true;
 
-    if(inputVariableValues.get_inputVariableBoolValue("overwrite_past_outputs") == false)
+    std::string foundCreateInputs_path = inputVariableValues.get_inputVariablePathnameValue("createInputs_path") + "/";
+    std::string foundFinalOutput_path = inputVariableValues.get_inputVariablePathnameValue("finalOutput_path") + "/";
+
+    // check for "/" symbols
+    if(foundCreateInputs_path.substr(foundCreateInputs_path.length()-2,foundCreateInputs_path.length()-1) == "/")
     {
-        actualCreateInputs_path = inputVariableValues.get_inputVariablePathnameValue("createInputs_path");
-        actualFinalOutput_path = inputVariableValues.get_inputVariablePathnameValue("finalOutput_path");
+        foundCreateInputs_path = foundCreateInputs_path.substr(0,foundCreateInputs_path.length()-1);
+    }
+    if(foundFinalOutput_path.substr(foundFinalOutput_path.length()-2,foundFinalOutput_path.length()-1) == "/")
+    {
+        foundFinalOutput_path = foundFinalOutput_path.substr(0,foundFinalOutput_path.length()-1);
+    }
+
+    foundCreateInputs_path = foundCreateInputs_path + "createInputs";
+    foundFinalOutput_path = foundFinalOutput_path + "finalOutput";
+
+    if(inputVariableValues.get_inputVariableBoolValue("overwrite_past_outputs") == true)
+    {
+        actualCreateInputs_path = foundCreateInputs_path;
+        actualFinalOutput_path = foundFinalOutput_path;
     } else
     {
-        std::string currentCreateInputsPath = inputVariableValues.get_inputVariablePathnameValue("createInputs_path");
-        std::string currentFinalOutputPath = inputVariableValues.get_inputVariablePathnameValue("finalOutput_path");
+        std::string currentCreateInputsPath = foundCreateInputs_path;
+        std::string currentFinalOutputPath = foundFinalOutput_path;
 
-        size_t createInputsCount = 0;
-        while(doesFolderExist(currentCreateInputsPath) == true)
+        if(doesFolderExist(currentCreateInputsPath) == false && doesFolderExist(currentFinalOutputPath) == false)
         {
-            currentCreateInputsPath = std::to_string(createInputsCount) + "_" + inputVariableValues.get_inputVariablePathnameValue("createInputs_path");
-            createInputsCount = createInputsCount + 1;
-        }
-
-        size_t finalOutputsCount = 0;
-        while(doesFolderExist(currentFinalOutputPath) == true)
-        {
-            currentFinalOutputPath = std::to_string(finalOutputsCount) + "_" + inputVariableValues.get_inputVariablePathnameValue("finalOutput_path");
-            finalOutputsCount = finalOutputsCount + 1;
-        }
-
-        if(createInputsCount == 0 && finalOutputsCount == 0)
-        {
-            actualCreateInputs_path = currentCreateInputsPath;
-            actualFinalOutput_path = currentFinalOutputPath;
-        } else if(createInputsCount >= finalOutputsCount)
-        {
-            actualCreateInputs_path = std::to_string(createInputsCount) + "_" + inputVariableValues.get_inputVariablePathnameValue("createInputs_path");
-            actualFinalOutput_path = std::to_string(createInputsCount) + "_" + inputVariableValues.get_inputVariablePathnameValue("finalOutput_path");
+            actualCreateInputs_path = foundCreateInputs_path;
+            actualFinalOutput_path = foundFinalOutput_path;
         } else
         {
-            actualCreateInputs_path = std::to_string(finalOutputsCount) + "_" + inputVariableValues.get_inputVariablePathnameValue("createInputs_path");
-            actualFinalOutput_path = std::to_string(finalOutputsCount) + "_" + inputVariableValues.get_inputVariablePathnameValue("finalOutput_path");
-        }
-    }
+            size_t fileIdxCount = 0;
+            while(doesFolderExist(currentCreateInputsPath) == true || doesFolderExist(currentFinalOutputPath) == true)
+            {
+                fileIdxCount = fileIdxCount + 1;
+                currentCreateInputsPath = foundCreateInputs_path + "-" + std::to_string(fileIdxCount);
+                currentFinalOutputPath = foundFinalOutput_path + "-" + std::to_string(fileIdxCount);
+            }
 
-    if(actualCreateInputs_path.substr(actualCreateInputs_path.length()-1,actualCreateInputs_path.length()) == "/")
-    {
-        actualCreateInputs_path = actualCreateInputs_path.substr(0,actualCreateInputs_path.length()-1);
-    }
-    if(actualFinalOutput_path.substr(actualFinalOutput_path.length()-1,actualFinalOutput_path.length()) == "/")
-    {
-        actualFinalOutput_path = actualFinalOutput_path.substr(0,actualFinalOutput_path.length()-1);
+            actualCreateInputs_path = currentCreateInputsPath;
+            actualFinalOutput_path = currentFinalOutputPath;
+        }
     }
 
     return success;

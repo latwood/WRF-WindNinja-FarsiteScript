@@ -24,7 +24,8 @@ set(SZIP_INCLUDE_DIR   "/home/atw09001/src/extraLibs/szlib/build_szip-2.1/includ
 set(ZLIB_INCLUDE_DIR   "/home/atw09001/src/extraLibs/zlib/build_zlib-1.2.11/include/")
 set(CURL_INCLUDE_DIR   "/home/atw09001/src/extraLibs/curl/build_curl-7.61.0/include/curl/")
 set(JASPER_INCLUDE_DIR "/home/atw09001/src/extraLibs/jasper/build_jasper-1.900.1/include/")
-set(GDAL_INCLUDE_DIR   "/home/atw09001/src/extraLibs/gdal/build_gdal-2.3.1/include/")
+#set(GDAL_INCLUDE_DIR   "/home/atw09001/src/extraLibs/gdal/build_gdal-2.3.1/include/")
+set(GDAL_INCLUDE_DIR   "/home/atw09001/src/extraLibs/gdal/build_gdal-2.0.3/include/")
 set(NETCDF_LIB_C       "/home/atw09001/src/extraLibs/netcdf-c/build_netcdf-c-4.6.1/lib/libnetcdf.a")
 set(NETCDF_LIB_CXX     "/home/atw09001/src/extraLibs/netcdf-cxx/build_netcdf-cxx4-4.3.0/lib/libnetcdf_c++4.so")
 set(HDF5_LIB_1         "/home/atw09001/src/extraLibs/hdf5/build_hdf5-1.10.2/lib/libhdf5.so")
@@ -33,7 +34,8 @@ set(SZIP_LIB           "/home/atw09001/src/extraLibs/szlib/build_szip-2.1/lib/li
 set(ZLIB_LIB           "/home/atw09001/src/extraLibs/zlib/build_zlib-1.2.11/lib/libz.a")
 set(CURL_LIB           "/home/atw09001/src/extraLibs/curl/build_curl-7.61.0/lib/libcurl.so")
 set(JASPER_LIB         "/home/atw09001/src/extraLibs/jasper/build_jasper-1.900.1/lib/libjasper.so")
-set(GDAL_LIB           "/home/atw09001/src/extraLibs/gdal/build_gdal-2.3.1/lib/libgdal.so")
+#set(GDAL_LIB           "/home/atw09001/src/extraLibs/gdal/build_gdal-2.3.1/lib/libgdal.so")
+set(GDAL_LIB           "/home/atw09001/src/extraLibs/gdal/build_gdal-2.0.3/lib/libgdal.so")
 
 #set(LIBS ${NETCDF_LIB_CPP} ${NETCDF_LIB_C} ${HDF5_LIB_2} ${HDF5_LIB_1} ${SZIP_LIB})
 #set(LIBS ${NETCDF_LIB_CPP} ${NETCDF_LIB_C} ${HDF5_LIB_2} ${HDF5_LIB_1} ${SZIP_LIB} ${CURL_LIB} m z)
@@ -78,6 +80,9 @@ add_definitions(-DRESTRICTKEYWORD=restrict)
 ### Used info from this website to install an older gcc https://askubuntu.com/questions/923337/installing-an-older-gcc-version3-4-3-on-ubuntu-14-04-currently-4-8-installed, and this website to add the flags https://stackoverflow.com/questions/3698441/how-to-use-an-older-version-of-gcc-in-linux. Yeah this is apparently a bunch of bugs not related to the versions of the compiling stuff. Guess I got to ask Natalie some stuff, and see if newer gdal can open the archive stuff.
 # ./configure --prefix=$HOME/src/extraLibs/gdal/build_gdal-2.3.1 --with-curl=$HOME/src/extraLibs/curl/build_curl-7.61.0 --with-jasper=$HOME/src/extraLibs/jasper/build_jasper-1.900.1 --with-netcdf=$HOME/src/extraLibs/netcdf-c/build_netcdf-c-4.6.1 --with-hdf5=$HOME/src/extraLibs/hdf5/build_hdf5-1.10.2 --with-libz=$HOME/src/extraLibs/zlib/build_zlib-1.2.11
 ## this second newer version built without problems and no changes to files. My guess is the other one had some issues with later versions of gcc.
+
+## okay this gdal worked, but some of the WindNinja stuff appears to no longer work with it. So going to try gdal 2.0.3 as that is what WindNinja currently uses
+# ./configure --prefix=$HOME/src/extraLibs/gdal/build_gdal-2.0.3 --with-curl=$HOME/src/extraLibs/curl/build_curl-7.61.0 --with-jasper=$HOME/src/extraLibs/jasper/build_jasper-1.900.1 --with-netcdf=$HOME/src/extraLibs/netcdf-c/build_netcdf-c-4.6.1 --with-hdf5=$HOME/src/extraLibs/hdf5/build_hdf5-1.10.2 --with-libz=$HOME/src/extraLibs/zlib/build_zlib-1.2.11
 
 
 

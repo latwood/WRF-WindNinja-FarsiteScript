@@ -1,40 +1,113 @@
 #include "wrfInterpretation.h"
 
+/***** public functions *****/
+
+/*** constructor functions ***/
 wrfInterpretation::wrfInterpretation()
 {
 
 }
+/*** end constructor functions ***/
 
+/*** run everything functions ***/
 bool wrfInterpretation::interpretWRFfiles(inputVariablesHandler *inputs)
 {
-    bool success = true;
-    /* first take necessary input information and store it somehow, probably validating that it is good in the moment if that isn't already done with scriptInputs loading */
+    printf("\nrunning wrfInterpretation class\n");
+    // first do WindNinja stuff, then wrfGetWeather stuff
 
-    /* need a for loop to go over all the WRF files, running windninja first time (probably outside loop) to download lcp file, other times using current lcp file. Also does gdal/netcdf grab weather info */
-    if(!runWindNinja())
+    printf("\nloading inputs into WindNinjaAPI\n");
+    // load inputs into WindNinjaApi class
+    if(WindNinjaClass.load_required_inputs(inputs) == false)
     {
-        printf("WindNinja run for wrf file . . . failed!\n");
-        success = false;
+        printf("failed to load inputs into WindNinjaAPI class!\n");
+        return false;
     }
-    if(!getWeatherInfo())
+
+    /*printf("\ncreating WindNinja cfg files\n");
+    // now create WindNinja cfg files
+    if(WindNinjaClass.create_WindNinja_cfg_files() == false)
     {
-        printf("getWeatherInfo for wrf file . . . failed!\n");
-        success = false;
+        printf("failed to create all WindNinja cfg files!\n");
+        return false;
+    }*/
+
+    /*printf("\nrunning WindNinja!\n");
+    // now run WindNinja
+    if(WindNinjaClass.run_WindNinja() == false)
+    {
+        printf("problems running WindNinja!\n");
+        return false;
+    }*/
+
+    // okay now ready to do the wrfWeatherInterpretation stuff
+
+    printf("\nloading inputs into wrfGetWeather class\n");
+    // first load in the inputs
+    if(wrfWeatherClass.load_required_inputs(inputs) == false)
+    {
+        printf("failed to load inputs into wrfGetWeather class!\n");
+        return false;
     }
-    /* end for loop stuff */
-    return success;
-}
 
-bool wrfInterpretation::runWindNinja()
+    printf("\nrunning wrfGetWeather!\n");
+    // now run getWeather to get weather data from all netcdf files
+    if(wrfWeatherClass.getWeather() == false)
+    {
+        printf("problems running wrfGetWeather!\n");
+        return false;
+    }
+
+    printf("\nfinished wrfInterpretation class!\n");
+    // got to the end successfully, so return true
+    return true;
+}
+/*** end run everything functions ***/
+
+/*** WindNinjaAPI get value functions ***/
+std::vector<std::string> wrfInterpretation::get_atmFilePaths()
 {
-    bool success = true;
-
-    return success;
+    return WindNinjaClass.get_atmFilePaths();
 }
 
-bool wrfInterpretation::getWeatherInfo()
+std::vector<std::string> wrfInterpretation::get_velFilePaths()
 {
-    bool success = true;
-
-    return success;
+    return WindNinjaClass.get_velFilePaths();
 }
+
+std::vector<std::string> wrfInterpretation::get_angFilePaths()
+{
+    return WindNinjaClass.get_angFilePaths();
+}
+
+std::vector<std::string> wrfInterpretation::get_cldFilePaths()
+{
+    return WindNinjaClass.get_cldFilePaths();
+}
+/*** end WindNinjaAPI get value functions ***/
+
+/*** wrfGetWeather get value functions ***/
+std::vector<double> wrfInterpretation::get_temperatures()
+{
+    return wrfWeatherClass.get_temperatures();
+}
+
+std::vector<double> wrfInterpretation::get_humidities()
+{
+    return wrfWeatherClass.get_humidities();
+}
+
+std::vector<double> wrfInterpretation::get_totalPrecip()
+{
+    return wrfWeatherClass.get_totalPrecip();
+}
+
+std::vector<double> wrfInterpretation::get_cloudCover()
+{
+    return wrfWeatherClass.get_cloudCover();
+}
+/*** end wrfGetWeather get value functions ***/
+
+
+
+/***** private functions *****/
+

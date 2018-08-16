@@ -99,12 +99,22 @@ int main(int argc, char* argv[])
         VSIMkdir( inputs.get_actualFinalOutput_path().c_str(), 0777 );
     }
 
+    // probably need to load inputs into lcpManager and createIgnition classes before this
+    if(inputs.get_inputVariableBoolValue("use_past_lcp") == true)
+    {
+        // one way process lcp first, then ignitions
+    } else
+    {
+        // need to process something in ignitions area first, then process lcp (download it), then ignitions
+    }
+
     if(!ignitions.createAllIgnitions(&inputs))
     {
         printf("Error creating ignitions! Exiting program!\n");
         exit(1);
     }
 
+    // maybe move all this out to here, cause it is pretty repetitive. If could do something similar to this with other applications, fine, but turns out that doesn't occur
     if(!wrfInterp.interpretWRFfiles(&inputs))
     {
         printf("Error running windninja or extracting weather information from wrf files! Exiting program!\n");

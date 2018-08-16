@@ -26,7 +26,7 @@ bool WindNinjaAPI::load_required_inputs(inputVariablesHandler *inputs)
     automate_lcp_download = inputs->get_inputVariableBoolValue("automate_lcp_download");
     fireperim_to_lcp_scalefactor = inputs->get_inputVariableDoubleValue("fireperim_to_lcp_scalefactor");
     use_past_lcp = inputs->get_inputVariableBoolValue("use_past_lcp");
-    lcp_file_path = inputs->get_inputVariablePathnameValue("lcp_file_path");
+    lcp_file_path = inputs->get_inputVariableFilenameValue("lcp_file_path");
     specify_lcp_download = inputs->get_inputVariableBoolValue("specify_lcp_download");
     // others get hairy quickly, was thinking just pull everything, then a string says which of the three methods to use to know which of the pulled data actually matters.
     // but when a datatype is non-standard like lat long point, makes it confusing how to pull it out and use it.
@@ -70,9 +70,11 @@ bool WindNinjaAPI::load_required_inputs(inputVariablesHandler *inputs)
     WindNinjaOutputFolderPath = actualCreateInputs_path + "/WindNinja";
     for(size_t wrfCount = 0; wrfCount < wrf_files.size(); wrfCount++)
     {
-        WindNinjaCfgFileNames.push_back(CPLGetBasename(wrf_files[wrfCount].c_str()));   // if this doesn't work, can always do a for loop of chars till hit "/"
-        std::string runFolderPath = WindNinjaOutputFolderPath +"/" + WindNinjaCfgFileNames[wrfCount];
+        std::string wrfBaseName = CPLGetBasename(wrf_files[wrfCount].c_str());
+        std::string runFolderPath = WindNinjaOutputFolderPath + "/" + wrfBaseName;
         WindNinjaRunFolderPaths.push_back(runFolderPath);
+        std::string cfgFilePath = runFolderPath + "/" + wrfBaseName + ".cfg";
+        WindNinjaCfgFileNames.push_back(cfgFilePath);   // if this doesn't work, can always do a for loop of chars till hit "/"
     }
 
     if(use_native_timezone == true)
@@ -113,6 +115,7 @@ bool WindNinjaAPI::load_required_inputs(inputVariablesHandler *inputs)
         WindNinja_non_neutral_stability_string = "false";
     }
 
+    return true;
 }
 /*** end reconstructor like functions ***/
 
@@ -130,10 +133,6 @@ bool WindNinjaAPI::create_WindNinja_cfg_files()
     // all paths up to this point should end without a "/" character
     if(doesFolderExist(WindNinjaOutputFolderPath) == false)
     {
-            //force temp dir to DEM location (is this even necessary?)
-        CPLSetConfigOption("CPL_TMPDIR", CPLGetDirname(WindNinjaOutputFolderPath.c_str()));
-        CPLSetConfigOption("CPLTMPDIR", CPLGetDirname(WindNinjaOutputFolderPath.c_str()));
-        CPLSetConfigOption("TEMP", CPLGetDirname(WindNinjaOutputFolderPath.c_str()));
             // now make the directory
         VSIMkdir( WindNinjaOutputFolderPath.c_str(), 0777 );
     }
@@ -143,69 +142,62 @@ bool WindNinjaAPI::create_WindNinja_cfg_files()
         // make folder for the run if it doesn't yet exist
         if(doesFolderExist(WindNinjaRunFolderPaths[wrfCount]) == false)
         {
-                //force temp dir to DEM location (is this even necessary?)
-            CPLSetConfigOption("CPL_TMPDIR", CPLGetDirname(WindNinjaRunFolderPaths[wrfCount].c_str()));
-            CPLSetConfigOption("CPLTMPDIR", CPLGetDirname(WindNinjaRunFolderPaths[wrfCount].c_str()));
-            CPLSetConfigOption("TEMP", CPLGetDirname(WindNinjaRunFolderPaths[wrfCount].c_str()));
                 // now make the directory
             VSIMkdir( WindNinjaRunFolderPaths[wrfCount].c_str(), 0777 );
         }
 
-        // next write the cfg files
-        if(doesFileExist(WindNinjaCfgFileNames[wrfCount]) == false)
+        // next write the cfg files, will always overwrite these if not exist as the actualCreateInputs path takes care of overwriting when not supposed to
+        FILE *fzout;
+        fzout = fopen(WindNinjaCfgFileNames[wrfCount].c_str(), "w");
+        fprintf(fzout,"num_threads                       =   %zu\n",WindNinja_number_of_threads);
+        fprintf(fzout,"elevation_file                    =   %s\n",lcp_file_path.c_str());
+        fprintf(fzout,"initialization_method             =   wxModelInitialization\n");
+        fprintf(fzout,"time_zone                         =   %s\n",WindNinja_timezone.c_str());
+        fprintf(fzout,"forecast_filename                 =   %s\n",wrf_files[wrfCount].c_str());
+        fprintf(fzout,"match_points                      =   true\n");
+        fprintf(fzout,"output_speed_units                =   %s\n",WindNinja_output_speed_units.c_str());
+        fprintf(fzout,"output_wind_height                =   %s\n",WindNinja_output_wind_height.c_str());
+        fprintf(fzout,"units_output_wind_height          =   %s\n",WindNinja_units_output_wind_height.c_str());
+        fprintf(fzout,"diurnal_winds                     =   %s\n",WindNinja_diurnal_winds_string.c_str());
+        if(WindNinja_mesh_choice != "custom")
         {
-            FILE *fzout;
-            fzout = fopen(WindNinjaCfgFileNames[wrfCount].c_str(), "w");
-            fprintf(fzout,"num_threads                       =   %zu\n",WindNinja_number_of_threads);
-            fprintf(fzout,"elevation_file                    =   %s\n",lcp_file_path.c_str());
-            fprintf(fzout,"initialization_method             =   wxModelInitialization\n");
-            fprintf(fzout,"time_zone                         =   %s\n",WindNinja_timezone.c_str());
-            fprintf(fzout,"forecast_filename                 =   %s\n",wrf_files[wrfCount].c_str());
-            fprintf(fzout,"match_points                      =   true\n");
-            fprintf(fzout,"output_speed_units                =   %s\n",WindNinja_output_speed_units.c_str());
-            fprintf(fzout,"output_wind_height			     =	%s\n",WindNinja_output_wind_height.c_str());
-            fprintf(fzout,"units_output_wind_height          =   %s\n",WindNinja_units_output_wind_height.c_str());
-            fprintf(fzout,"diurnal_winds                     =   %s\n",WindNinja_diurnal_winds_string.c_str());
-            if(WindNinja_mesh_choice != "custom")
-            {
-                fprintf(fzout,"mesh_choice                       =   %s\n",WindNinja_mesh_choice.c_str());
-            } else
-            {
-                fprintf(fzout,"mesh_resolution                   =   %f\n",WindNinja_mesh_resolution);
-                fprintf(fzout,"units_mesh_resolution             =   %s\n",WindNinja_mesh_res_units.c_str());
-            }
-            //fprintf(fzout,"write_wx_model_goog_output        =   %d\n",write_wx_model_goog_output[wrfCount]);
-            //fprintf(fzout,"write_goog_output                 =   %d\n",write_goog_output[wrfCount]);
-            //fprintf(fzout,"goog_out_resolution               =   %f\n",goog_out_resolution[wrfCount]);
-            //fprintf(fzout,"units_goog_out_resolution         =   %s\n",units_goog_out_resolution[wrfCount].c_str());
-            //fprintf(fzout,"goog_out_color_scheme             =   %s\n",goog_out_color_scheme[wrfCount].c_str());
-            //fprintf(fzout,"goog_out_vector_scaling           =   %d\n",goog_out_vector_scaling[wrfCount]);
-            //fprintf(fzout,"write_wx_model_shapefile_output   =   %d\n",write_wx_model_shapefile_output[wrfCount]);
-            //fprintf(fzout,"write_shapefile_output            =   %d\n",write_shapefile_output[wrfCount]);
-            //fprintf(fzout,"shape_out_resolution              =   %f\n",shape_out_resolution[wrfCount]);
-            //fprintf(fzout,"units_shape_out_resolution        =   %s\n",units_shape_out_resolution[wrfCount].c_str());
-            fprintf(fzout,"write_ascii_output                =   true\n");
-            fprintf(fzout,"ascii_out_resolution              =   -1\n");
-            fprintf(fzout,"units_ascii_out_resolution        =   %s\n",WindNinja_units_ascii_out_resolution.c_str());
-            //fprintf(fzout,"write_vtk_output                  =   %d\n",WindNinja_write_vtk_output);
-            fprintf(fzout,"write_farsite_atm                 =   true\n");
-            //fprintf(fzout,"write_pdf_output                  =   %d\n",write_pdf_output[wrfCount]);
-            //fprintf(fzout,"pdf_out_resolution                =   %f\n",pdf_out_resolution[wrfCount]);
-            //fprintf(fzout,"units_pdf_out_resolution          =   %s\n",units_pdf_out_resolution[wrfCount].c_str());
-            //fprintf(fzout,"pdf_linewidth                     =   %f\n",pdf_linewidth[wrfCount]);
-            //fprintf(fzout,"pdf_basemap                       =   %s\n",pdf_basemap[wrfCount].c_str());
-            //fprintf(fzout,"pdf_height                        =   %f\n",pdf_height[wrfCount]);
-            //fprintf(fzout,"pdf_width                         =   %f\n",pdf_width[wrfCount]);
-            //fprintf(fzout,"pdf_size                          =   %s\n",pdf_size[wrfCount].c_str());
-            fprintf(fzout,"output_path                       =   %s\n",WindNinjaRunFolderPaths[wrfCount].c_str());
-            fprintf(fzout,"non_neutral_stability             =   %s\n",WindNinja_non_neutral_stability_string.c_str());
-            //if(use_momentum_solver == true)   // if I added this in at some point, would have to do all kinds of fun things with if statements for filenaming stuff
-            //{
-            //    fprintf(fzout,"momentum_flag                     =   %d\n",use_momentum_solver);
-            //    fprintf(fzout,"non_equilibrium_boundary_conditions     =   true\n");    // yes this is optional, but seems like you always want this
-            //}
-            fclose(fzout);
+            fprintf(fzout,"mesh_choice                       =   %s\n",WindNinja_mesh_choice.c_str());
+        } else
+        {
+            fprintf(fzout,"mesh_resolution                   =   %f\n",WindNinja_mesh_resolution);
+            fprintf(fzout,"units_mesh_resolution             =   %s\n",WindNinja_mesh_res_units.c_str());
         }
+        //fprintf(fzout,"write_wx_model_goog_output        =   %d\n",write_wx_model_goog_output[wrfCount]);
+        //fprintf(fzout,"write_goog_output                 =   %d\n",write_goog_output[wrfCount]);
+        //fprintf(fzout,"goog_out_resolution               =   %f\n",goog_out_resolution[wrfCount]);
+        //fprintf(fzout,"units_goog_out_resolution         =   %s\n",units_goog_out_resolution[wrfCount].c_str());
+        //fprintf(fzout,"goog_out_color_scheme             =   %s\n",goog_out_color_scheme[wrfCount].c_str());
+        //fprintf(fzout,"goog_out_vector_scaling           =   %d\n",goog_out_vector_scaling[wrfCount]);
+        //fprintf(fzout,"write_wx_model_shapefile_output   =   %d\n",write_wx_model_shapefile_output[wrfCount]);
+        //fprintf(fzout,"write_shapefile_output            =   %d\n",write_shapefile_output[wrfCount]);
+        //fprintf(fzout,"shape_out_resolution              =   %f\n",shape_out_resolution[wrfCount]);
+        //fprintf(fzout,"units_shape_out_resolution        =   %s\n",units_shape_out_resolution[wrfCount].c_str());
+        fprintf(fzout,"write_ascii_output                =   true\n");
+        fprintf(fzout,"ascii_out_resolution              =   -1\n");
+        fprintf(fzout,"units_ascii_out_resolution        =   %s\n",WindNinja_units_ascii_out_resolution.c_str());
+        //fprintf(fzout,"write_vtk_output                  =   %d\n",WindNinja_write_vtk_output);
+        fprintf(fzout,"write_farsite_atm                 =   true\n");
+        //fprintf(fzout,"write_pdf_output                  =   %d\n",write_pdf_output[wrfCount]);
+        //fprintf(fzout,"pdf_out_resolution                =   %f\n",pdf_out_resolution[wrfCount]);
+        //fprintf(fzout,"units_pdf_out_resolution          =   %s\n",units_pdf_out_resolution[wrfCount].c_str());
+        //fprintf(fzout,"pdf_linewidth                     =   %f\n",pdf_linewidth[wrfCount]);
+        //fprintf(fzout,"pdf_basemap                       =   %s\n",pdf_basemap[wrfCount].c_str());
+        //fprintf(fzout,"pdf_height                        =   %f\n",pdf_height[wrfCount]);
+        //fprintf(fzout,"pdf_width                         =   %f\n",pdf_width[wrfCount]);
+        //fprintf(fzout,"pdf_size                          =   %s\n",pdf_size[wrfCount].c_str());
+        fprintf(fzout,"output_path                       =   %s/\n",WindNinjaRunFolderPaths[wrfCount].c_str()); // extra "/" cause that gets lost, can't add it on earlier cause it is one way or the other
+        fprintf(fzout,"non_neutral_stability             =   %s\n",WindNinja_non_neutral_stability_string.c_str());
+        //if(use_momentum_solver == true)   // if I added this in at some point, would have to do all kinds of fun things with if statements for filenaming stuff
+        //{
+        //    fprintf(fzout,"momentum_flag                     =   %d\n",use_momentum_solver);
+        //    fprintf(fzout,"non_equilibrium_boundary_conditions     =   true\n");    // yes this is optional, but seems like you always want this
+        //}
+        fclose(fzout);
     }
 
     return success;
@@ -217,33 +209,125 @@ bool WindNinjaAPI::run_WindNinja()
 
     for(size_t wrfCount = 0; wrfCount < wrf_files.size(); wrfCount++)
     {
-        if(doOutputFilesExist(wrfCount) == false)
+
+        int nRet = -1;
+
+        const char *const papszArgv[] = { "WindNinja_cli",
+                                          WindNinjaCfgFileNames[wrfCount].c_str(),
+                                          NULL };
+
+        // this method appears to be limited by whatever is the current application in the command line. Doesn't appear possible to supply a path to an executable
+        // would like to replace a lot of stuff with WindNinja API
+        VSILFILE *fout = VSIFOpenL(CPLFormFilename(WindNinjaRunFolderPaths[wrfCount].c_str(), "log.WindNinjaRun", ""), "w");
+
+        nRet = CPLSpawn(papszArgv, NULL, fout, TRUE);
+
+        VSIFCloseL(fout);
+
+        if(nRet == -1)
         {
-            int nRet = -1;
-
-            // want to check the cfg file and folder path match?
-
-            const char *const papszArgv[] = { "WindNinja_cli",
-                                              wrf_files[wrfCount].c_str(),
-                                              NULL };
-
-            VSILFILE *fout = VSIFOpenL(CPLFormFilename(WindNinjaRunFolderPaths[wrfCount].c_str(), "log.WindNinjaRun", ""), "w");
-
-            nRet = CPLSpawn(papszArgv, NULL, fout, TRUE);
-
-            VSIFCloseL(fout);
-
-            if(nRet == -1)
-            {
-                success = false;
-                break;
-            }
+            success = false;
+            break;
         }
     }
 
     return success;
 }
+
+bool WindNinjaAPI::findFinalRunFiles()
+{
+    for(size_t runCount = 0; runCount < WindNinjaRunFolderPaths.size(); runCount++)
+    {
+        std::string currentFolder = WindNinjaRunFolderPaths[runCount];
+        if(doesFolderExist(currentFolder) == false)
+        {
+            printf("folder \"%s\" does not exist!\n",currentFolder.c_str());
+            return false;
+        }
+
+        std::string atmGlobPattern = currentFolder + "/*.atm";
+        std::vector<std::string> foundAtmFiles = globVector(atmGlobPattern);
+        if(foundAtmFiles.size() == 0)
+        {
+            return false;
+        } else if(foundAtmFiles.size() > 1)
+        {
+            printf("found too many atm files for WindNinja run \"%zu\" in path \"%s\"!\n",runCount,currentFolder.c_str());
+            return false;
+        } else
+        {
+            atmFiles.push_back(foundAtmFiles[0]);
+        }
+
+        std::string velGlobPattern = currentFolder + "/*vel.asc";
+        std::vector<std::string> foundVelFiles = globVector(velGlobPattern);
+        if(foundVelFiles.size() == 0)
+        {
+            return false;
+        } else if(foundVelFiles.size() > 1)
+        {
+            printf("found too many velocity files for WindNinja run \"%zu\" in path \"%s\"!\n",runCount,currentFolder.c_str());
+            return false;
+        } else
+        {
+            velFiles.push_back(foundVelFiles[0]);
+        }
+
+        std::string angGlobPattern = currentFolder + "/*ang.asc";
+        std::vector<std::string> foundAngFiles = globVector(angGlobPattern);
+        if(foundAngFiles.size() == 0)
+        {
+            return false;
+        } else if(foundAngFiles.size() > 1)
+        {
+            printf("found too many angle files for WindNinja run \"%zu\" in path \"%s\"!\n",runCount,currentFolder.c_str());
+            return false;
+        } else
+        {
+            angFiles.push_back(foundAngFiles[0]);
+        }
+
+        std::string cldGlobPattern = currentFolder + "/*cld.asc";
+        std::vector<std::string> foundCldFiles = globVector(cldGlobPattern);
+        if(foundCldFiles.size() == 0)
+        {
+            return false;
+        } else if(foundCldFiles.size() > 1)
+        {
+            printf("found too many cloud cover files for WindNinja run \"%zu\" in path \"%s\"!\n",runCount,currentFolder.c_str());
+            return false;
+        } else
+        {
+            cldFiles.push_back(foundCldFiles[0]);
+        }
+
+    }
+
+    return true;
+}
 /*** end functions ***/
+
+/*** get value functions ***/
+std::vector<std::string> WindNinjaAPI::get_atmFilePaths()
+{
+    return atmFiles;
+}
+
+std::vector<std::string> WindNinjaAPI::get_velFilePaths()
+{
+    return velFiles;
+}
+
+std::vector<std::string> WindNinjaAPI::get_angFilePaths()
+{
+    angFiles;
+}
+
+std::vector<std::string> WindNinjaAPI::get_cldFilePaths()
+{
+    cldFiles;
+}
+/*** end get value functions ***/
 
 
 
@@ -380,6 +464,25 @@ void WindNinjaAPI::reset()
     WindNinja_diurnal_winds_string = "";
     WindNinja_non_neutral_stability_string = "";
     WindNinja_units_ascii_out_resolution = "";
+
+    // desired output values
+    while(!atmFiles.empty())
+    {
+        atmFiles.pop_back();
+    }
+    while(!velFiles.empty())
+    {
+        velFiles.pop_back();
+    }
+    while(!angFiles.empty())
+    {
+        angFiles.pop_back();
+    }
+    while(!cldFiles.empty())
+    {
+        cldFiles.pop_back();
+    }
+
 }
 /*** end reconstructor like functions ***/
 
@@ -406,18 +509,21 @@ bool WindNinjaAPI::doesFolderExist(std::string pathName)
     return exists;
 }
 
-bool WindNinjaAPI::doesFileExist(std::string pathName)
+bool WindNinjaAPI::doesNetCDFFileExist(std::string pathName)
 {
-    bool exists = true;
-
-    FILE *fzTemp = fopen(pathName.c_str(),"r");    // use "w" for write
-    if( fzTemp == NULL)
+    GDALDatasetH  hDataset;
+    std::string netCDFFileString = "NETCDF:\"" + pathName + "\"";
+    CPLPushErrorHandler(&CPLQuietErrorHandler);
+    hDataset = GDALOpen( netCDFFileString.c_str(), GA_ReadOnly );
+    CPLPopErrorHandler();
+    if(hDataset == NULL)
     {
-        exists = false;
+        return false;
     }
-    fclose(fzTemp);
+    GDALClose(hDataset);
 
-    return exists;
+    // it got here so it was okay
+    return true;
 }
 
 std::vector<std::string> WindNinjaAPI::globVector(const std::string& pattern){

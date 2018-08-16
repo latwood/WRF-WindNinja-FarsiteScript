@@ -23,6 +23,13 @@ public:
     // functions
     bool create_WindNinja_cfg_files();
     bool run_WindNinja();
+    bool findFinalRunFiles();
+
+    // get value functions
+    std::vector<std::string> get_atmFilePaths();
+    std::vector<std::string> get_velFilePaths();
+    std::vector<std::string> get_angFilePaths();
+    std::vector<std::string> get_cldFilePaths();
 
 private:
 
@@ -31,7 +38,7 @@ private:
 
     // useful utility functions
     bool doesFolderExist(std::string pathName);
-    bool doesFileExist(std::string pathName);
+    bool doesNetCDFFileExist(std::string pathName);
     std::vector<std::string> globVector(const std::string& pattern);
     bool doOutputFilesExist(size_t runNumber);
 
@@ -98,6 +105,13 @@ private:
     std::string WindNinja_diurnal_winds_string;
     std::string WindNinja_non_neutral_stability_string;
     std::string WindNinja_units_ascii_out_resolution;
+
+    // desired output values
+    // don't need to check for prj files with this version of everything
+    std::vector<std::string> atmFiles;
+    std::vector<std::string> velFiles;
+    std::vector<std::string> angFiles;
+    std::vector<std::string> cldFiles;
 
 };
 

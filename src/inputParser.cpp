@@ -10,7 +10,6 @@ inputParser::inputParser()
 }
 /*** end constructor functions ***/
 
-
 /*** variable class getter functions ***/
 void inputParser::loadVariableInfo(inputVariables_valueStorage* newInputVariables)
 {
@@ -1121,6 +1120,7 @@ bool inputParser::isValidLcpFilename(std::string inputString, bool suppressWarni
 
             / end tutorial stuff */
         }
+        GDALClose(hDataset);
     }
     if(conversionSuccess == true)
     {
@@ -1231,6 +1231,7 @@ bool inputParser::isValidShapeFilename(std::string inputString, bool suppressWar
 
             / end tutorial stuff */
         }
+        GDALClose( hDS );
     }
     // need to check for all other file types that go along with, or does gdal already deal with that type of problem?
 
@@ -1257,6 +1258,7 @@ bool inputParser::isValidNetCDFFilename(std::string inputString, bool suppressWa
             printf("could not open string \"%s\" as netcdf file!\n",inputString.c_str());
         }
         conversionSuccess = false;
+        GDALClose(hDataset);
     } else
     {
         /* tutorial stuff /
@@ -1384,8 +1386,18 @@ bool inputParser::isValidNetCDFFilename(std::string inputString, bool suppressWa
 
                     //set the data
                     padfScanline = new double[nXSize*nYSize];
-                    poBand->RasterIO(GF_Read, 0, 0, nXSize, nYSize, padfScanline,
+                    pbSuccess = poBand->RasterIO(GF_Read, 0, 0, nXSize, nYSize, padfScanline,
                                      nXSize, nYSize, GDT_Float64, 0, 0);
+                    if(pbSuccess == CE_Failure)
+                    {
+                        if(suppressWarnings == false)
+                        {
+                            printf("error reading raster band!\n");
+                        }
+                        conversionSuccess = false;
+                        GDALClose((GDALDatasetH) srcDS );
+                        break;
+                    }
                     for(size_t dataIdx = 0; dataIdx < nXSize*nYSize; dataIdx++)
                     {
                         //Check if value is no data (if no data value was defined in file)

@@ -6,7 +6,10 @@
 #include "inputVariablesHandler.h"
 
 #include "netcdf.h"
+#include <ogr_spatialref.h>
 #include "gdalwarper.h"
+#include "boost/lexical_cast.hpp"
+#include <sstream>
 
 class wrfGetWeather
 {
@@ -21,6 +24,12 @@ public:
 
     // functions
     bool getWeather();
+
+    // get variable functions
+    std::vector<double> get_temperatures();
+    std::vector<double> get_humidities();
+    std::vector<double> get_totalPrecip();
+    std::vector<double> get_cloudCover();
 
 private:
 
