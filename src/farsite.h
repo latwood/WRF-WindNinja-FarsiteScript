@@ -7,10 +7,19 @@
 
 class farsite
 {
+
 public:
+
+    // constructors
     farsite();
+
+    // functions
     bool runFarsite(createFarsiteInputs *farsiteInputs);
     bool createAdditionalFarsiteResults();
+
+private:
+
+
 };
 
 #endif // FARSITE_H

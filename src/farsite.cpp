@@ -1,10 +1,15 @@
 #include "farsite.h"
 
+/***** public functions *****/
+
+/*** constructor functions ***/
 farsite::farsite()
 {
 
 }
+/*** end constructor functions ***/
 
+/*** functions ***/
 bool farsite::runFarsite(createFarsiteInputs *farsiteInputs)
 {
     bool success = true;
@@ -18,3 +23,10 @@ bool farsite::createAdditionalFarsiteResults()
 
     return success;
 }
+/*** end functions ***/
+
+
+
+/***** private functions *****/
+
+

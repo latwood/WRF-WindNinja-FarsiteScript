@@ -107,6 +107,16 @@ bool inputVariablesHandler::loadScriptInputs(std::string inputFileName)
         }
     }
 
+    // now get the actual lcp path and run base name setup for use by everything
+    if(success == true)
+    {
+        if(findActualLcpPathAndBaseName() == false)
+        {
+            printf("problem finding actual lcp path and run base name!\n");
+            success = false;
+        }
+    }
+
     return success;
 }
 
@@ -260,6 +270,16 @@ std::string inputVariablesHandler::get_actualCreateInputs_path()
 std::string inputVariablesHandler::get_actualFinalOutput_path()
 {
     return actualFinalOutput_path;
+}
+
+std::string inputVariablesHandler::get_actual_run_base_name()
+{
+    return actual_run_base_name;
+}
+
+std::string inputVariablesHandler::get_actualLcpPath()
+{
+    return actualLcpPath;
 }
 /*** end  functions ***/
 
@@ -594,6 +614,23 @@ bool inputVariablesHandler::findActualCreateInputsAndFinalOutputsPaths()
             actualCreateInputs_path = currentCreateInputsPath;
             actualFinalOutput_path = currentFinalOutputPath;
         }
+    }
+
+    return success;
+}
+
+bool inputVariablesHandler::findActualLcpPathAndBaseName()
+{
+    bool success = true;
+
+    if(inputVariableValues.get_inputVariableBoolValue("use_past_lcp") == true)
+    {
+        actualLcpPath = inputVariableValues.get_inputVariableFilenameValue("lcp_file_path");
+        actual_run_base_name = actualLcpPath.substr(0,actualLcpPath.length()-4);
+    } else
+    {
+        actual_run_base_name = get_inputVariableStringValue("run_base_name");
+        actualLcpPath = get_actualCreateInputs_path() + actual_run_base_name + ".lcp";
     }
 
     return success;

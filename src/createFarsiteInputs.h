@@ -4,14 +4,20 @@
 
 #include "inputVariablesHandler.h"
 #include "createIgnitions.h"
-#include "wrfInterpretation.h"
+#include "WindNinjaAPI.h"
+#include "wrfGetWeather.h"
 
 
 class createFarsiteInputs
 {
+
 public:
+
+    // constructors
     createFarsiteInputs();
-    bool createAllFarsiteInputs(inputVariablesHandler *inputs, createIgnitions *ignitions, wrfInterpretation *wrfInterp);
+
+    // functions
+    bool createAllFarsiteInputs(inputVariablesHandler *inputs, createIgnitions *ignitions, WindNinjaAPI *windAPI, wrfGetWeather *weatherAPI);
 
 private:
 

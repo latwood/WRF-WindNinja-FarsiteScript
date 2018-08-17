@@ -43,10 +43,9 @@ private:
 
     // data members needed from the inputs
     std::string actualCreateInputs_path;
+    std::string actualLcpFilePath;
         // application specific variables
     std::string wrfGetWeather_output_units;
-        // lcp download variables
-    std::string lcp_file_path;
         // wrfGetWeather and WindNinja variables
     bool extend_wrf_data;
     std::vector<std::string> wrf_files;

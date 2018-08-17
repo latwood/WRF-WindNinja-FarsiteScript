@@ -2,8 +2,10 @@
 #include <iostream>
 
 #include "inputVariablesHandler.h"
+#include "lcpManager.h"
 #include "createIgnitions.h"
-#include "wrfInterpretation.h"
+#include "WindNinjaAPI.h"
+#include "wrfGetWeather.h"
 #include "createFarsiteInputs.h"
 #include "farsite.h"
 
@@ -56,29 +58,36 @@ bool doesFolderExist(std::string pathName)
 
 int main(int argc, char* argv[])
 {
-    printf("\nbeginning WRF-WindNinja-FarsiteScript\n\n");
+    printf("\n\nbeginning WRF-WindNinja-FarsiteScript\n\n");
     auto start = std::chrono::high_resolution_clock::now(); // start recording execution time
 
     inputVariablesHandler inputs;
+    lcpManager createLcp;
     createIgnitions ignitions;
-    wrfInterpretation wrfInterp;
+    WindNinjaAPI windAPI;
+    wrfGetWeather weatherAPI;
     createFarsiteInputs farsiteInputs;
     farsite farsite;
 
     std::string inputFilePath;
 
-    if(checkCommandLineInput(argc,argv,&inputs))
+    printf("\nchecking WRF-WindNinja-FarsiteScript command line inputs\n");
+    if(checkCommandLineInput(argc,argv,&inputs) == true)
     {
         inputFilePath = argv[1];
         printf("using inputFilePath %s\n",inputFilePath.c_str());
     }
 
-    if(!inputs.loadScriptInputs(inputFilePath))
+    printf("\nloading WRF-WinNinja-FarsiteScript inputs into input class\n");
+    if(inputs.loadScriptInputs(inputFilePath) == false)
     {
         printf("Error loading script inputs! Exiting program!\n");
         exit(1);
     }
 
+    // okay now create the necessary overall folders to be used by all the other classes, as they add more folders to these folders
+
+    printf("\ncreating main output folders\n");
     // create main output folders if needed. overwrite outputs will already be checked to get the right paths
     if(doesFolderExist(inputs.get_actualCreateInputs_path()) == false)
     {
@@ -99,50 +108,119 @@ int main(int argc, char* argv[])
         VSIMkdir( inputs.get_actualFinalOutput_path().c_str(), 0777 );
     }
 
-    // probably need to load inputs into lcpManager and createIgnition classes before this
-    if(inputs.get_inputVariableBoolValue("use_past_lcp") == true)
+    printf("\nloading inputs into createIgnition class\n");
+    // okay do what is needed for lcp downloading stuff, which possibly includes some ignition stuff, so load inputs first
+    if(ignitions.load_required_inputs(&inputs) == false)
     {
-        // one way process lcp first, then ignitions
-    } else
-    {
-        // need to process something in ignitions area first, then process lcp (download it), then ignitions
+        printf("failed to load createIgnition inputs!\n");
+        exit(1);
     }
 
-    if(!ignitions.createAllIgnitions(&inputs))
+    printf("\nfinding largest fire perimeter from ignition files\n");
+    // turns out that we need the fire perimeter lat long positions no matter what anyways, so let's just get that done first
+    if(ignitions.findLargestFirePerimeter() == false)
+    {
+        printf("failed to find largest fire perimeter for automatic lcp download!\n");
+        exit(1);
+    }
+
+    printf("\ndetermining whether lcp file needs downloaded\n");
+    // probably need to load inputs into lcpManager and createIgnition classes before this
+    if(inputs.get_inputVariableBoolValue("use_past_lcp") != true)
+    {
+        printf("\nloading inputs into lcpDownloader class\n");
+        // okay need to download lcp so first load inputs
+        if(createLcp.load_required_inputs(&inputs, ignitions.get_firePerimMinLat(), ignitions.get_firePerimMinLong(), ignitions.get_firePerimMaxLat(), ignitions.get_firePerimMaxLong()) == false)
+        {
+            printf("failed to load inputs into lcpDownloader class!\n");
+            exit(1);
+        }
+
+        printf("\nrunning lcpDownloader!\n");
+        // now attempt to download lcp. lcpDownloader class determines whether to use a specified boundary or an automated process with the largest fire perimeters
+        if(createLcp.downloadLcp() == false)
+        {
+            printf("failed to download lcp file!\n");
+            exit(1);
+        }
+    }
+
+    printf("\nrunning createIgnitions!\n");
+    if(ignitions.createAllIgnitions() == false)
     {
         printf("Error creating ignitions! Exiting program!\n");
         exit(1);
     }
 
-    // maybe move all this out to here, cause it is pretty repetitive. If could do something similar to this with other applications, fine, but turns out that doesn't occur
-    if(!wrfInterp.interpretWRFfiles(&inputs))
+    printf("\nloading inputs into WindNinjaAPI\n");
+    // load inputs into WindNinjaApi class
+    if(windAPI.load_required_inputs(&inputs) == false)
     {
-        printf("Error running windninja or extracting weather information from wrf files! Exiting program!\n");
+        printf("failed to load inputs into WindNinjaAPI class!\n");
         exit(1);
     }
 
-    if(!farsiteInputs.createAllFarsiteInputs(&inputs,&ignitions,&wrfInterp))
+    printf("\ncreating WindNinja cfg files\n");
+    // now create WindNinja cfg files
+    if(windAPI.create_WindNinja_cfg_files() == false)
+    {
+        printf("failed to create all WindNinja cfg files!\n");
+        exit(1);
+    }
+
+    printf("\nrunning WindNinja!\n");
+    // now run WindNinja
+    if(windAPI.run_WindNinja() == false)
+    {
+        printf("problems running WindNinja!\n");
+        exit(1);
+    }
+
+    printf("\nloading inputs into wrfGetWeather class\n");
+    // first load in the inputs
+    if(weatherAPI.load_required_inputs(&inputs) == false)
+    {
+        printf("failed to load inputs into wrfGetWeather class!\n");
+        exit(1);
+    }
+
+    printf("\nrunning wrfGetWeather!\n");
+    // now run getWeather to get weather data from all netcdf files
+    if(weatherAPI.getWeather() == false)
+    {
+        printf("problems running wrfGetWeather!\n");
+        exit(1);
+    }
+
+    printf("\nloading inputs into createFarsiteAPI class\n");
+
+    printf("\ncreating farsite input files\n");
+    // okay finished getting everything ready, now start farsite stuff
+    if(farsiteInputs.createAllFarsiteInputs(&inputs,&ignitions,&windAPI,&weatherAPI) == false)
     {
         printf("Error creating farsite inputs! Exiting program!\n");
         exit(1);
     }
 
-    if(!farsite.runFarsite(&farsiteInputs)) // maybe replace with load inputs? Or just go with it?
+    printf("\nrunning farsite!\n");
+    if(farsite.runFarsite(&farsiteInputs) == false) // maybe replace with load inputs? Or just go with it?
     {
         printf("Error running Farsite! Exiting program!\n");
         exit(1);
     }
 
-    if(!farsite.createAdditionalFarsiteResults())
+    printf("\nprocessing output farsite files for additional results\n");
+    if(farsite.createAdditionalFarsiteResults() == false)
     {
         printf("Error generating extra farsite inputs! Exiting program!\n");
         exit(1);
     }
 
+    printf("\n\nfinished WRF-WindNinja-FarsiteScript\n");
+
     auto finish = std::chrono::high_resolution_clock::now();  // finish recording execution time
     std::chrono::duration<double> elapsed = finish - start;
-    printf("Elapsed time: %f seconds\n",elapsed.count());   // print out elapsed execution time
+    printf("Elapsed time: %f seconds\n\n\n",elapsed.count());   // print out elapsed execution time
 
-    printf("\nfinished WRF-WindNinja-FarsiteScript\n\n");
     return 0;
 }

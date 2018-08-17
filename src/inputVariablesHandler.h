@@ -24,6 +24,8 @@ public:
     void printFoundInput();
     std::string get_actualCreateInputs_path();
     std::string get_actualFinalOutput_path();
+    std::string get_actual_run_base_name();
+    std::string get_actualLcpPath();
 
     // will probably have to repeat the functions from the inputVariable_valueStorage class unfortunately.
     // Difference is the values won't be stored in this class, just in the one referenced here
@@ -85,6 +87,7 @@ private:
     bool verifyFoundInputCombinations();
     bool doesFolderExist(std::string pathName);
     bool findActualCreateInputsAndFinalOutputsPaths();
+    bool findActualLcpPathAndBaseName();
 
     // class data members
     std::vector<inputVariable_info> inputVariableInfo;
@@ -94,6 +97,8 @@ private:
     // important for file management
     std::string actualCreateInputs_path;
     std::string actualFinalOutput_path;
+    std::string actual_run_base_name;
+    std::string actualLcpPath;
 
 };
 

@@ -16,20 +16,12 @@ bool WindNinjaAPI::load_required_inputs(inputVariablesHandler *inputs)
     reset();
 
     // next load all the needed inputs from the input file
+    actual_run_base_name = inputs->get_actual_run_base_name();
     actualCreateInputs_path = inputs->get_actualCreateInputs_path();
+    actualLcpFilePath = inputs->get_actualLcpPath();
         // application specific variables
-    run_base_name = inputs->get_inputVariableStringValue("run_base_name");
     WindNinja_required_output_units = inputs->get_inputVariableStringValue("WindNinja_required_output_units");
     use_native_timezone = inputs->get_inputVariableBoolValue("use_native_timezone");
-        // lcp download variables (WindNinja related)
-    // going to do this one later after everything is finished. Not sure if use WindNinja api for lcp download or if setup separate lcp class
-    automate_lcp_download = inputs->get_inputVariableBoolValue("automate_lcp_download");
-    fireperim_to_lcp_scalefactor = inputs->get_inputVariableDoubleValue("fireperim_to_lcp_scalefactor");
-    use_past_lcp = inputs->get_inputVariableBoolValue("use_past_lcp");
-    lcp_file_path = inputs->get_inputVariableFilenameValue("lcp_file_path");
-    specify_lcp_download = inputs->get_inputVariableBoolValue("specify_lcp_download");
-    // others get hairy quickly, was thinking just pull everything, then a string says which of the three methods to use to know which of the pulled data actually matters.
-    // but when a datatype is non-standard like lat long point, makes it confusing how to pull it out and use it.
         // WindNinja and getWeather
     extend_wrf_data = inputs->get_inputVariableBoolValue("extend_wrf_data");
     wrf_files = inputs->get_wrf_files();
@@ -150,7 +142,7 @@ bool WindNinjaAPI::create_WindNinja_cfg_files()
         FILE *fzout;
         fzout = fopen(WindNinjaCfgFileNames[wrfCount].c_str(), "w");
         fprintf(fzout,"num_threads                       =   %zu\n",WindNinja_number_of_threads);
-        fprintf(fzout,"elevation_file                    =   %s\n",lcp_file_path.c_str());
+        fprintf(fzout,"elevation_file                    =   %s\n",actualLcpFilePath.c_str());
         fprintf(fzout,"initialization_method             =   wxModelInitialization\n");
         fprintf(fzout,"time_zone                         =   %s\n",WindNinja_timezone.c_str());
         fprintf(fzout,"forecast_filename                 =   %s\n",wrf_files[wrfCount].c_str());
@@ -303,6 +295,24 @@ bool WindNinjaAPI::findFinalRunFiles()
 
     }
 
+    printf("\nFound Wind Files:\n");
+    for(size_t fileIdx = 0; fileIdx < atmFiles.size(); fileIdx++)
+    {
+        printf("atmFiles[%zu] = %s\n",fileIdx,atmFiles[fileIdx].c_str());
+    }
+    for(size_t fileIdx = 0; fileIdx < velFiles.size(); fileIdx++)
+    {
+        printf("velFiles[%zu] = %s\n",fileIdx,velFiles[fileIdx].c_str());
+    }
+    for(size_t fileIdx = 0; fileIdx < angFiles.size(); fileIdx++)
+    {
+        printf("angFiles[%zu] = %s\n",fileIdx,angFiles[fileIdx].c_str());
+    }
+    for(size_t fileIdx = 0; fileIdx < cldFiles.size(); fileIdx++)
+    {
+        printf("cldFiles[%zu] = %s\n",fileIdx,cldFiles[fileIdx].c_str());
+    }
+
     return true;
 }
 /*** end functions ***/
@@ -338,20 +348,12 @@ std::vector<std::string> WindNinjaAPI::get_cldFilePaths()
 /*** reconstructor like functions ***/
 void WindNinjaAPI::reset()
 {
+    actual_run_base_name = "";
     actualCreateInputs_path = "";
+    actualLcpFilePath = "";
         // application specific variables
-    run_base_name = "";
     WindNinja_required_output_units = "";
     use_native_timezone = false;
-        // lcp download variables (WindNinja related)
-    // going to do this one later after everything is finished. Not sure if use WindNinja api for lcp download or if setup separate lcp class
-    automate_lcp_download = false;
-    fireperim_to_lcp_scalefactor = 0.0;
-    use_past_lcp = false;
-    lcp_file_path = "";
-    specify_lcp_download = false;
-    // others get hairy quickly, was thinking just pull everything, then a string says which of the three methods to use to know which of the pulled data actually matters.
-    // but when a datatype is non-standard like lat long point, makes it confusing how to pull it out and use it.
         // WindNinja and getWeather
     extend_wrf_data = false;
     while(!wrf_files.empty())
@@ -559,9 +561,9 @@ bool WindNinjaAPI::doOutputFilesExist(size_t runNumber)
             for(size_t asciiCount = 0; asciiCount < foundAsciiFiles.size(); asciiCount++)
             {
                 std::string currentFileName = foundAsciiFiles[asciiCount];
-                if(currentFileName.length() >= 5+run_base_name.length())
+                if(currentFileName.length() >= 5+actual_run_base_name.length())
                 {
-                    if(currentFileName.substr(0,run_base_name.length()) == run_base_name && currentFileName.substr(currentFileName.length()-7,currentFileName.length()) == "vel.asc")
+                    if(currentFileName.substr(0,actual_run_base_name.length()) == actual_run_base_name && currentFileName.substr(currentFileName.length()-7,currentFileName.length()) == "vel.asc")
                     {
                         exists = true;
                         break;

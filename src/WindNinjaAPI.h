@@ -43,20 +43,12 @@ private:
     bool doOutputFilesExist(size_t runNumber);
 
     // data members needed from the inputs
+    std::string actual_run_base_name;
     std::string actualCreateInputs_path;
+    std::string actualLcpFilePath;
         // application specific variables
-    std::string run_base_name;
     std::string WindNinja_required_output_units;
     bool use_native_timezone;
-        // lcp download variables (WindNinja related)
-    // going to do this one later after everything is finished. Not sure if use WindNinja api for lcp download or if setup separate lcp class
-    bool automate_lcp_download;
-    double fireperim_to_lcp_scalefactor;
-    bool use_past_lcp;
-    std::string lcp_file_path;
-    bool specify_lcp_download;
-    // others get hairy quickly, was thinking just pull everything, then a string says which of the three methods to use to know which of the pulled data actually matters.
-    // but when a datatype is non-standard like lat long point, makes it confusing how to pull it out and use it.
         // WindNinja and getWeather
     bool extend_wrf_data;
     std::vector<std::string> wrf_files;
