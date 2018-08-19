@@ -2,12 +2,11 @@
 #include <iostream>
 
 #include "inputVariablesHandler.h"
-#include "lcpManager.h"
+#include "lcpDownloader.h"
 #include "createIgnitions.h"
 #include "WindNinjaAPI.h"
 #include "wrfGetWeather.h"
-#include "createFarsiteInputs.h"
-#include "farsite.h"
+#include "farsiteAPI.h"
 
 #include <chrono>
 
@@ -62,12 +61,11 @@ int main(int argc, char* argv[])
     auto start = std::chrono::high_resolution_clock::now(); // start recording execution time
 
     inputVariablesHandler inputs;
-    lcpManager createLcp;
+    lcpDownloader createLcp;
     createIgnitions ignitions;
     WindNinjaAPI windAPI;
     wrfGetWeather weatherAPI;
-    createFarsiteInputs farsiteInputs;
-    farsite farsite;
+    farsiteAPI fireAPI;
 
     std::string inputFilePath;
 
@@ -176,6 +174,13 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
+    printf("\nfinding WindNinja final run files\n");
+    if(windAPI.findFinalRunFiles() == false)
+    {
+        printf("problems finding WindNinja output run files for processing!\n");
+        exit(1);
+    }
+
     printf("\nloading inputs into wrfGetWeather class\n");
     // first load in the inputs
     if(weatherAPI.load_required_inputs(&inputs) == false)
@@ -192,25 +197,30 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
-    printf("\nloading inputs into createFarsiteAPI class\n");
-
-    printf("\ncreating farsite input files\n");
-    // okay finished getting everything ready, now start farsite stuff
-    if(farsiteInputs.createAllFarsiteInputs(&inputs,&ignitions,&windAPI,&weatherAPI) == false)
+    printf("\nloading inputs into farsiteAPI class\n");
+    if(fireAPI.load_required_inputs(&inputs,&ignitions,&windAPI,&weatherAPI) == false)
     {
         printf("Error creating farsite inputs! Exiting program!\n");
         exit(1);
     }
 
-    printf("\nrunning farsite!\n");
-    if(farsite.runFarsite(&farsiteInputs) == false) // maybe replace with load inputs? Or just go with it?
+    printf("\ncreating farsite input files\n");
+    // okay finished getting everything ready, now start farsite stuff
+    if(fireAPI.createAllFarsiteInputs() == false)
     {
-        printf("Error running Farsite! Exiting program!\n");
+        printf("Error creating farsite inputs! Exiting program!\n");
         exit(1);
     }
 
+    /*printf("\nrunning farsite!\n");
+    if(fireAPI.runFarsite() == false) // maybe replace with load inputs? Or just go with it?
+    {
+        printf("Error running Farsite! Exiting program!\n");
+        exit(1);
+    }*/
+
     printf("\nprocessing output farsite files for additional results\n");
-    if(farsite.createAdditionalFarsiteResults() == false)
+    if(fireAPI.createAdditionalFarsiteResults() == false)
     {
         printf("Error generating extra farsite inputs! Exiting program!\n");
         exit(1);

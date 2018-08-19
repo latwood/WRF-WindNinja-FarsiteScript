@@ -90,13 +90,13 @@ void inputVariables_infoStorage::setupAvailableApplicationUseNames()
 {
     // the idea is that each variable is used for different things, and when explaining uses, it is handy to show the applications they are for
     // other functions will verify that the setupAvailableVariables() function only used these types and that they were specified in order of application type, so in this order :)
-    allowedApplicationUseNames.push_back("application specific input");
+    allowedApplicationUseNames.push_back("application specific");
     allowedApplicationUseNames.push_back("lcpDownloader");
     allowedApplicationUseNames.push_back("createIgnition");
     allowedApplicationUseNames.push_back("wrfGetWeather and WindNinja");
     allowedApplicationUseNames.push_back("WindNinja only");
     allowedApplicationUseNames.push_back("wrfGetWeather only");
-    allowedApplicationUseNames.push_back("createFarsiteInput");
+    allowedApplicationUseNames.push_back("farsiteAPI");
     allowedApplicationUseNames.push_back("debugging related");
     allowedApplicationUseNames.push_back("optional WindNinja output settings");
 }
@@ -155,34 +155,34 @@ void inputVariables_infoStorage::setupAvailableVariables()
         // variables may be loaded or no, but to verify if optional or no, need to change verification in the checkSetVarNamesForConflictingOptions function in the inputVariablesHandler class.
 
         // application specific variables
-    addVariable("run_base_name","application specific input","string","NA",
+    addVariable("run_base_name","application specific","string","NA",
                 "The base name for all created files, so example run_base_name is cougarCreek, all files will be cougarCreek.lcp cougarCreek_ignit.shp so stuff like this. "
                 "If use_past_lcp is set, this value will be set to the found base name of the lcp file specified in lcp_file_path");
-    addVariable("createInputs_path","application specific input","pathname","NA",
+    addVariable("createInputs_path","application specific","pathname","NA",
                 "The path where files created by createIgnitions, WindNinja, wrfGetWeather, and createFarsiteInputs go. "
                 "createInputs folder Will contain separate folders for each of these outputs");
-    addVariable("finalOutput_path","application specific input","pathname","NA",
+    addVariable("finalOutput_path","application specific","pathname","NA",
                 "The path where farsite run outputs will be generated");
-    addVariable("overwrite_past_outputs","application specific input","bool","NA",
+    addVariable("overwrite_past_outputs","application specific","bool","NA",
                 "A boolean specifying whether the output files found in createdInputs and finalOutputs folders should be overwritten. "
                 "If these output folders exist in createInputs_path or finalOutputs_path and overwrite_past_outputs is true, folders aren't deleted, "
                 "just if names are the same they will be overwritten. If overwrite_past_outputs is false and these folders exist, "
                 "a search for either createInputs-# or finalOutputs-# will determine the highest # value, add one to it, and use that as the new output. "
                 "Default value is false");
-    addVariable("createIgnition_output_units","application specific input","string","NA",
+    addVariable("createIgnition_output_units","application specific","string","NA",
                 "A string specifying the types of units to be used by all files outputted by createIgnitions during the script. "
                 "Values can be english, metric, or input where input is the default value");
-    addVariable("WindNinja_required_output_units","application specific input","string","NA",
+    addVariable("WindNinja_required_output_units","application specific","string","NA",
                 "A string specifying the types of units to be used by all files required for later use outputted by WindNinja during the script. "
                 "Values can be english or metric where metric is the default value. output_wind_height is 20 ft for english and 10 m for metric");
-    addVariable("wrfGetWeather_output_units","application specific input","string","NA",
+    addVariable("wrfGetWeather_output_units","application specific","string","NA",
                 "A string specifying the types of units to be used by all files outputted by wrfGetWeather during the script. "
                 "Values can be english, or metric where metric is the default value");
-    addVariable("farsite_output_units","application specific input","string","NA",
+    addVariable("farsite_output_units","application specific","string","NA",
                 "A string specifying the types of units to be used by all files output by farsite at the very end. "
                 "I suspect this isn't actually allowable yet, so it might just be whatever units are used coming in, or default to english, but we shall see. "
                 "Values can be english or metric");
-    addVariable("use_native_timezone","application specific input","bool","NA",
+    addVariable("use_native_timezone","application specific","bool","NA",
                 "A boolean specifying whether the timezone should be native to the area or GMT for all created inputs and final output files. "
                 "Default is false so that the GMT timezone is used by default");
 
@@ -237,11 +237,6 @@ void inputVariables_infoStorage::setupAvailableVariables()
                 "Specify only if use_past_lcp is set to true, with conditions as explained for that variable");
 
         // createIgnition variables
-    addVariable("burn_start_time","createIgnition","date","NA",
-                "Needs to be a single date of format (month day year hour:minute). hour:minute goes from 00:00 to 23:59");
-    addVariable("burn_end_time","createIgnition","date","NA",
-                "Needs to be a single date of format (month day year hour:minute). hour:minute goes from 00:00 to 23:59. "
-                "Will be checked to make sure it is after burn_start_time");
     addVariable("create_ignition_from_latlongs","createIgnition","count","load_create_ignition_from_latlongs",
                 "Consists of a list of lat long locations from which a single ignition file will be created of format (lat long). "
                 "Need at least one of create_ignition_from_latlongs, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, "
@@ -306,28 +301,33 @@ void inputVariables_infoStorage::setupAvailableVariables()
     addVariable("use_weather_from_wrf_center","wrfGetWeather only","bool","NA",
                 "A boolean to know whether weather data should be pulled from the WRF files by using the center of the WRF file and is the initially preferred method of the three options");
 
-        // createFarsiteInput variables
-    addVariable("farsite_barrier_shapefile","createFarsiteInput","shape filename","NA",
+        // farsiteAPI variables
+    addVariable("burn_start_time","farsiteAPI","date","NA",
+                "Needs to be a single date of format (month day year hour:minute). hour:minute goes from 00:00 to 23:59");
+    addVariable("burn_end_time","farsiteAPI","date","NA",
+                "Needs to be a single date of format (month day year hour:minute). hour:minute goes from 00:00 to 23:59. "
+                "Will be checked to make sure it is after burn_start_time");
+    addVariable("farsite_barrier_shapefile","farsiteAPI","shape filename","NA",
                 "A path to a barrier file to use with each farsite run. Is an optional input. Checks to make sure file has .shp extension and is openable by ogr/gdal");
     // # farsite_distance_res and farsite_perimeter_res will be 60 meters and 30 meters for now with farsite_min_ignition_vertex_distance and farsite_spot_grid_resolution
     //      as half the farsite_perimeter_res with farsite_minimum_spot_distance the same value as farsite_perimeter_res
     // # farsite_time_step will be 60 minutes for now, and is dependent on the wrf files
-    addVariable("farsite_spot_probability","createFarsiteInput","signless percent","NA",
+    addVariable("farsite_spot_probability","farsiteAPI","signless percent","NA",
                 "A percentage given with the % sign missing. The default value is 0.05 so 0.05%");
-    addVariable("farsite_spot_ignition_delay","createFarsiteInput","size_t","NA",
+    addVariable("farsite_spot_ignition_delay","farsiteAPI","size_t","NA",
                 "A time in minutes to give a short time delay to when spotting calculations occur. Default value is 0");
-    addVariable("farsite_spotting_seed","createFarsiteInput","size_t","NA",
+    addVariable("farsite_spotting_seed","farsiteAPI","size_t","NA",
                 "A tally number for the assumed starting possible number of spotting embers to be generated at a given time. The default value is 1000");
-    addVariable("farsite_earliest_burn_hour","createFarsiteInput","hour_min","NA",
+    addVariable("farsite_earliest_burn_time","farsiteAPI","hour_min","NA",
                 "A time used for setting the farsite_burn_periods, so the earliest time during a day that fires can burn. "
                 "Format is (hour:minute) which can range from 00:00 to 23:59. The default value is 08:00");
-    addVariable("farsite_latest_burn_hour","createFarsiteInput","hour_min","NA",
+    addVariable("farsite_latest_burn_time","farsiteAPI","hour_min","NA",
                 "A time used for setting the farsite_burn_periods, so the latest time during a day that fires can burn. "
                 "This is usually set with the assumption that fires don't burn well at night. "
                 "Format is (hour:minute) which can range from 00:00 to 23:59. The default value is 19:59");
-    addVariable("farsite_foliar_moisture_content","createFarsiteInput","signless percent","NA",
+    addVariable("farsite_foliar_moisture_content","farsiteAPI","signless percent","NA",
                 "A percentage given with the % sign missing. The default value is 70 so 70%. Can play a large role in crown fire spread");
-    addVariable("farsite_crown_fire_method","createFarsiteInput","string","NA",
+    addVariable("farsite_crown_fire_method","farsiteAPI","string","NA",
                 "A string specifying the crown fire method used in farsite. "
                 "Options are Finney or Reinhart where Finney is the default if farsite_crown_fire_method is not specified");
 

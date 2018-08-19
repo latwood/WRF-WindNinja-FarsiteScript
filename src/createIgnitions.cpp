@@ -21,16 +21,6 @@ bool createIgnitions::load_required_inputs(inputVariablesHandler *inputs)
         // application specific variables
     createIgnition_output_units = inputs->get_inputVariableStringValue("createIgnition_output_units");
         // createIgnition variables
-    burn_start_month = inputs->get_inputVariableDateValueMonth("burn_start_time");
-    burn_start_day = inputs->get_inputVariableDateValueDay("burn_start_time");
-    burn_start_year = inputs->get_inputVariableDateValueYear("burn_start_time");
-    burn_start_hour = inputs->get_inputVariableDateValueHour("burn_start_time");
-    burn_start_minute = inputs->get_inputVariableDateValueMinute("burn_start_time");
-    burn_end_month = inputs->get_inputVariableDateValueMonth("burn_end_time");
-    burn_end_day = inputs->get_inputVariableDateValueDay("burn_end_time");
-    burn_end_year = inputs->get_inputVariableDateValueYear("burn_end_time");
-    burn_end_hour = inputs->get_inputVariableDateValueHour("burn_end_time");
-    burn_end_minute = inputs->get_inputVariableDateValueMinute("burn_end_time");
     create_ignition_from_latlongs = inputs->get_create_ignition_from_latlongs();
     polygon_ignit_shape_files = inputs->get_polygon_ignit_shape_files();
     GeoMAC_fire_perimeter_files = inputs->get_GeoMAC_fire_perimeter_files();
@@ -148,16 +138,6 @@ void createIgnitions::reset()
         // application specific variables
     createIgnition_output_units = "";
         // createIgnition variables
-    burn_start_month = 0;
-    burn_start_day = 0;
-    burn_start_year = 0;
-    burn_start_hour = 0;
-    burn_start_minute = 0;
-    burn_end_month = 0;
-    burn_end_day = 0;
-    burn_end_year = 0;
-    burn_end_hour = 0;
-    burn_end_minute = 0;
     while(!create_ignition_from_latlongs.empty())
     {
         create_ignition_from_latlongs.pop_back();
@@ -231,6 +211,8 @@ bool createIgnitions::createIgnitionFromPastFarsiteOutputs()
 /*** useful utility functions ***/
 bool createIgnitions::checkIgnitionFile(std::string ignitionFile)
 {
+    // should at a minimum make sure all the required side files are there to go with the ignition file, probably during the inputs handling
+
     // if it gets here, everything went well
     return true;
 }

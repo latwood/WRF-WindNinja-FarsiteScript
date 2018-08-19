@@ -330,12 +330,12 @@ std::vector<std::string> WindNinjaAPI::get_velFilePaths()
 
 std::vector<std::string> WindNinjaAPI::get_angFilePaths()
 {
-    angFiles;
+    return angFiles;
 }
 
 std::vector<std::string> WindNinjaAPI::get_cldFilePaths()
 {
-    cldFiles;
+    return cldFiles;
 }
 /*** end get value functions ***/
 

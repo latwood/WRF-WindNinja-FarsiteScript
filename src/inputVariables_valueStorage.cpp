@@ -1607,7 +1607,7 @@ bool inputVariables_valueStorage::setSpecializedDefaults()
         success = false;
     }
 
-        // createFarsiteInput variables
+        // farsiteAPI variables
     if(set_inputVariableDoubleValue("farsite_spot_probability",0.05) == false)   // need to be careful that it is a legit signless percent
     {
         success = false;
@@ -1620,11 +1620,11 @@ bool inputVariables_valueStorage::setSpecializedDefaults()
     {
         success = false;
     }
-    if(set_inputVariableHour_MinValue("farsite_earliest_burn_hour",8,00) == false)
+    if(set_inputVariableHour_MinValue("farsite_earliest_burn_time",8,00) == false)
     {
         success = false;
     }
-    if(set_inputVariableHour_MinValue("farsite_latest_burn_hour",19,59) == false)  // need to be careful that this is later than "farsite_earliest_burn_hour"
+    if(set_inputVariableHour_MinValue("farsite_latest_burn_time",19,59) == false)  // need to be careful that this is later than "farsite_earliest_burn_hour"
     {
         success = false;
     }

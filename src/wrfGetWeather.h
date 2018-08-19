@@ -57,16 +57,7 @@ private:
 
     // data members created from inputs that are API specific
 
-    /*
-     * turns out it doesn't make sense to create these except in the moment IF needing more than one value from the dataset
-    std::vector<std::vector<double> > AllFoundTemperatures;
-    std::vector<std::vector<double> > AllFoundHumidities;
-    std::vector<std::vector<double> > AllFoundCumulusPrecip;
-    std::vector<std::vector<double> > AllFoundGridSaclePrecip;
-    std::vector<std::vector<double> > AllFoundCloudCover;
-    std::vector<std::vector<double> > totalPrecip;
-    */
-
+    // desired output values
     std::vector<double> temperatures;
     std::vector<double> humidities;
     std::vector<double> totalPrecip;

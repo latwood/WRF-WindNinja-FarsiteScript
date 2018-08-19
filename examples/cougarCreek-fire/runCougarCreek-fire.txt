@@ -1,4 +1,4 @@
-### /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/runCougarCreek-fire.txt
+### /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/template-runCougarCreek-fire.txt
 ######################
 ######## basic idea here is I need to figure out what inputs are necessary and what format they need to have
 ####  So list out all the required and optional inputs and figure out their format and dependencies or if optional, what would need to be checked against
@@ -80,13 +80,6 @@ specify_lcp_download: false
 
 ### createIgnition variables
 ## four types of ignitions possible, can choose as many of them as desired but at least one has to be specified
-# cougar creek case was actually 08 11 2015, 01:00 gmt to 08 13 2015, 01:00 but I don't have those WRF files
-
-# burn_start_time needs to be a single date of format (month day year hour:minute). hour:minute goes from 00:00 to 23:59
-burn_start_time: 08 09 2015 12:00
-
-# burn_end_time needs to be a single date of format (month day year hour:minute). hour:minute goes from 00:00 to 23:59. Will be checked to make sure it is after burn_start_time
-burn_end_time: 08 10 2015 12:0
 
 # create_ignition_from_latlongs consists of a list of lat long locations from which a single ignition file will be created of format (lat long). Need at least one of create_ignition_from_latlongs, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, or farsite_output_fire_perimeter_files ignition types to run
 create_ignition_from_latlongs: 1
@@ -159,7 +152,14 @@ use_weather_from_full_ignition_area: false
 use_weather_from_wrf_center: true
 
 
-### createFarsiteInput variables
+### farsiteAPI variables
+# cougar creek case was actually 08 11 2015, 01:00 gmt to 08 13 2015, 01:00 but I don't have those WRF files
+
+# burn_start_time needs to be a single date of format (month day year hour:minute). hour:minute goes from 00:00 to 23:59
+burn_start_time: 08 09 2015 12:00
+
+# burn_end_time needs to be a single date of format (month day year hour:minute). hour:minute goes from 00:00 to 23:59. Will be checked to make sure it is after burn_start_time
+burn_end_time: 08 10 2015 12:0
 
 # farsite_barrier_shapefile is a path to a barrier file to use with each farsite run. Is an optional input. Checks to make sure file has .shp extension and is openable by ogr/gdal
 #farsite_barrier_shapefile: /home/atw09001/Documents/windninjaPanther/test1177973/currentInput/test1177973_NTFBBarrier.shp
@@ -177,11 +177,11 @@ farsite_spot_ignition_delay: 0
 # farsite_spotting_seed is a tally number for the assumed starting possible number of spotting embers to be generated at a given time. The default value is 1000
 farsite_spotting_seed: 1000
 
-# farsite_earliest_burn_hour is a time used for setting the farsite_burn_periods, so the earliest time during a day that fires can burn. Format is (hour:minute) which can range from 00:00 to 23:59. The default value is 08:00
-farsite_earliest_burn_hour: 08:00
+# farsite_earliest_burn_time is a time used for setting the farsite_burn_periods, so the earliest time during a day that fires can burn. Format is (hour:minute) which can range from 00:00 to 23:59. The default value is 08:00
+farsite_earliest_burn_time: 08:00
 
-# farsite_latest_burn_hour is a time used for setting the farsite_burn_periods, so the latest time during a day that fires can burn. This is usually set with the assumption that fires don't burn well at night. Format is (hour:minute) which can range from 00:00 to 23:59. The default value is 19:59
-farsite_latest_burn_hour: 18:00
+# farsite_latest_burn_time is a time used for setting the farsite_burn_periods, so the latest time during a day that fires can burn. This is usually set with the assumption that fires don't burn well at night. Format is (hour:minute) which can range from 00:00 to 23:59. The default value is 19:59
+farsite_latest_burn_time: 18:00
 
 # farsite_foliar_moisture_content is a percentage given with the % sign missing. The default value is 70 so 70%. Can play a large role in crown fire spread
 farsite_foliar_moisture_content: 70
