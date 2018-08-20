@@ -24,12 +24,21 @@ public:
     bool create_WindNinja_cfg_files();
     bool run_WindNinja();
     bool findFinalRunFiles();
+    bool findWrfTimes();
 
     // get value functions
     std::vector<std::string> get_atmFilePaths();
     std::vector<std::string> get_velFilePaths();
     std::vector<std::string> get_angFilePaths();
     std::vector<std::string> get_cldFilePaths();
+    std::vector<std::string> get_wrfYears();
+    std::vector<std::string> get_wrfMonths();
+    std::vector<std::string> get_wrfDays();
+    std::vector<std::string> get_wrfHours();
+    std::vector<std::string> get_wrfMinutes();
+    std::vector<std::string> get_wrfSeconds();
+    std::vector<std::string> get_wrfTimeZones();
+
 
 private:
 
@@ -38,6 +47,7 @@ private:
 
     // useful utility functions
     bool doesFolderExist(std::string pathName);
+    bool doesFilenameExist(std::string fileName);
     bool doesNetCDFFileExist(std::string pathName);
     std::vector<std::string> globVector(const std::string& pattern);
     bool doOutputFilesExist(size_t runNumber);
@@ -104,6 +114,13 @@ private:
     std::vector<std::string> velFiles;
     std::vector<std::string> angFiles;
     std::vector<std::string> cldFiles;
+    std::vector<std::string> wrfYears;
+    std::vector<std::string> wrfMonths;
+    std::vector<std::string> wrfDays;
+    std::vector<std::string> wrfHours;
+    std::vector<std::string> wrfMinutes;
+    std::vector<std::string> wrfSeconds;
+    std::vector<std::string> wrfTimeZones;
 
 };
 

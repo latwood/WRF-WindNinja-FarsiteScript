@@ -58,6 +58,13 @@ bool farsiteAPI::load_required_inputs(inputVariablesHandler *inputs, createIgnit
     velFiles = windAPI->get_velFilePaths();
     angFiles = windAPI->get_angFilePaths();
     cldFiles = windAPI->get_cldFilePaths();
+    wrfYears = windAPI->get_wrfYears();
+    wrfMonths = windAPI->get_wrfMonths();
+    wrfDays = windAPI->get_wrfDays();
+    wrfHours = windAPI->get_wrfHours();
+    wrfMinutes = windAPI->get_wrfMinutes();
+    wrfSeconds = windAPI->get_wrfSeconds();
+    wrfTimeZones = windAPI->get_wrfTimeZones();
 
     // now load all variables needed from the wrfGetWeather class
     temperatures = weatherAPI->get_temperatures();
@@ -155,6 +162,10 @@ bool farsiteAPI::load_required_inputs(inputVariablesHandler *inputs, createIgnit
     }
     farsiteApplicationPath = "/home/atw09001/src/farsite/src/TestFARSITE";
 
+    // for farsite burn period stuff
+    // this can run now cause wrf file times has been found
+    uniqueDates = findUniqueDates();
+
     // if it gets here, everything went well
     return true;
 }
@@ -190,30 +201,54 @@ bool farsiteAPI::createAllFarsiteInputs()
         for(size_t fileIdx = 0; fileIdx < farsiteVelFiles[runIdx].size(); fileIdx++)
         {
             std::string velFileOutput = farsiteVelFiles[runIdx][fileIdx] + ".asc";
-            copyFile(velFiles[fileIdx],velFileOutput);
+            if(copyFile(velFiles[fileIdx],velFileOutput) == false)
+            {
+                printf("problem copying velocity .asc file!\n");
+                return false;
+            }
             std::string prjFileInput = findBaseNameWithPath(velFiles[fileIdx]) + ".prj";
             std::string prjFileOutput = farsiteVelFiles[runIdx][fileIdx] + ".prj";
-            copyFile(prjFileInput,prjFileOutput);
+            if(copyFile(prjFileInput,prjFileOutput) == false)
+            {
+                printf("problem copying velocity .prj file!\n");
+                return false;
+            }
         }
 
         // now the angle files
         for(size_t fileIdx = 0; fileIdx < farsiteAngFiles[runIdx].size(); fileIdx++)
         {
             std::string angFileOutput = farsiteAngFiles[runIdx][fileIdx] + ".asc";
-            copyFile(angFiles[fileIdx],angFileOutput);
+            if(copyFile(angFiles[fileIdx],angFileOutput) == false)
+            {
+                printf("problem copying angle .asc file!\n");
+                return false;
+            }
             std::string prjFileInput = findBaseNameWithPath(angFiles[fileIdx]) + ".prj";
             std::string prjFileOutput = farsiteAngFiles[runIdx][fileIdx] + ".prj";
-            copyFile(prjFileInput,prjFileOutput);
+            if(copyFile(prjFileInput,prjFileOutput) == false)
+            {
+                printf("problem copying angle .prj file!\n");
+                return false;
+            }
         }
 
         // now the cloud cover files
         for(size_t fileIdx = 0; fileIdx < farsiteCldFiles[runIdx].size(); fileIdx++)
         {
             std::string cldFileOutput = farsiteCldFiles[runIdx][fileIdx] + ".asc";
-            copyFile(cldFiles[fileIdx],cldFileOutput);
+            if(copyFile(cldFiles[fileIdx],cldFileOutput) == false)
+            {
+                printf("problem copying cloud cover .asc file!\n");
+                return false;
+            }
             std::string prjFileInput = findBaseNameWithPath(cldFiles[fileIdx]) + ".prj";
             std::string prjFileOutput = farsiteCldFiles[runIdx][fileIdx] + ".prj";
-            copyFile(prjFileInput,prjFileOutput);
+            if(copyFile(prjFileInput,prjFileOutput) == false)
+            {
+                printf("problem copying cloud cover .prj file!\n");
+                return false;
+            }
         }
 
         // now the barrier file if it exists (is optional)
@@ -221,52 +256,113 @@ bool farsiteAPI::createAllFarsiteInputs()
         {
             std::string inputBarrierBaseNameAndPath = findBaseNameWithPath(farsite_barrier_shapefile);
             std::string barrierShpFileOutput = farsiteBarrierFiles[runIdx] + ".shp";
-            copyFile(farsite_barrier_shapefile,barrierShpFileOutput);
+            if(copyFile(farsite_barrier_shapefile,barrierShpFileOutput) == false)
+            {
+                printf("problem copying barrier .shp file!\n");
+                return false;
+            }
             std::string barrierDbfFileInput = inputBarrierBaseNameAndPath + ".dbf";
             std::string barrierDbfFileOutput = farsiteBarrierFiles[runIdx] + ".dbf";
-            copyFile(barrierDbfFileInput,barrierDbfFileOutput);
+            if(copyFile(barrierDbfFileInput,barrierDbfFileOutput) == false)
+            {
+                printf("problem copying barrier .dbf file!\n");
+                return false;
+            }
             std::string barrierShxFileInput = inputBarrierBaseNameAndPath + ".shx";
             std::string barrierShxFileOutput = farsiteBarrierFiles[runIdx] + ".shx";
-            copyFile(barrierShxFileInput,barrierShxFileOutput);
+            if(copyFile(barrierShxFileInput,barrierShxFileOutput) == false)
+            {
+                printf("problem copying barrier .shx file!\n");
+                return false;
+            }
             std::string barrierPrjFileInput = inputBarrierBaseNameAndPath + ".prj";
             std::string barrierPrjFileOutput = farsiteBarrierFiles[runIdx] + ".prj";    // this one might be optional
             if(doesFilenameExist(barrierPrjFileInput) == true)
             {
-                copyFile(barrierPrjFileInput,barrierPrjFileOutput);
+                if(copyFile(barrierPrjFileInput,barrierPrjFileOutput) == false)
+                {
+                    printf("problem copying barrier .prj file!\n");
+                    return false;
+                }
             }
         }
 
         // now the ignition files
         std::string inputIgnitionBaseNameAndPath = findBaseNameWithPath(ignitionShapefilesForSimulations[runIdx]);
         std::string ignitionShpFileOutput = farsiteIgnitionFiles[runIdx] + ".shp";
-        copyFile(ignitionShapefilesForSimulations[runIdx],ignitionShpFileOutput);
+        if(copyFile(ignitionShapefilesForSimulations[runIdx],ignitionShpFileOutput) == false)
+        {
+            printf("problem copying ignition .shp file!\n");
+            return false;
+        }
         std::string ignitionDbfFileInput = inputIgnitionBaseNameAndPath + ".dbf";
         std::string ignitionDbfFileOutput = farsiteIgnitionFiles[runIdx] + ".dbf";
-        copyFile(ignitionDbfFileInput,ignitionDbfFileOutput);
+        if(copyFile(ignitionDbfFileInput,ignitionDbfFileOutput) == false)
+        {
+            printf("problem copying ignition .dbf file!\n");
+            return false;
+        }
         std::string ignitionShxFileInput = inputIgnitionBaseNameAndPath + ".shx";
         std::string ignitionShxFileOutput = farsiteIgnitionFiles[runIdx] + ".shx";
-        copyFile(ignitionShxFileInput,ignitionShxFileOutput);
+        if(copyFile(ignitionShxFileInput,ignitionShxFileOutput) == false)
+        {
+            printf("problem copying ignition .shx file!\n");
+            return false;
+        }
         std::string ignitionPrjFileInput = inputIgnitionBaseNameAndPath + ".prj";
         std::string ignitionPrjFileOutput = farsiteIgnitionFiles[runIdx] + ".prj";    // this one might be optional
         if(doesFilenameExist(ignitionPrjFileInput) == true)
         {
-            copyFile(ignitionPrjFileInput,ignitionPrjFileOutput);
+            if(copyFile(ignitionPrjFileInput,ignitionPrjFileOutput) == false)
+            {
+                printf("problem copying ignition .prj file!\n");
+                return false;
+            }
         }
 
         // now the lcp file
         std::string lcpFileOutput = farsiteLcpFiles[runIdx] + ".lcp";
-        copyFile(actualLcpPath,lcpFileOutput);
+        if(copyFile(actualLcpPath,lcpFileOutput) == false)
+        {
+            printf("problem copying lcp .lcp file!\n");
+            return false;
+        }
         std::string prjFileInput = findBaseNameWithPath(actualLcpPath) + ".prj";
         std::string prjFileOutput = farsiteLcpFiles[runIdx] + ".prj";
-        copyFile(prjFileInput,prjFileOutput);
+        if(copyFile(prjFileInput,prjFileOutput) == false)
+        {
+            printf("problem copying lcp .prj file!\n");
+            return false;
+        }
 
        // now write the combination atm file
+        if(setupFinalAtmFiles(runIdx) == false)
+        {
+            printf("problem setting up final .atm file!\n");
+            return false;
+        }
 
        // now write Raws file
+        if(createRawsFile(runIdx) == false)
+        {
+            printf("problem creating raws file!\n");
+            return false;
+        }
 
        // now write the input file
+        if(writeFarsiteInputFile(runIdx) == false)
+        {
+            printf("problem writing farsite input file!\n");
+            return false;
+        }
 
        // now write the command line file
+        if(writeFarsiteCommandFile(runIdx) == false)
+        {
+            printf("problem writing farsite command file!\n");
+            return false;
+        }
+
     }
 
     // if it gets here, everything went well
@@ -370,6 +466,34 @@ void farsiteAPI::reset()
     {
         cldFiles.pop_back();
     }
+    while(!wrfYears.empty())
+    {
+        wrfYears.pop_back();
+    }
+    while(!wrfMonths.empty())
+    {
+        wrfMonths.pop_back();
+    }
+    while(!wrfDays.empty())
+    {
+        wrfDays.pop_back();
+    }
+    while(!wrfHours.empty())
+    {
+        wrfHours.pop_back();
+    }
+    while(!wrfMinutes.empty())
+    {
+        wrfMinutes.pop_back();
+    }
+    while(!wrfSeconds.empty())
+    {
+        wrfSeconds.pop_back();
+    }
+    while(!wrfTimeZones.empty())
+    {
+        wrfTimeZones.pop_back();
+    }
 
     // data members needed from wrfGetWeather class
     while(!temperatures.empty())
@@ -454,14 +578,140 @@ void farsiteAPI::reset()
     }
     farsiteApplicationPath = "";
 
+    // for farsite burn period stuff
+    while(!uniqueDates.empty())
+    {
+        uniqueDates.pop_back();
+    }
+
 }
 /*** end reconstructor like functions ***/
 
 /*** create farsite input functions ***/
-bool farsiteAPI::createRawsFile()
+bool farsiteAPI::setupFinalAtmFiles(size_t runIdx)
 {
+    FILE *fzout;
+    fzout = fopen(farsiteAtmFiles[runIdx].c_str(), "w");
+    for(size_t atmFileIdx = 0; atmFileIdx < atmFiles.size(); atmFileIdx++)
+    {
+        std::string velFileName = velFiles[atmFileIdx] + ".asc";
+        std::string angFileName = angFiles[atmFileIdx] + ".asc";
+        fprintf(fzout,"%s %s %s%s %s %s\n",wrfMonths[atmFileIdx].c_str(),wrfDays[atmFileIdx].c_str(),wrfHours[atmFileIdx].c_str(),
+               wrfMinutes[atmFileIdx].c_str(),velFileName.c_str(),angFileName.c_str());
+    }
+    fclose(fzout);
+
     // if it gets here, everything went well
     return true;
+}
+
+bool farsiteAPI::createRawsFile(size_t runIdx)
+{
+    std::string guess_RAWS_ELEVATION = "500"; // 2 m was wrf data, but I don't know if it is safe to go that low
+    std::string fake_WindSpeed = "999"; // still have to supply it, but is ignored since gridded winds will be used
+    std::string fake_WindDir = "180";   // still have to supply it, but is ignored since gridded winds will be used
+    FILE *fzout;
+    fzout = fopen(farsiteRawsFiles[runIdx].c_str(), "w");
+    fprintf(fzout,"RAWS_ELEVATION: %s\n",guess_RAWS_ELEVATION.c_str());
+    fprintf(fzout,"RAWS_UNITS: %s\n",wrfGetWeather_output_units.c_str());
+    fprintf(fzout,"RAWS: %zu\n",atmFiles.size());
+    for(size_t atmFileIdx = 0; atmFileIdx < atmFiles.size(); atmFileIdx++)
+    {
+        fprintf(fzout,"%s %s %s%s %f %f %f %s %s %f\n",wrfMonths[atmFileIdx].c_str(),wrfDays[atmFileIdx].c_str(),wrfHours[atmFileIdx].c_str(),
+               wrfMinutes[atmFileIdx].c_str(),temperatures[atmFileIdx],humidities[atmFileIdx],totalPrecip[atmFileIdx],
+               fake_WindSpeed.c_str(),fake_WindDir.c_str(),cloudCover[atmFileIdx]);
+    }
+    fclose(fzout);
+
+    // if it gets here, everything went well
+    return true;
+}
+
+bool farsiteAPI::writeFarsiteInputFile(size_t runIdx)
+{
+    FILE *fzout;
+    fzout = fopen(farsiteInputFiles[runIdx].c_str(), "w");
+    fprintf(fzout,"FARSITE INPUTS FILE VERSION 1.0\n");
+    fprintf(fzout,"FARSITE_START_TIME: %s\n",farsite_start_time.c_str());
+    fprintf(fzout,"FARSITE_END_TIME: %s\n",farsite_end_time.c_str());
+    fprintf(fzout,"FARSITE_TIMESTEP: %s\n",farsite_timestep.c_str());
+    fprintf(fzout,"FARSITE_DISTANCE_RES: %s\n",farsite_distance_res.c_str());
+    fprintf(fzout,"FARSITE_PERIMETER_RES: %s\n",farsite_perimeter_res.c_str());
+    fprintf(fzout,"FARSITE_MIN_IGNITION_VERTEX_DISTANCE: %s\n",farsite_min_ignition_vertex_distance.c_str());
+    fprintf(fzout,"FARSITE_SPOT_GRID_RESOLUTION: %s\n",farsite_spot_grid_resolution.c_str());
+    fprintf(fzout,"FARSITE_SPOT_PROBABILITY: %f\n",farsite_spot_probability);
+    fprintf(fzout,"FARSITE_SPOT_IGNITION_DELAY: %zu\n",farsite_spot_ignition_delay);
+    fprintf(fzout,"FARSITE_MINIMUM_SPOT_DISTANCE: %s\n",farsite_minimum_spot_distance.c_str());
+    fprintf(fzout,"FARSITE_ACCELERATION_ON: %s\n",farsite_acceleration_on.c_str());
+    fprintf(fzout,"FARSITE_FILL_BARRIERS: %s\n",farsite_fill_barriers.c_str());
+    fprintf(fzout,"SPOTTING_SEED: %zu\n",farsite_spotting_seed);
+    fprintf(fzout,"\n");
+    fprintf(fzout,"FARSITE_BURN_PERIODS: %zu\n",uniqueDates.size());
+    for(size_t uniqueDatesIdx = 0; uniqueDatesIdx < uniqueDates.size(); uniqueDatesIdx++)
+    {
+        fprintf(fzout,"%s %d%d %d%d\n",uniqueDates[uniqueDatesIdx].c_str(),farsite_earliest_burn_time_hour,farsite_earliest_burn_time_minute,
+               farsite_latest_burn_time_hour,farsite_latest_burn_time_minute);
+    }
+    fprintf(fzout,"\n");
+    fprintf(fzout,"FUEL_MOISTURES_DATA: 1\n");
+    fprintf(fzout,"%s\n",farsite_default_fuel_mositures_data.c_str());
+    fprintf(fzout,"\n");
+    fprintf(fzout,"RAWS_FILE: %s\n",farsiteRawsFiles[runIdx].c_str());
+    fprintf(fzout,"\n");
+    fprintf(fzout,"FARSITE_ATM_FILE: %s\n",farsiteAtmFiles[runIdx].c_str());
+    fprintf(fzout,"\n");
+    fprintf(fzout,"FOLIAR_MOISTURE_CONTENT: %f\n",farsite_foliar_moisture_content);
+    fprintf(fzout,"CROWN_FIRE_METHOD: %s\n",farsite_crown_fire_method.c_str());
+    fprintf(fzout,"NUMBER_PROCESSORS: %zu\n",WindNinja_number_of_threads);
+    fclose(fzout);
+
+    // if it gets here, everything went well
+    return true;
+}
+
+bool farsiteAPI::writeFarsiteCommandFile(size_t runIdx)
+{
+    std::string lcpFile = farsiteLcpFiles[runIdx] + ".lcp";
+    std::string ignitionFile = farsiteIgnitionFiles[runIdx] + ".shp";
+    std::string outputFilePath = farsiteFinalOutputRunFolderPaths[runIdx] + "/" + findBaseName(actual_run_base_name);
+    FILE *fzout;
+    fzout = fopen(farsiteCommandFiles[runIdx].c_str(), "w");
+    if(farsiteBarrierFiles.size() == 0)
+    {
+        fprintf(fzout,"%s %s %s 0 %s 0\n",lcpFile.c_str(),farsiteInputFiles[runIdx].c_str(),ignitionFile.c_str(),outputFilePath.c_str());
+    } else
+    {
+        std::string barrierFile = farsiteBarrierFiles[runIdx] + ".shp";
+        fprintf(fzout,"%s %s %s %s %s 0\n",lcpFile.c_str(),farsiteInputFiles[runIdx].c_str(),ignitionFile.c_str(),barrierFile.c_str(),outputFilePath.c_str());
+    }
+    fclose(fzout);
+
+    // if it gets here, everything went well
+    return true;
+}
+
+std::vector<std::string> farsiteAPI::findUniqueDates()
+{
+    std::vector<std::string> outputFiles;
+
+    if(wrfYears.size() >= 1)
+    {
+        std::string foundUniqueDate = wrfMonths[0] + " " + wrfDays[0];
+        outputFiles.push_back(foundUniqueDate);
+    }
+    if(wrfYears.size() > 1)
+    {
+        for(size_t wrfFileIdx = 1; wrfFileIdx < wrfYears.size(); wrfFileIdx++)
+        {
+            if(wrfYears[wrfFileIdx-1] != wrfYears[wrfFileIdx] && wrfMonths[wrfFileIdx-1] != wrfMonths[wrfFileIdx] && wrfDays[wrfFileIdx-1] != wrfDays[wrfFileIdx])
+            {
+                std::string foundUniqueDate = wrfMonths[wrfFileIdx] + " " + wrfDays[wrfFileIdx];
+                outputFiles.push_back(foundUniqueDate);
+            }
+        }
+    }
+
+    return outputFiles;
 }
 /*** end create farsite input functions ***/
 

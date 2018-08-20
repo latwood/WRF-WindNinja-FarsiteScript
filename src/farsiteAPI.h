@@ -40,15 +40,11 @@ private:
     void reset();
 
     // create farsite input functions
-    bool createRawsFile();
-    bool setupFinalAtmFiles();
-    bool writeFarsiteInputFile();
-    bool writeFarsiteCommandFile();
-    // do I really not want these? It would be nice to be able to group all the inputs into one nice place instead of pointing to locations of them
-    // from whoever knows where specified by the user as some of these can potentially be supplied external to the createdInputs set of folders
-    //bool copyCreateIgnitionFiles();   // actually probably don't need this as these are in the createdInputs main folder under createIgnitions
-    //bool copyWindNinjaFiles();   // actually probably don't need this as these are in the createdInputs main folder under WindNinja
-    //bool copyLcpFile();   // actually probably don't need this
+    bool setupFinalAtmFiles(size_t runIdx);
+    bool createRawsFile(size_t runIdx);
+    bool writeFarsiteInputFile(size_t runIdx);
+    bool writeFarsiteCommandFile(size_t runIdx);
+    std::vector<std::string> findUniqueDates();
 
     // special execute external script commands
     std::string exec_cmd(const char* cmd);
@@ -105,6 +101,13 @@ private:
     std::vector<std::string> velFiles;
     std::vector<std::string> angFiles;
     std::vector<std::string> cldFiles;
+    std::vector<std::string> wrfYears;
+    std::vector<std::string> wrfMonths;
+    std::vector<std::string> wrfDays;
+    std::vector<std::string> wrfHours;
+    std::vector<std::string> wrfMinutes;
+    std::vector<std::string> wrfSeconds;
+    std::vector<std::string> wrfTimeZones;
 
     // data members needed from wrfGetWeather class
     std::vector<double> temperatures;
@@ -147,6 +150,9 @@ private:
     std::vector<std::vector<std::string> > farsiteAngFiles; // is the same set of files, just different paths
     std::vector<std::vector<std::string> > farsiteCldFiles; // is the same set of files, just different paths
     std::string farsiteApplicationPath; // this should probably be an input variable, with a default value being the nice farsite location
+
+    // for farsite burn period stuff
+    std::vector<std::string> uniqueDates;
 
 };
 

@@ -181,6 +181,13 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
+    printf("\nfinding wrf file times from WindNinja logs\n");
+    if(windAPI.findWrfTimes() == false)
+    {
+        printf("problems finding wrf file times from WindNinja logs!\n");
+        exit(1);
+    }
+
     printf("\nloading inputs into wrfGetWeather class\n");
     // first load in the inputs
     if(weatherAPI.load_required_inputs(&inputs) == false)

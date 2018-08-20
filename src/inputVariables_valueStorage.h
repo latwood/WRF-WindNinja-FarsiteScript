@@ -274,6 +274,7 @@ private:
 
     size_t wrf_files_count;
     std::vector<std::string> wrf_files;
+//    std::vector<dateValue> wrf_times; // check to make sure times are in a certain order, but better to use WindNinja output times as then it is the right timezone
 
     size_t additional_WindNinja_outputs_google_count;
     std::vector<additional_WindNinja_outputs_googleValue> additional_WindNinja_outputs_googleValues;

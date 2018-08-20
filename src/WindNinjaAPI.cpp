@@ -107,6 +107,7 @@ bool WindNinjaAPI::load_required_inputs(inputVariablesHandler *inputs)
         WindNinja_non_neutral_stability_string = "false";
     }
 
+    // if it gets here, everything went well
     return true;
 }
 /*** end reconstructor like functions ***/
@@ -313,6 +314,116 @@ bool WindNinjaAPI::findFinalRunFiles()
         printf("cldFiles[%zu] = %s\n",fileIdx,cldFiles[fileIdx].c_str());
     }
 
+    // if it gets here, everything went well
+    return true;
+}
+
+bool WindNinjaAPI::findWrfTimes()
+{
+    for(size_t wrfCount = 0; wrfCount < wrf_files.size(); wrfCount++)
+    {
+        std::string logFileName = WindNinjaRunFolderPaths[wrfCount] + "/log.WindNinjaRun";
+        std::ifstream fzInput;
+        if(doesFilenameExist(logFileName) == false)
+        {
+            printf("failed to open WindNinja log file \"%s\"!\n",logFileName.c_str());
+            return false;
+        }
+        fzInput.open(logFileName.c_str());
+        std::string currentLine;
+        while(std::getline(fzInput,currentLine))
+        {
+            if(currentLine.substr(0,26) == "Run 0: Simulation time is ")
+            {
+                std::string timeString = currentLine.substr(26,currentLine.length());
+
+                size_t startValueSpot = 0;
+                for(size_t charIdx = 0; charIdx < timeString.length(); charIdx++)
+                {
+                    std::string currentChr = timeString.substr(charIdx,1);
+                    if(currentChr == "-")
+                    {
+                        std::string foundTime = timeString.substr(startValueSpot,charIdx-startValueSpot);
+                        wrfYears.push_back(foundTime);
+                        timeString = timeString.substr(charIdx-startValueSpot+1,timeString.length());
+                        break;
+                    }
+                }
+
+                startValueSpot = 0;
+                for(size_t charIdx = 0; charIdx < timeString.length(); charIdx++)
+                {
+                    std::string currentChr = timeString.substr(charIdx,1);
+                    if(currentChr == "-")
+                    {
+                        std::string foundTime = timeString.substr(startValueSpot,charIdx-startValueSpot);
+                        wrfMonths.push_back(foundTime);
+                        timeString = timeString.substr(charIdx-startValueSpot+1,timeString.length());
+                        break;
+                    }
+                }
+
+                startValueSpot = 0;
+                for(size_t charIdx = 0; charIdx < timeString.length(); charIdx++)
+                {
+                    std::string currentChr = timeString.substr(charIdx,1);
+                    if(currentChr == " ")
+                    {
+                        std::string foundTime = timeString.substr(startValueSpot,charIdx-startValueSpot);
+                        wrfDays.push_back(foundTime);
+                        timeString = timeString.substr(charIdx-startValueSpot+1,timeString.length());
+                        break;
+                    }
+                }
+
+                startValueSpot = 0;
+                for(size_t charIdx = 0; charIdx < timeString.length(); charIdx++)
+                {
+                    std::string currentChr = timeString.substr(charIdx,1);
+                    if(currentChr == ":")
+                    {
+                        std::string foundTime = timeString.substr(startValueSpot,charIdx-startValueSpot);
+                        wrfHours.push_back(foundTime);
+                        timeString = timeString.substr(charIdx-startValueSpot+1,timeString.length());
+                        break;
+                    }
+                }
+
+                startValueSpot = 0;
+                for(size_t charIdx = 0; charIdx < timeString.length(); charIdx++)
+                {
+                    std::string currentChr = timeString.substr(charIdx,1);
+                    if(currentChr == ":")
+                    {
+                        std::string foundTime = timeString.substr(startValueSpot,charIdx-startValueSpot);
+                        wrfMinutes.push_back(foundTime);
+                        timeString = timeString.substr(charIdx-startValueSpot+1,timeString.length());
+                        break;
+                    }
+                }
+
+                startValueSpot = 0;
+                for(size_t charIdx = 0; charIdx < timeString.length(); charIdx++)
+                {
+                    std::string currentChr = timeString.substr(charIdx,1);
+                    if(currentChr == " ")
+                    {
+                        std::string foundTime = timeString.substr(startValueSpot,charIdx-startValueSpot);
+                        wrfSeconds.push_back(foundTime);
+                        timeString = timeString.substr(charIdx-startValueSpot+1,timeString.length());
+                        break;
+                    }
+                }
+
+                // the leftover is the timezone
+                wrfTimeZones.push_back(timeString);
+                break;
+            }
+        }
+        fzInput.close();
+    }
+
+    // if it gets here, everything went well
     return true;
 }
 /*** end functions ***/
@@ -336,6 +447,41 @@ std::vector<std::string> WindNinjaAPI::get_angFilePaths()
 std::vector<std::string> WindNinjaAPI::get_cldFilePaths()
 {
     return cldFiles;
+}
+
+std::vector<std::string> WindNinjaAPI::get_wrfYears()
+{
+    return wrfYears;
+}
+
+std::vector<std::string> WindNinjaAPI::get_wrfMonths()
+{
+    return wrfMonths;
+}
+
+std::vector<std::string> WindNinjaAPI::get_wrfDays()
+{
+    return wrfDays;
+}
+
+std::vector<std::string> WindNinjaAPI::get_wrfHours()
+{
+    return wrfHours;
+}
+
+std::vector<std::string> WindNinjaAPI::get_wrfMinutes()
+{
+    return wrfMinutes;
+}
+
+std::vector<std::string> WindNinjaAPI::get_wrfSeconds()
+{
+    return wrfSeconds;
+}
+
+std::vector<std::string> WindNinjaAPI::get_wrfTimeZones()
+{
+    return wrfTimeZones;
 }
 /*** end get value functions ***/
 
@@ -484,6 +630,34 @@ void WindNinjaAPI::reset()
     {
         cldFiles.pop_back();
     }
+    while(!wrfYears.empty())
+    {
+        wrfYears.pop_back();
+    }
+    while(!wrfMonths.empty())
+    {
+        wrfMonths.pop_back();
+    }
+    while(!wrfDays.empty())
+    {
+        wrfDays.pop_back();
+    }
+    while(!wrfHours.empty())
+    {
+        wrfHours.pop_back();
+    }
+    while(!wrfMinutes.empty())
+    {
+        wrfMinutes.pop_back();
+    }
+    while(!wrfSeconds.empty())
+    {
+        wrfSeconds.pop_back();
+    }
+    while(!wrfTimeZones.empty())
+    {
+        wrfTimeZones.pop_back();
+    }
 
 }
 /*** end reconstructor like functions ***/
@@ -509,6 +683,14 @@ bool WindNinjaAPI::doesFolderExist(std::string pathName)
     }
 
     return exists;
+}
+
+bool WindNinjaAPI::doesFilenameExist(std::string fileName)
+{
+    // found this here: https://stackoverflow.com/questions/12774207/fastest-way-to-check-if-a-file-exist-using-standard-c-c11-c
+    // hopefully it works for files as well as directories as this is the same thing used to check a file path. More interesting hopefully this works for .prj files!
+    struct stat buffer;
+    return (stat (fileName.c_str(), &buffer) == 0);
 }
 
 bool WindNinjaAPI::doesNetCDFFileExist(std::string pathName)
