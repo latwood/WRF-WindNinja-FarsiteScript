@@ -219,12 +219,12 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
-    /*printf("\nrunning farsite!\n");
+    printf("\nrunning farsite!\n");
     if(fireAPI.runFarsite() == false) // maybe replace with load inputs? Or just go with it?
     {
         printf("Error running Farsite! Exiting program!\n");
         exit(1);
-    }*/
+    }
 
     printf("\nprocessing output farsite files for additional results\n");
     if(fireAPI.createAdditionalFarsiteResults() == false)

@@ -57,6 +57,9 @@ private:
     std::string findBaseName(std::string filePath);
     std::string findBaseNameWithPath(std::string filePath);
     bool copyFile(std::string inputFilename, std::string outputFilename);
+    std::string monthTextToNumber(std::string inputMonthText);
+    std::string monthDayHourMinSecAddZero(int time);
+
 
     // data members needed from the inputs class
     std::string actual_run_base_name;

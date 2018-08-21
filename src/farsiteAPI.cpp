@@ -73,8 +73,10 @@ bool farsiteAPI::load_required_inputs(inputVariablesHandler *inputs, createIgnit
     cloudCover = weatherAPI->get_cloudCover();
 
     // data members created from inputs that are farsiteAPI specific
-    farsite_start_time = std::to_string(burn_start_month) + " " + std::to_string(burn_start_day) + " " + std::to_string(burn_start_hour) + std::to_string(burn_start_minute);
-    farsite_end_time =  std::to_string(burn_end_month) + " " + std::to_string(burn_end_day) + " " + std::to_string(burn_end_hour) + std::to_string(burn_end_minute);
+    farsite_start_time = monthDayHourMinSecAddZero(burn_start_month) + " " + monthDayHourMinSecAddZero(burn_start_day) + " " +
+            monthDayHourMinSecAddZero(burn_start_hour) + monthDayHourMinSecAddZero(burn_start_minute);
+    farsite_end_time =  monthDayHourMinSecAddZero(burn_end_month) + " " + monthDayHourMinSecAddZero(burn_end_day) + " " +
+            monthDayHourMinSecAddZero(burn_end_hour) + monthDayHourMinSecAddZero(burn_end_minute);
     farsite_timestep = "60";
     farsite_distance_res = "30.0";
     farsite_perimeter_res = "60.0";
@@ -377,14 +379,16 @@ bool farsiteAPI::runFarsite()
         return false;
     }
 
-    for(size_t runIdx = 0; runIdx < farsiteInputFiles.size(); runIdx++)
+    for(size_t runIdx = 0; runIdx < farsiteCommandFiles.size(); runIdx++)
     {
-        if(doesFilenameExist(farsiteInputFiles[runIdx]) == false)
+        if(doesFilenameExist(farsiteCommandFiles[runIdx]) == false)
         {
-            printf("farsite input file \"%s\" does not exist!\n",farsiteInputFiles[runIdx].c_str());
+            printf("farsite command file \"%s\" does not exist!\n",farsiteCommandFiles[runIdx].c_str());
             return false;
         }
-        std::string execution_command = farsiteApplicationPath + " " + farsiteInputFiles[runIdx];
+        std::string execution_command = farsiteApplicationPath + " " + farsiteCommandFiles[runIdx];
+        printf("execution_command = \"%s\"\n",execution_command.c_str());
+        //execution_command = farsiteApplicationPath + " /home/atw09001/Documents/cougarCreek-fire/run_cougarCreekFire.txt";
         exec_cmd(execution_command.c_str());
     }
 
@@ -594,9 +598,9 @@ bool farsiteAPI::setupFinalAtmFiles(size_t runIdx)
     fzout = fopen(farsiteAtmFiles[runIdx].c_str(), "w");
     for(size_t atmFileIdx = 0; atmFileIdx < atmFiles.size(); atmFileIdx++)
     {
-        std::string velFileName = velFiles[atmFileIdx] + ".asc";
-        std::string angFileName = angFiles[atmFileIdx] + ".asc";
-        fprintf(fzout,"%s %s %s%s %s %s\n",wrfMonths[atmFileIdx].c_str(),wrfDays[atmFileIdx].c_str(),wrfHours[atmFileIdx].c_str(),
+        std::string velFileName = velFiles[atmFileIdx];
+        std::string angFileName = angFiles[atmFileIdx];
+        fprintf(fzout,"%s %s %s%s %s %s\n",monthTextToNumber(wrfMonths[atmFileIdx]).c_str(),wrfDays[atmFileIdx].c_str(),wrfHours[atmFileIdx].c_str(),
                wrfMinutes[atmFileIdx].c_str(),velFileName.c_str(),angFileName.c_str());
     }
     fclose(fzout);
@@ -608,17 +612,36 @@ bool farsiteAPI::setupFinalAtmFiles(size_t runIdx)
 bool farsiteAPI::createRawsFile(size_t runIdx)
 {
     std::string guess_RAWS_ELEVATION = "500"; // 2 m was wrf data, but I don't know if it is safe to go that low
-    std::string fake_WindSpeed = "999"; // still have to supply it, but is ignored since gridded winds will be used
+    std::string fake_WindSpeed = "150"; // still have to supply it, but is ignored since gridded winds will be used
     std::string fake_WindDir = "180";   // still have to supply it, but is ignored since gridded winds will be used
     FILE *fzout;
     fzout = fopen(farsiteRawsFiles[runIdx].c_str(), "w");
     fprintf(fzout,"RAWS_ELEVATION: %s\n",guess_RAWS_ELEVATION.c_str());
-    fprintf(fzout,"RAWS_UNITS: %s\n",wrfGetWeather_output_units.c_str());
+    if(wrfGetWeather_output_units == "english")
+    {
+        fprintf(fzout,"RAWS_UNITS: English\n");
+        guess_RAWS_ELEVATION = std::to_string(std::atof(guess_RAWS_ELEVATION.c_str())*3.28084); // convert from m to feet
+    } else if(wrfGetWeather_output_units == "metric")
+    {
+        fprintf(fzout,"RAWS_UNITS: Metric\n");
+    }
     fprintf(fzout,"RAWS: %zu\n",atmFiles.size());
     for(size_t atmFileIdx = 0; atmFileIdx < atmFiles.size(); atmFileIdx++)
     {
-        fprintf(fzout,"%s %s %s%s %f %f %f %s %s %f\n",wrfMonths[atmFileIdx].c_str(),wrfDays[atmFileIdx].c_str(),wrfHours[atmFileIdx].c_str(),
-               wrfMinutes[atmFileIdx].c_str(),temperatures[atmFileIdx],humidities[atmFileIdx],totalPrecip[atmFileIdx],
+        double calcTemperature = temperatures[atmFileIdx];
+        double calcPrecip = totalPrecip[atmFileIdx];
+        if(wrfGetWeather_output_units == "english")
+        {
+            calcTemperature = 9.0/5.0 * (calcTemperature - 273.15) + 32.0; // it was incoming as degK, needs to be outgoing as degF
+            calcPrecip = calcPrecip * 1.0/24.0 * 1000.0 * 0.01/0.254;    // it was incoming as kg/(m^2*s), needs to be outgoing as hundredths of an inch, used density of water, and these are for a one hour time period out of a day
+
+        } else if(wrfGetWeather_output_units == "metric")
+        {
+            calcTemperature = calcTemperature - 273.15; // it was incoming as degK, needs to be outgoing as degC
+            calcPrecip = calcPrecip * 1.0/24.0 * 1000.0;    // it was incoming as kg/(m^2*s), needs to be outgoing as milimeters, used density of water, and these are for a one hour time period out of a day
+        }
+        fprintf(fzout,"%s %s %s %s%s %.2f %.2f %.2f %s %s %.2f\n",wrfYears[atmFileIdx].c_str(),monthTextToNumber(wrfMonths[atmFileIdx]).c_str(),wrfDays[atmFileIdx].c_str(),
+                wrfHours[atmFileIdx].c_str(),wrfMinutes[atmFileIdx].c_str(),calcTemperature,humidities[atmFileIdx],calcPrecip,
                fake_WindSpeed.c_str(),fake_WindDir.c_str(),cloudCover[atmFileIdx]);
     }
     fclose(fzout);
@@ -639,20 +662,21 @@ bool farsiteAPI::writeFarsiteInputFile(size_t runIdx)
     fprintf(fzout,"FARSITE_PERIMETER_RES: %s\n",farsite_perimeter_res.c_str());
     fprintf(fzout,"FARSITE_MIN_IGNITION_VERTEX_DISTANCE: %s\n",farsite_min_ignition_vertex_distance.c_str());
     fprintf(fzout,"FARSITE_SPOT_GRID_RESOLUTION: %s\n",farsite_spot_grid_resolution.c_str());
-    fprintf(fzout,"FARSITE_SPOT_PROBABILITY: %f\n",farsite_spot_probability);
+    fprintf(fzout,"FARSITE_SPOT_PROBABILITY: %.2f\n",farsite_spot_probability);
     fprintf(fzout,"FARSITE_SPOT_IGNITION_DELAY: %zu\n",farsite_spot_ignition_delay);
     fprintf(fzout,"FARSITE_MINIMUM_SPOT_DISTANCE: %s\n",farsite_minimum_spot_distance.c_str());
     fprintf(fzout,"FARSITE_ACCELERATION_ON: %s\n",farsite_acceleration_on.c_str());
     fprintf(fzout,"FARSITE_FILL_BARRIERS: %s\n",farsite_fill_barriers.c_str());
     fprintf(fzout,"SPOTTING_SEED: %zu\n",farsite_spotting_seed);
     fprintf(fzout,"\n");
-    fprintf(fzout,"FARSITE_BURN_PERIODS: %zu\n",uniqueDates.size());
+    /*fprintf(fzout,"FARSITE_BURN_PERIODS: %zu\n",uniqueDates.size());
     for(size_t uniqueDatesIdx = 0; uniqueDatesIdx < uniqueDates.size(); uniqueDatesIdx++)
     {
-        fprintf(fzout,"%s %d%d %d%d\n",uniqueDates[uniqueDatesIdx].c_str(),farsite_earliest_burn_time_hour,farsite_earliest_burn_time_minute,
-               farsite_latest_burn_time_hour,farsite_latest_burn_time_minute);
+        fprintf(fzout,"%s %s%s %s%s\n",uniqueDates[uniqueDatesIdx].c_str(),monthDayHourMinSecAddZero(farsite_earliest_burn_time_hour).c_str(),
+                monthDayHourMinSecAddZero(farsite_earliest_burn_time_minute).c_str(),monthDayHourMinSecAddZero(farsite_latest_burn_time_hour).c_str(),
+                monthDayHourMinSecAddZero(farsite_latest_burn_time_minute).c_str());
     }
-    fprintf(fzout,"\n");
+    fprintf(fzout,"\n");*/
     fprintf(fzout,"FUEL_MOISTURES_DATA: 1\n");
     fprintf(fzout,"%s\n",farsite_default_fuel_mositures_data.c_str());
     fprintf(fzout,"\n");
@@ -660,9 +684,10 @@ bool farsiteAPI::writeFarsiteInputFile(size_t runIdx)
     fprintf(fzout,"\n");
     fprintf(fzout,"FARSITE_ATM_FILE: %s\n",farsiteAtmFiles[runIdx].c_str());
     fprintf(fzout,"\n");
-    fprintf(fzout,"FOLIAR_MOISTURE_CONTENT: %f\n",farsite_foliar_moisture_content);
+    fprintf(fzout,"FOLIAR_MOISTURE_CONTENT: %.2f\n",farsite_foliar_moisture_content);
     fprintf(fzout,"CROWN_FIRE_METHOD: %s\n",farsite_crown_fire_method.c_str());
-    fprintf(fzout,"NUMBER_PROCESSORS: %zu\n",WindNinja_number_of_threads);
+    //fprintf(fzout,"NUMBER_PROCESSORS: %zu\n",WindNinja_number_of_threads);
+    fprintf(fzout,"NUMBER_PROCESSORS: 1\n");    // there are problems with using more than the number available on the computer
     fclose(fzout);
 
     // if it gets here, everything went well
@@ -696,7 +721,7 @@ std::vector<std::string> farsiteAPI::findUniqueDates()
 
     if(wrfYears.size() >= 1)
     {
-        std::string foundUniqueDate = wrfMonths[0] + " " + wrfDays[0];
+        std::string foundUniqueDate =  monthTextToNumber(wrfMonths[0]) + " " + wrfDays[0];
         outputFiles.push_back(foundUniqueDate);
     }
     if(wrfYears.size() > 1)
@@ -705,7 +730,7 @@ std::vector<std::string> farsiteAPI::findUniqueDates()
         {
             if(wrfYears[wrfFileIdx-1] != wrfYears[wrfFileIdx] && wrfMonths[wrfFileIdx-1] != wrfMonths[wrfFileIdx] && wrfDays[wrfFileIdx-1] != wrfDays[wrfFileIdx])
             {
-                std::string foundUniqueDate = wrfMonths[wrfFileIdx] + " " + wrfDays[wrfFileIdx];
+                std::string foundUniqueDate = monthTextToNumber(wrfMonths[wrfFileIdx]) + " " + wrfDays[wrfFileIdx];
                 outputFiles.push_back(foundUniqueDate);
             }
         }
@@ -718,13 +743,13 @@ std::vector<std::string> farsiteAPI::findUniqueDates()
 /*** special execute external script commands ***/
 std::string farsiteAPI::exec_cmd(const char* cmd)
 {
-    char buffer[128];
+    char buffer[1512];
     std::string result = "";
     FILE* pipe = popen(cmd, "r");
     if (!pipe) throw std::runtime_error("popen() failed!");
     try {
         while (!feof(pipe)) {
-            if (fgets(buffer, 128, pipe) != NULL)
+            if (fgets(buffer, 1512, pipe) != NULL)
                 result += buffer;
                 std::cout << buffer;
         }
@@ -853,5 +878,63 @@ bool farsiteAPI::copyFile(std::string inputFilename, std::string outputFilename)
 
     // if it gets here, everything went well
     return true;
+}
+
+std::string farsiteAPI::monthTextToNumber(std::string inputMonthText)
+{
+    std::string outputMonthNumber = "";
+
+    if(inputMonthText == "jan" || inputMonthText == "Jan" || inputMonthText == "january" || inputMonthText == "January")
+    {
+        outputMonthNumber = "01";
+    } else if(inputMonthText == "feb" || inputMonthText == "Feb" || inputMonthText == "february" || inputMonthText == "February")
+    {
+        outputMonthNumber = "02";
+    } else if(inputMonthText == "mar" || inputMonthText == "Mar" || inputMonthText == "march" || inputMonthText == "March")
+    {
+        outputMonthNumber = "03";
+    } else if(inputMonthText == "apr" || inputMonthText == "Apr" || inputMonthText == "april" || inputMonthText == "April")
+    {
+        outputMonthNumber = "04";
+    } else if(inputMonthText == "may" || inputMonthText == "May")
+    {
+        outputMonthNumber = "05";
+    } else if(inputMonthText == "jun" || inputMonthText == "Jun" || inputMonthText == "june" || inputMonthText == "June")
+    {
+        outputMonthNumber = "06";
+    } else if(inputMonthText == "jul" || inputMonthText == "Jul" || inputMonthText == "july" || inputMonthText == "July")
+    {
+        outputMonthNumber = "07";
+    } else if(inputMonthText == "aug" || inputMonthText == "Aug" || inputMonthText == "august" || inputMonthText == "August")
+    {
+        outputMonthNumber = "08";
+    } else if(inputMonthText == "sep" || inputMonthText == "Sep" || inputMonthText == "sept" || inputMonthText == "Sept" || inputMonthText == "september" || inputMonthText == "September")
+    {
+        outputMonthNumber = "09";
+    } else if(inputMonthText == "oct" || inputMonthText == "Oct" || inputMonthText == "october" || inputMonthText == "October")
+    {
+        outputMonthNumber = "10";
+    } else if(inputMonthText == "nov" || inputMonthText == "Nov" || inputMonthText == "november" || inputMonthText == "November")
+    {
+        outputMonthNumber = "11";
+    } else if(inputMonthText == "dec" || inputMonthText == "Dec" || inputMonthText == "december" || inputMonthText == "December")
+    {
+        outputMonthNumber = "12";
+    } else
+    {
+        printf("problem converting inputMonthText \"%s\" to number!\n",inputMonthText.c_str());
+    }
+
+    return outputMonthNumber;
+}
+
+std::string farsiteAPI::monthDayHourMinSecAddZero(int time)
+{
+    std::string timeString = std::to_string(time);
+    if(timeString.size() == 1)
+    {
+        timeString = "0" + timeString;
+    }
+    return timeString;
 }
 /*** end useful utility functions ***/

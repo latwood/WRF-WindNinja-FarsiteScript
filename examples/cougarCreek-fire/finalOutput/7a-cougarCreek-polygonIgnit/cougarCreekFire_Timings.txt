@@ -1,0 +1,116 @@
+Farsite BenchMark Results
+
+
+Simulation Info:
+	Landscape File: /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/createInputs/farsite/7a-cougarCreek-polygonIgnit/cougarCreekFire.lcp
+	Landscape Resolution: 30.0
+	Landscape Size: 1040 x 1000
+	Inputs File: /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/createInputs/farsite/7a-cougarCreek-polygonIgnit/7a-cougarCreek-polygonIgnit.input
+	Farsite Start Time: 08 11 1300
+	Farsite End Time:   08 13 1200
+	Total Sim Time:     2820.000000
+	Ignition File:      /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/createInputs/farsite/7a-cougarCreek-polygonIgnit/7a-cougarCreek-polygonIgnit.shp
+	Barriers File:      None
+	Time Step:                  60.000000
+	Distance Resolution:        30.000000
+	Perimeter Resolution:       60.000000
+	Enable Spotting:            Yes
+	Spot Probability:           0.050000
+	Spot Ignition Delay:        0.000000
+	Spot Grid Resolution:        15
+	Spotting Seed:               1000
+	Minimum Spotting Distance:  30.000000
+	Foliar Moisture:            70.0000
+	Enable Crowning:            Yes
+	Crown Fire Method:          Finney
+	                            Crown Density NOT LINKED to Crown Cover
+	Dist Check Method:          Fire Level
+	Acceleration:               On
+	Backing Spread:             Calculated from Elliptical Dimensions
+	Simulation Started:         8/11 13:00
+	Simulation Ended:           08/13  12:00
+	Elapsed Time:               01 23:00
+	Restore Ignitions:          No
+	Preserve Inactive Enclaves: Yes
+	Tree Species Number:        1
+	Conditoning Start:          0/0
+	Burn Periods:           0
+	Relative Burn Periods:      0
+	Internal Weather:            -20
+	Internal Winds:              74
+8 10 1200 150 180 0
+8 10 1300 150 180 0
+8 10 1400 150 180 0
+8 10 1500 150 180 0
+8 10 1600 150 180 0
+8 10 1700 150 180 0
+8 10 1800 150 180 0
+8 10 1900 150 180 0
+8 10 2000 150 180 0
+8 10 2100 150 180 0
+8 10 2200 150 180 0
+8 10 2300 150 180 0
+8 11 0 150 180 0
+8 11 100 150 180 0
+8 11 200 150 180 0
+8 11 300 150 180 0
+8 11 400 150 180 0
+8 11 500 150 180 0
+8 11 600 150 180 0
+8 11 700 150 180 0
+8 11 800 150 180 0
+8 11 900 150 180 0
+8 11 1000 150 180 0
+8 11 1100 150 180 0
+8 11 1200 150 180 0
+8 11 1300 150 180 0
+8 11 1400 150 180 0
+8 11 1500 150 180 0
+8 11 1600 150 180 0
+8 11 1700 150 180 0
+8 11 1800 150 180 0
+8 11 1900 150 180 0
+8 11 2000 150 180 0
+8 11 2100 150 180 0
+8 11 2200 150 180 0
+8 11 2300 150 180 0
+8 12 0 150 180 0
+8 12 100 150 180 0
+8 12 200 150 180 0
+8 12 300 150 180 0
+8 12 400 150 180 0
+8 12 500 150 180 0
+8 12 600 150 180 0
+8 12 700 150 180 0
+8 12 800 150 180 0
+8 12 900 150 180 0
+8 12 1000 150 180 0
+8 12 1100 150 180 0
+8 12 1200 150 180 0
+8 12 1300 150 180 0
+8 12 1400 150 180 0
+8 12 1500 150 180 0
+8 12 1600 150 180 0
+8 12 1700 150 180 0
+8 12 1800 150 180 0
+8 12 1900 150 180 0
+8 12 2000 150 180 0
+8 12 2100 150 180 0
+8 12 2200 150 180 0
+8 12 2300 150 180 0
+8 13 0 150 180 0
+8 13 100 150 180 0
+8 13 200 150 180 0
+8 13 300 150 180 0
+8 13 400 150 180 0
+8 13 500 150 180 0
+8 13 600 150 180 0
+8 13 700 150 180 0
+8 13 800 150 180 0
+8 13 900 150 180 0
+8 13 1000 150 180 0
+8 13 1100 150 180 0
+8 13 1200 150 180 0
+8 13 1800 150 180 0
+
+	Total Farsite Run Time: 44.788 Seconds
