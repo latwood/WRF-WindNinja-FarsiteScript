@@ -48,7 +48,7 @@ private:
     std::string wrfGetWeather_output_units;
         // wrfGetWeather and WindNinja variables
     bool extend_wrf_data;
-    std::vector<std::string> wrf_files;
+    std::vector<wrfFileValue> wrf_files;
         // wrfGetWeather only variables
     bool use_weather_from_ignition_center;
     bool use_weather_from_full_ignition_area;

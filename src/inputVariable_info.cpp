@@ -3,15 +3,13 @@
 /***** public functions *****/
 
 /*** constructor functions ***/
-inputVariable_info::inputVariable_info(std::string newVariableName,std::string newApplicationUseName,std::string newVariableCountType,
-                                       std::string newLoaderFunctionName,std::string newVariableDescription)
+inputVariable_info::inputVariable_info(std::string newVariableName,std::string newApplicationUseName,std::string newVariableCountType,std::string newVariableDescription)
 {
     variableName = newVariableName;
     applicationUseName = newApplicationUseName;
     // type is allowed to be abstract, so type setting and checking is handled by class that creates or uses a vector of these configVariables
     variableCountType = newVariableCountType;
-    // no conflictingVariables because this sort of verification will be checked by the classes that use vectors of configVariables
-    loaderFunctionName = newLoaderFunctionName;
+    // no conflictingVariables because this sort of verification will be checked by the classes that use vectors of configVariables. Uses wantDefaultValue to know if it went well or no
     variableDescription = newVariableDescription;
     isFoundInInputFile = false;
     wantDefaultValue = false;
@@ -72,11 +70,6 @@ std::string inputVariable_info::get_applicationUseName()
 std::string inputVariable_info::get_variableCountType()
 {
     return variableCountType;
-}
-
-std::string inputVariable_info::get_loaderFunctionName()
-{
-    return loaderFunctionName;
 }
 
 std::string inputVariable_info::get_variableDescription()

@@ -19,13 +19,13 @@ bool createIgnitions::load_required_inputs(inputVariablesHandler *inputs)
     actual_run_base_name = inputs->get_actual_run_base_name();
     actualCreateInputs_path = inputs->get_actualCreateInputs_path();
         // application specific variables
-    createIgnition_output_units = inputs->get_inputVariableStringValue("createIgnition_output_units");
+    createIgnition_output_units = inputs->get_stringValue("createIgnition_output_units").get_storedStringValue();
         // createIgnition variables
-    create_ignition_from_latlongs = inputs->get_create_ignition_from_latlongs();
-    polygon_ignit_shape_files = inputs->get_polygon_ignit_shape_files();
-    GeoMAC_fire_perimeter_files = inputs->get_GeoMAC_fire_perimeter_files();
-    farsite_output_fire_perimeter_files = inputs->get_farsite_output_fire_perimeter_files();
-    fire_perimeter_widening_factor = inputs->get_inputVariableDoubleValue("fire_perimeter_widening_factor");
+    create_ignition_from_latlongs = inputs->get_createIgnitionFromLatLongsStorage();
+    polygon_ignit_shape_files = inputs->get_polygonIgnitShapeFileStorage();
+    GeoMAC_fire_perimeter_files = inputs->get_GeoMACfirePerimeterFileStorage();
+    farsite_output_fire_perimeter_files = inputs->get_farsiteOutputFirePerimeterFileStorage();
+    fire_perimeter_widening_factor = inputs->get_doubleValue("fire_perimeter_widening_factor").get_storedDoubleValue();
 
     // data members created from inputs that are lcpManager specific
 
@@ -44,7 +44,7 @@ bool createIgnitions::findLargestFirePerimeter()
 bool createIgnitions::createAllIgnitions()
 {
     // first try to setup the ignitions from latlong points
-    if(create_ignition_from_latlongs.size() != 0)
+    if(create_ignition_from_latlongs.get_storedCreateIgnitionLatLongValues().size() != 0)
     {
         if(createIgnitionFromLatLongs() == false)
         {
@@ -54,7 +54,7 @@ bool createIgnitions::createAllIgnitions()
     }
 
     // now try to do the polygon ignit shapefiles
-    if(polygon_ignit_shape_files.size() != 0)
+    if(polygon_ignit_shape_files.get_storedPolygonIgnitShapeFiles().size() != 0)
     {
         if(addPolygonIgnitShapeFiles() == false)
         {
@@ -64,7 +64,7 @@ bool createIgnitions::createAllIgnitions()
     }
 
     // now try setting up the GeoMAC fire perimeter files
-    if(GeoMAC_fire_perimeter_files.size() != 0)
+    if(GeoMAC_fire_perimeter_files.get_storedGeoMACfirePerimeterFiles().size() != 0)
     {
         if(createIgnitionFromGeoMacFirePerimFiles() == false)
         {
@@ -74,7 +74,7 @@ bool createIgnitions::createAllIgnitions()
     }
 
     // now try to use past farsite output fire perimeter files
-    if(farsite_output_fire_perimeter_files.size() != 0)
+    if(farsite_output_fire_perimeter_files.get_storedFarsiteOutputFirePerimeterFiles().size() != 0)
     {
         if(createIgnitionFromPastFarsiteOutputs() == false)
         {
@@ -138,22 +138,11 @@ void createIgnitions::reset()
         // application specific variables
     createIgnition_output_units = "";
         // createIgnition variables
-    while(!create_ignition_from_latlongs.empty())
-    {
-        create_ignition_from_latlongs.pop_back();
-    }
-    while(!polygon_ignit_shape_files.empty())
-    {
-        polygon_ignit_shape_files.pop_back();
-    }
-    while(!GeoMAC_fire_perimeter_files.empty())
-    {
-        GeoMAC_fire_perimeter_files.pop_back();
-    }
-    while(!farsite_output_fire_perimeter_files.empty())
-    {
-        farsite_output_fire_perimeter_files.pop_back();
-    }
+    // just realized, this is not the right place to be using reset on these!
+    //create_ignition_from_latlongs.reset();
+    //polygon_ignit_shape_files.reset();
+    //GeoMAC_fire_perimeter_files.reset();
+    //farsite_output_fire_perimeter_files.reset();
     fire_perimeter_widening_factor = 1.0;
 
     // data members created from inputs that are lcpManager specific
@@ -179,14 +168,16 @@ bool createIgnitions::createIgnitionFromLatLongs()
 
 bool createIgnitions::addPolygonIgnitShapeFiles()
 {
-    for(size_t shpFileIdx = 0; shpFileIdx < polygon_ignit_shape_files.size(); shpFileIdx++)
+    std::vector<shapeFileValue> polygonIgnitShapeFileValues = polygon_ignit_shape_files.get_storedPolygonIgnitShapeFiles();
+    for(size_t shpFileIdx = 0; shpFileIdx < polygonIgnitShapeFileValues.size(); shpFileIdx++)
     {
-        if(checkIgnitionFile(polygon_ignit_shape_files[shpFileIdx]) == true)
+        std::string currentShapeFile = polygonIgnitShapeFileValues[shpFileIdx].get_storedShapeFileValue();
+        if(checkIgnitionFile(currentShapeFile) == true)
         {
-            ignitionShapefilesForSimulations.push_back(polygon_ignit_shape_files[shpFileIdx]);
+            ignitionShapefilesForSimulations.push_back(currentShapeFile);
         } else
         {
-            printf("problem with polygon_ignit_shape_file \"%s\"!",polygon_ignit_shape_files[shpFileIdx].c_str());
+            printf("problem with polygon_ignit_shape_file \"%s\"!",currentShapeFile.c_str());
             return false;
         }
     }
@@ -212,7 +203,7 @@ bool createIgnitions::createIgnitionFromPastFarsiteOutputs()
 bool createIgnitions::checkIgnitionFile(std::string ignitionFile)
 {
     // should at a minimum make sure all the required side files are there to go with the ignition file, probably during the inputs handling
-
+    printf("checkIgnitionFile ignition file \"%s\"\n",ignitionFile.c_str());
     // if it gets here, everything went well
     return true;
 }

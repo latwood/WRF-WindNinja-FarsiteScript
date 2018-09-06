@@ -34,8 +34,7 @@ private:
     // setup functions
     void setupAvailableApplicationUseNames();
     void setupAvailableVariableCountTypes();
-    void addVariable(std::string newVariableName,std::string newApplicationUseName,std::string newVariableCountType,
-                     std::string newLoaderFunctionName,std::string newVariableDescription); //make this private so that it is only called by constructor
+    void addVariable(std::string newVariableName,std::string newApplicationUseName,std::string newVariableCountType,std::string newVariableDescription);
     void setupAvailableVariables();
 
 
@@ -44,7 +43,6 @@ private:
     bool check_setupForValidApplicationUseNames();
     bool check_setupForValidOrderingByApplicationUseNames();
     bool check_setupForValidVariableCountTypes();
-    bool check_setupLoaderFunctionNames();
     bool check_setupDescription();
 
     // description whitespace and line break calculations, with error checking

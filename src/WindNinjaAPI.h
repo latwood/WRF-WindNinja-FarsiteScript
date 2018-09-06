@@ -61,7 +61,7 @@ private:
     bool use_native_timezone;
         // WindNinja and getWeather
     bool extend_wrf_data;
-    std::vector<std::string> wrf_files;
+    std::vector<wrfFileValue> wrf_files;
         // WindNinja only required vars
     size_t WindNinja_number_of_threads;
     std::string WindNinja_mesh_choice;
@@ -74,26 +74,11 @@ private:
     // okay I think the trick is that at some point in the process, these have to be generated for each and every wrf file even if not specified by the user,
     // makes it easier to keep stuff of correct sizes and such
         // additional_WindNinja_outputs_google
-    std::vector<bool> write_wx_model_goog_output;
-    std::vector<bool> write_goog_output;
-    std::vector<double> goog_out_resolution;
-    std::vector<std::string> units_goog_out_resolution;
-    std::vector<std::string> goog_out_color_scheme;
-    std::vector<bool> goog_out_vector_scaling;
+    additionalWindNinjaOutputs_googleStorage stored_additional_WindNinja_Outputs_google;
         // additional_WindNinja_outputs_shapefile
-    std::vector<bool> write_wx_model_shapefile_output;
-    std::vector<bool> write_shapefile_output;
-    std::vector<double> shape_out_resolution;
-    std::vector<std::string> units_shape_out_resolution;
+    additionalWindNinjaOutputs_shapefileStorage stored_additional_WindNinja_Outputs_shapefile;
         // additional_WindNinja_outputs_pdf
-    std::vector<bool> write_pdf_output;
-    std::vector<double> pdf_out_resolution;
-    std::vector<std::string> units_pdf_out_resolution;
-    std::vector<double> pdf_linewidth;
-    std::vector<std::string> pdf_basemap;
-    std::vector<double> pdf_height;
-    std::vector<double> pdf_width;
-    std::vector<std::string> pdf_size;
+    additionalWindNinjaOutputs_pdfStorage stored_additional_WindNinja_Outputs_pdf;
 
     // data members created from inputs that are API specific
     std::string WindNinjaOutputFolderPath;

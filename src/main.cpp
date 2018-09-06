@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
 
     printf("\ndetermining whether lcp file needs downloaded\n");
     // probably need to load inputs into lcpManager and createIgnition classes before this
-    if(inputs.get_inputVariableBoolValue("use_past_lcp") != true)
+    if(inputs.get_boolValue("use_past_lcp").get_storedBoolValue() != true)
     {
         printf("\nloading inputs into lcpDownloader class\n");
         // okay need to download lcp so first load inputs

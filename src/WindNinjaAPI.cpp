@@ -20,49 +20,34 @@ bool WindNinjaAPI::load_required_inputs(inputVariablesHandler *inputs)
     actualCreateInputs_path = inputs->get_actualCreateInputs_path();
     actualLcpFilePath = inputs->get_actualLcpPath();
         // application specific variables
-    WindNinja_required_output_units = inputs->get_inputVariableStringValue("WindNinja_required_output_units");
-    use_native_timezone = inputs->get_inputVariableBoolValue("use_native_timezone");
+    WindNinja_required_output_units = inputs->get_stringValue("WindNinja_required_output_units").get_storedStringValue();
+    use_native_timezone = inputs->get_boolValue("use_native_timezone").get_storedBoolValue();
         // WindNinja and getWeather
-    extend_wrf_data = inputs->get_inputVariableBoolValue("extend_wrf_data");
-    wrf_files = inputs->get_wrf_files();
+    extend_wrf_data = inputs->get_boolValue("extend_wrf_data").get_storedBoolValue();
+    wrf_files = inputs->get_wrfFileStorage().get_storedWrfFiles();
         // WindNinja only required vars
-    WindNinja_number_of_threads = inputs->get_inputVariableSize_tValue("WindNinja_number_of_threads");
-    WindNinja_mesh_choice = inputs->get_inputVariableStringValue("WindNinja_mesh_choice");
-    WindNinja_mesh_resolution = inputs->get_inputVariableDoubleValue("WindNinja_mesh_resolution");
-    WindNinja_mesh_res_units = inputs->get_inputVariableStringValue("WindNinja_mesh_res_units");
-    diurnal_winds = inputs->get_inputVariableBoolValue("diurnal_winds");
-    non_neutral_stability = inputs->get_inputVariableBoolValue("non_neutral_stability");
+    WindNinja_number_of_threads = inputs->get_size_tValue("WindNinja_number_of_threads").get_storedSize_tValue();
+    WindNinja_mesh_choice = inputs->get_stringValue("WindNinja_mesh_choice").get_storedStringValue();
+    WindNinja_mesh_resolution = inputs->get_doubleValue("WindNinja_mesh_resolution").get_storedDoubleValue();
+    WindNinja_mesh_res_units = inputs->get_stringValue("WindNinja_mesh_res_units").get_storedStringValue();
+    diurnal_winds = inputs->get_boolValue("diurnal_winds").get_storedBoolValue();
+    non_neutral_stability = inputs->get_boolValue("non_neutral_stability").get_storedBoolValue();
         // optional WindNinja variables
     // will do these ones later, as they need special care and are not necessary till the end after this script is beautiful
     // okay I think the trick is that at some point in the process, these have to be generated for each and every wrf file even if not specified by the user,
     // makes it easier to keep stuff of correct sizes and such
         // additional_WindNinja_outputs_google
-    //write_wx_model_goog_output = inputs->get_write_wx_model_goog_output();
-    //write_goog_output = inputs->get_write_goog_output();
-    //goog_out_resolution = inputs->get_goog_out_resolution();
-    /*units_goog_out_resolution;
-    std::vector<std::string> goog_out_color_scheme;
-    std::vector<bool> goog_out_vector_scaling;
+    stored_additional_WindNinja_Outputs_google = inputs->get_additionalWindNinjaOutputs_googleStorage();
         // additional_WindNinja_outputs_shapefile
-    std::vector<bool> write_wx_model_shapefile_output;
-    std::vector<bool> write_shapefile_output;
-    std::vector<int> shape_out_resolution;
-    std::vector<std::string> units_shape_out_resolution;
+    stored_additional_WindNinja_Outputs_shapefile = inputs->get_additionalWindNinjaOutputs_shapefileStorage();
         // additional_WindNinja_outputs_pdf
-    std::vector<bool> write_pdf_output;
-    std::vector<int> pdf_out_resolution;
-    std::vector<std::string> units_pdf_out_resolution;
-    std::vector<size_t> pdf_linewidth;
-    std::vector<std::string> pdf_basemap;
-    std::vector<double> pdf_height;
-    std::vector<double> pdf_width;
-    std::vector<std::string> pdf_size;*/
+    stored_additional_WindNinja_Outputs_pdf = inputs->get_additionalWindNinjaOutputs_pdfStorage();
 
     // now create any WindNinjaAPI specific inputs that are needed from these inputs
     WindNinjaOutputFolderPath = actualCreateInputs_path + "/WindNinja";
     for(size_t wrfCount = 0; wrfCount < wrf_files.size(); wrfCount++)
     {
-        std::string wrfBaseName = CPLGetBasename(wrf_files[wrfCount].c_str());
+        std::string wrfBaseName = CPLGetBasename(wrf_files[wrfCount].get_storedWrfFileName().c_str());
         std::string runFolderPath = WindNinjaOutputFolderPath + "/" + wrfBaseName;
         WindNinjaRunFolderPaths.push_back(runFolderPath);
         std::string cfgFilePath = runFolderPath + "/" + wrfBaseName + ".cfg";
@@ -123,6 +108,32 @@ bool WindNinjaAPI::create_WindNinja_cfg_files()
     // so if it is true, trying to see if the folder or file already exists will result in a true, so don't make one, just overwrite
     // so in the end, just need to know whether it exists or not to know if overwrite or make a new one, names will be the same either way
 
+    // create temporary additionalWindNinjaOutput variables
+        // additional_WindNinja_outputs_google
+    std::vector<std::string> google_wrfFileNames = stored_additional_WindNinja_Outputs_google.get_stored_wrfFileNames();
+    std::vector<boolValue> write_wx_model_goog_output_values = stored_additional_WindNinja_Outputs_google.get_stored_write_wx_model_goog_output_values();
+    std::vector<boolValue> write_goog_output_values = stored_additional_WindNinja_Outputs_google.get_stored_write_goog_output_values();
+    std::vector<doubleValue> goog_out_resolution_values = stored_additional_WindNinja_Outputs_google.get_stored_goog_out_resolution_values();
+    std::vector<stringValue> units_goog_out_resolution_values = stored_additional_WindNinja_Outputs_google.get_stored_units_goog_out_resolution_values();
+    std::vector<stringValue> goog_out_color_scheme_values = stored_additional_WindNinja_Outputs_google.get_stored_goog_out_color_scheme_values();
+    std::vector<boolValue> goog_out_vector_scaling_values = stored_additional_WindNinja_Outputs_google.get_stored_goog_out_vector_scaling_values();
+        // additional_WindNinja_outputs_shapefile
+    std::vector<std::string> shapefile_wrfFileNames = stored_additional_WindNinja_Outputs_shapefile.get_stored_wrfFileNames();
+    std::vector<boolValue> write_wx_model_shapefile_output_values = stored_additional_WindNinja_Outputs_shapefile.get_stored_write_wx_model_shapefile_output_values();
+    std::vector<boolValue> write_shapefile_output_values = stored_additional_WindNinja_Outputs_shapefile.get_stored_write_shapefile_output_values();
+    std::vector<doubleValue> shape_out_resolution_values = stored_additional_WindNinja_Outputs_shapefile.get_stored_shape_out_resolution_values();
+    std::vector<stringValue> units_shape_out_resolution_values = stored_additional_WindNinja_Outputs_shapefile.get_stored_units_shape_out_resolution_values();
+        // additional_WindNinja_outputs_pdf
+    std::vector<std::string> pdf_wrfFileNames = stored_additional_WindNinja_Outputs_pdf.get_stored_wrfFileNames();
+    std::vector<boolValue> write_pdf_output_values = stored_additional_WindNinja_Outputs_pdf.get_stored_write_pdf_output_values();
+    std::vector<doubleValue> pdf_out_resolution_values = stored_additional_WindNinja_Outputs_pdf.get_stored_pdf_out_resolution_values();
+    std::vector<stringValue> units_pdf_out_resolution_values = stored_additional_WindNinja_Outputs_pdf.get_stored_units_pdf_out_resolution_values();
+    std::vector<doubleValue> pdf_linewidth_values = stored_additional_WindNinja_Outputs_pdf.get_stored_pdf_linewidth_values();
+    std::vector<stringValue> pdf_basemap_values = stored_additional_WindNinja_Outputs_pdf.get_stored_pdf_basemap_values();
+    std::vector<doubleValue> pdf_height_values = stored_additional_WindNinja_Outputs_pdf.get_stored_pdf_height_values();
+    std::vector<doubleValue> pdf_width_values = stored_additional_WindNinja_Outputs_pdf.get_stored_pdf_width_values();
+    std::vector<stringValue> pdf_size_values = stored_additional_WindNinja_Outputs_pdf.get_stored_pdf_size_values();
+
     // all paths up to this point should end without a "/" character
     if(doesFolderExist(WindNinjaOutputFolderPath) == false)
     {
@@ -146,7 +157,7 @@ bool WindNinjaAPI::create_WindNinja_cfg_files()
         fprintf(fzout,"elevation_file                    =   %s\n",actualLcpFilePath.c_str());
         fprintf(fzout,"initialization_method             =   wxModelInitialization\n");
         fprintf(fzout,"time_zone                         =   %s\n",WindNinja_timezone.c_str());
-        fprintf(fzout,"forecast_filename                 =   %s\n",wrf_files[wrfCount].c_str());
+        fprintf(fzout,"forecast_filename                 =   %s\n",wrf_files[wrfCount].get_storedWrfFileName().c_str());
         fprintf(fzout,"match_points                      =   true\n");
         fprintf(fzout,"output_speed_units                =   %s\n",WindNinja_output_speed_units.c_str());
         fprintf(fzout,"output_wind_height                =   %s\n",WindNinja_output_wind_height.c_str());
@@ -160,29 +171,29 @@ bool WindNinjaAPI::create_WindNinja_cfg_files()
             fprintf(fzout,"mesh_resolution                   =   %f\n",WindNinja_mesh_resolution);
             fprintf(fzout,"units_mesh_resolution             =   %s\n",WindNinja_mesh_res_units.c_str());
         }
-        //fprintf(fzout,"write_wx_model_goog_output        =   %d\n",write_wx_model_goog_output[wrfCount]);
-        //fprintf(fzout,"write_goog_output                 =   %d\n",write_goog_output[wrfCount]);
-        //fprintf(fzout,"goog_out_resolution               =   %f\n",goog_out_resolution[wrfCount]);
-        //fprintf(fzout,"units_goog_out_resolution         =   %s\n",units_goog_out_resolution[wrfCount].c_str());
-        //fprintf(fzout,"goog_out_color_scheme             =   %s\n",goog_out_color_scheme[wrfCount].c_str());
-        //fprintf(fzout,"goog_out_vector_scaling           =   %d\n",goog_out_vector_scaling[wrfCount]);
-        //fprintf(fzout,"write_wx_model_shapefile_output   =   %d\n",write_wx_model_shapefile_output[wrfCount]);
-        //fprintf(fzout,"write_shapefile_output            =   %d\n",write_shapefile_output[wrfCount]);
-        //fprintf(fzout,"shape_out_resolution              =   %f\n",shape_out_resolution[wrfCount]);
-        //fprintf(fzout,"units_shape_out_resolution        =   %s\n",units_shape_out_resolution[wrfCount].c_str());
+        //fprintf(fzout,"write_wx_model_goog_output        =   %d\n",write_wx_model_goog_output_values[wrfCount].get_storedBoolValue());
+        //fprintf(fzout,"write_goog_output                 =   %d\n",write_goog_output_values[wrfCount].get_storedBoolValue());
+        //fprintf(fzout,"goog_out_resolution               =   %f\n",goog_out_resolution_values[wrfCount].get_storedDoubleValue());
+        //fprintf(fzout,"units_goog_out_resolution         =   %s\n",units_goog_out_resolution_values[wrfCount].get_storedStringValue().c_str());
+        //fprintf(fzout,"goog_out_color_scheme             =   %s\n",goog_out_color_scheme_values[wrfCount].get_storedStringValue().c_str());
+        //fprintf(fzout,"goog_out_vector_scaling           =   %d\n",goog_out_vector_scaling_values[wrfCount].get_storedBoolValue());
+        //fprintf(fzout,"write_wx_model_shapefile_output   =   %d\n",write_wx_model_shapefile_output_values[wrfCount].get_storedBoolValue());
+        //fprintf(fzout,"write_shapefile_output            =   %d\n",write_shapefile_output_values[wrfCount].get_storedBoolValue());
+        //fprintf(fzout,"shape_out_resolution              =   %f\n",shape_out_resolution_values[wrfCount].get_storedDoubleValue());
+        //fprintf(fzout,"units_shape_out_resolution        =   %s\n",units_shape_out_resolution_values[wrfCount].get_storedStringValue().c_str());
         fprintf(fzout,"write_ascii_output                =   true\n");
         fprintf(fzout,"ascii_out_resolution              =   -1\n");
         fprintf(fzout,"units_ascii_out_resolution        =   %s\n",WindNinja_units_ascii_out_resolution.c_str());
         //fprintf(fzout,"write_vtk_output                  =   %d\n",WindNinja_write_vtk_output);
         fprintf(fzout,"write_farsite_atm                 =   true\n");
-        //fprintf(fzout,"write_pdf_output                  =   %d\n",write_pdf_output[wrfCount]);
-        //fprintf(fzout,"pdf_out_resolution                =   %f\n",pdf_out_resolution[wrfCount]);
-        //fprintf(fzout,"units_pdf_out_resolution          =   %s\n",units_pdf_out_resolution[wrfCount].c_str());
-        //fprintf(fzout,"pdf_linewidth                     =   %f\n",pdf_linewidth[wrfCount]);
-        //fprintf(fzout,"pdf_basemap                       =   %s\n",pdf_basemap[wrfCount].c_str());
-        //fprintf(fzout,"pdf_height                        =   %f\n",pdf_height[wrfCount]);
-        //fprintf(fzout,"pdf_width                         =   %f\n",pdf_width[wrfCount]);
-        //fprintf(fzout,"pdf_size                          =   %s\n",pdf_size[wrfCount].c_str());
+        //fprintf(fzout,"write_pdf_output                  =   %d\n",write_pdf_output_values[wrfCount].get_storedBoolValue());
+        //fprintf(fzout,"pdf_out_resolution                =   %f\n",pdf_out_resolution_values[wrfCount].get_storedDoubleValue());
+        //fprintf(fzout,"units_pdf_out_resolution          =   %s\n",units_pdf_out_resolution_values[wrfCount].get_storedStringValue().c_str());
+        //fprintf(fzout,"pdf_linewidth                     =   %f\n",pdf_linewidth_values[wrfCount].get_storedDoubleValue());
+        //fprintf(fzout,"pdf_basemap                       =   %s\n",pdf_basemap_values[wrfCount].get_storedStringValue().c_str());
+        //fprintf(fzout,"pdf_height                        =   %f\n",pdf_height_values[wrfCount].get_storedDoubleValue());
+        //fprintf(fzout,"pdf_width                         =   %f\n",pdf_width_values[wrfCount].get_storedDoubleValue());
+        //fprintf(fzout,"pdf_size                          =   %s\n",pdf_size_values[wrfCount].get_storedStringValue().c_str());
         fprintf(fzout,"output_path                       =   %s/\n",WindNinjaRunFolderPaths[wrfCount].c_str()); // extra "/" cause that gets lost, can't add it on earlier cause it is one way or the other
         fprintf(fzout,"non_neutral_stability             =   %s\n",WindNinja_non_neutral_stability_string.c_str());
         //if(use_momentum_solver == true)   // if I added this in at some point, would have to do all kinds of fun things with if statements for filenaming stuff
@@ -518,80 +529,8 @@ void WindNinjaAPI::reset()
     // okay I think the trick is that at some point in the process, these have to be generated for each and every wrf file even if not specified by the user,
     // makes it easier to keep stuff of correct sizes and such
         // additional_WindNinja_outputs_google
-    while(!write_wx_model_goog_output.empty())
-    {
-        write_wx_model_goog_output.pop_back();
-    }
-    while(!write_goog_output.empty())
-    {
-        write_goog_output.pop_back();
-    }
-    while(!goog_out_resolution.empty())
-    {
-        goog_out_resolution.pop_back();
-    }
-    while(!units_goog_out_resolution.empty())
-    {
-        units_goog_out_resolution.pop_back();
-    }
-    while(!goog_out_color_scheme.empty())
-    {
-        goog_out_color_scheme.pop_back();
-    }
-    while(!goog_out_vector_scaling.empty())
-    {
-        goog_out_vector_scaling.pop_back();
-    }
         // additional_WindNinja_outputs_shapefile
-    while(!write_wx_model_shapefile_output.empty())
-    {
-        write_wx_model_shapefile_output.pop_back();
-    }
-    while(!write_shapefile_output.empty())
-    {
-        write_shapefile_output.pop_back();
-    }
-    while(!shape_out_resolution.empty())
-    {
-        shape_out_resolution.pop_back();
-    }
-    while(!units_shape_out_resolution.empty())
-    {
-        units_shape_out_resolution.pop_back();
-    }
         // additional_WindNinja_outputs_pdf
-    while(!write_pdf_output.empty())
-    {
-        write_pdf_output.pop_back();
-    }
-    while(!pdf_out_resolution.empty())
-    {
-        pdf_out_resolution.pop_back();
-    }
-    while(!units_pdf_out_resolution.empty())
-    {
-        units_pdf_out_resolution.pop_back();
-    }
-    while(!pdf_linewidth.empty())
-    {
-        pdf_linewidth.pop_back();
-    }
-    while(!pdf_basemap.empty())
-    {
-        pdf_basemap.pop_back();
-    }
-    while(!pdf_height.empty())
-    {
-        pdf_height.pop_back();
-    }
-    while(!pdf_width.empty())
-    {
-        pdf_width.pop_back();
-    }
-    while(!pdf_size.empty())
-    {
-        pdf_size.pop_back();
-    }
 
     // data members created from inputs that are API specific
     WindNinjaOutputFolderPath = "";

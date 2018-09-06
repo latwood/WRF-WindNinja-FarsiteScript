@@ -10,8 +10,7 @@ class inputVariable_info
 public:
 
     // constructors
-    inputVariable_info(std::string newVariableName,std::string newApplicationUseName,std::string newVariableCountType,
-                       std::string newLoaderFunctionName,std::string newVariableDescription);
+    inputVariable_info(std::string newVariableName,std::string newApplicationUseName,std::string newVariableCountType,std::string newVariableDescription);
 
     // reinit functions (like constructors)
     void resetVariable();     //kind of a reusable constructor/destructor
@@ -26,7 +25,6 @@ public:
     std::string get_variableName();
     std::string get_applicationUseName();
     std::string get_variableCountType();
-    std::string get_loaderFunctionName();
     std::string get_variableDescription();
     bool get_isFoundInInputFile();
     bool get_wantDefaultValue();
@@ -40,7 +38,6 @@ private:
     std::string variableName;
     std::string applicationUseName;
     std::string variableCountType;
-    std::string loaderFunctionName;
     std::string variableDescription;
     bool isFoundInInputFile;
     bool wantDefaultValue;

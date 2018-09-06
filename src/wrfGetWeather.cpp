@@ -19,14 +19,14 @@ bool wrfGetWeather::load_required_inputs(inputVariablesHandler *inputs)
     actualCreateInputs_path = inputs->get_actualCreateInputs_path();    // do we even need this? the wrfInterpretation class will combine the RAWS stuff
     actualLcpFilePath = inputs->get_actualLcpPath();
         // application specific variables
-    wrfGetWeather_output_units = inputs->get_inputVariableStringValue("wrfGetWeather_output_units");
+    wrfGetWeather_output_units = inputs->get_stringValue("wrfGetWeather_output_units").get_storedStringValue();
         // wrfGetWeather and WindNinja variables
-    extend_wrf_data = inputs->get_inputVariableBoolValue("extend_wrf_data");
-    wrf_files = inputs->get_wrf_files();
+    extend_wrf_data = inputs->get_boolValue("extend_wrf_data").get_storedBoolValue();
+    wrf_files = inputs->get_wrfFileStorage().get_storedWrfFiles();
         // wrfGetWeather only variables
-    use_weather_from_ignition_center = inputs->get_inputVariableBoolValue("use_weather_from_ignition_center");
-    use_weather_from_full_ignition_area = inputs->get_inputVariableBoolValue("use_weather_from_full_ignition_area");
-    use_weather_from_wrf_center = inputs->get_inputVariableBoolValue("use_weather_from_wrf_center");
+    use_weather_from_ignition_center = inputs->get_boolValue("use_weather_from_ignition_center").get_storedBoolValue();
+    use_weather_from_full_ignition_area = inputs->get_boolValue("use_weather_from_full_ignition_area").get_storedBoolValue();
+    use_weather_from_wrf_center = inputs->get_boolValue("use_weather_from_wrf_center").get_storedBoolValue();
     // may need some ignition and lcp related variables too if doing the more complex wrf weather positioning tricks
 
     // now create any wrfGetWeather specific inputs that are needed from these inputs
@@ -81,7 +81,7 @@ bool wrfGetWeather::getWeather()
         float trueLat1 = 0.0;
         float trueLat2 = 0.0;
         int nLayers = 0;
-        if(getNetCDFGlobalAttributes(wrf_files[wrfFileIdx], mapProj, dx, dy, cenLat, cenLon, moadCenLat, standLon, trueLat1, trueLat2, nLayers) == false)
+        if(getNetCDFGlobalAttributes(wrf_files[wrfFileIdx].get_storedWrfFileName(), mapProj, dx, dy, cenLat, cenLon, moadCenLat, standLon, trueLat1, trueLat2, nLayers) == false)
         {
             printf("problem getting netcdf global attributes!\n");
             return false;
@@ -89,11 +89,11 @@ bool wrfGetWeather::getWeather()
 
         // try opening it just for the heck of it
         CPLPushErrorHandler(&CPLQuietErrorHandler);
-        poDS = (GDALDataset*)GDALOpenShared( wrf_files[wrfFileIdx].c_str(), GA_ReadOnly );
+        poDS = (GDALDataset*)GDALOpenShared( wrf_files[wrfFileIdx].get_storedWrfFileName().c_str(), GA_ReadOnly );
         CPLPopErrorHandler();
         if( poDS == NULL )
         {
-            printf("problem opening wrf file \"%s\" is a bad forecast!\n",wrf_files[wrfFileIdx].c_str());
+            printf("problem opening wrf file \"%s\" is a bad forecast!\n",wrf_files[wrfFileIdx].get_storedWrfFileName().c_str());
             return false;
         } else {
             GDALClose((GDALDatasetH) poDS ); // close original wxModel file
@@ -105,13 +105,13 @@ bool wrfGetWeather::getWeather()
         GDALWarpOptions *psWarpOptions;
         for(size_t wrfVarIdx = 0; wrfVarIdx < wrf_var_list.size(); wrfVarIdx++)
         {
-            std::string netCDFFileString = "NETCDF:\"" + wrf_files[wrfFileIdx] + "\":" + wrf_var_list[wrfVarIdx];
+            std::string netCDFFileString = "NETCDF:\"" + wrf_files[wrfFileIdx].get_storedWrfFileName() + "\":" + wrf_var_list[wrfVarIdx];
             CPLPushErrorHandler(&CPLQuietErrorHandler);
             srcDS = (GDALDataset*)GDALOpenShared( netCDFFileString.c_str(), GA_ReadOnly );
             CPLPopErrorHandler();
             if(srcDS == NULL)
             {
-                printf("netcdf file \"%s\" does not have data of name \"%s\"!\n",wrf_files[wrfFileIdx].c_str(),wrf_var_list[wrfVarIdx].c_str());
+                printf("netcdf file \"%s\" does not have data of name \"%s\"!\n",wrf_files[wrfFileIdx].get_storedWrfFileName().c_str(),wrf_var_list[wrfVarIdx].c_str());
                 return false;
             }
 
@@ -161,11 +161,11 @@ bool wrfGetWeather::getWeather()
                               UNIT[\"Meter\",1]]";
             } else if(mapProj == 6)  //lat/long
             {
-                printf("Cannot initialize wrf file \"%s\" in lat/long spacing! Forecast file must be in a projected coordinate system!\n",wrf_files[wrfFileIdx].c_str());
+                printf("Cannot initialize wrf file \"%s\" in lat/long spacing! Forecast file must be in a projected coordinate system!\n",wrf_files[wrfFileIdx].get_storedWrfFileName().c_str());
                 return false;
             } else
             {
-                printf("Cannot determine projection from the forecast file information for wrf file \"%s\"!\n",wrf_files[wrfFileIdx].c_str());
+                printf("Cannot determine projection from the forecast file information for wrf file \"%s\"!\n",wrf_files[wrfFileIdx].get_storedWrfFileName().c_str());
                 return false;
             }
 
@@ -190,7 +190,7 @@ bool wrfGetWeather::getWeather()
 
             if(poCT==NULL || !poCT->Transform(1, &xCenter, &yCenter))
             {
-                printf("projection transformation failed for wrf file \"%s\"!\n",wrf_files[wrfFileIdx].c_str());
+                printf("projection transformation failed for wrf file \"%s\"!\n",wrf_files[wrfFileIdx].get_storedWrfFileName().c_str());
                 return false;
             }
 
@@ -278,7 +278,7 @@ bool wrfGetWeather::getWeather()
             double foundVar = 0.0;
             if(findWrfCenterValue( wrpDS, 1, foundVar ) == false)
             {
-                printf("problem finding wrf center \"%s\" value for wrf file \"%s\"!\n",wrf_var_list[wrfVarIdx].c_str(),wrf_files[wrfFileIdx].c_str());
+                printf("problem finding wrf center \"%s\" value for wrf file \"%s\"!\n",wrf_var_list[wrfVarIdx].c_str(),wrf_files[wrfFileIdx].get_storedWrfFileName().c_str());
                 return false;
             } else
             {

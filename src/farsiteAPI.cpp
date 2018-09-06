@@ -21,34 +21,34 @@ bool farsiteAPI::load_required_inputs(inputVariablesHandler *inputs, createIgnit
     actualFinalOutput_path = inputs->get_actualFinalOutput_path();
     actualLcpPath = inputs->get_actualLcpPath();
         // application specific variables
-    createIgnition_output_units = inputs->get_inputVariableStringValue("createIgnition_output_units");
-    WindNinja_required_output_units = inputs->get_inputVariableStringValue("WindNinja_required_output_units");
-    wrfGetWeather_output_units = inputs->get_inputVariableStringValue("wrfGetWeather_output_units");
-    farsite_output_units = inputs->get_inputVariableStringValue("farsite_output_units");
-    use_native_timezone = inputs->get_inputVariableBoolValue("use_native_timezone");
+    createIgnition_output_units = inputs->get_stringValue("createIgnition_output_units").get_storedStringValue();
+    WindNinja_required_output_units = inputs->get_stringValue("WindNinja_required_output_units").get_storedStringValue();
+    wrfGetWeather_output_units = inputs->get_stringValue("wrfGetWeather_output_units").get_storedStringValue();
+    farsite_output_units = inputs->get_stringValue("farsite_output_units").get_storedStringValue();
+    use_native_timezone = inputs->get_boolValue("use_native_timezone").get_storedBoolValue();
         // WindNinjaAPI variables
-    WindNinja_number_of_threads = inputs->get_inputVariableSize_tValue("WindNinja_number_of_threads");
+    WindNinja_number_of_threads = inputs->get_size_tValue("WindNinja_number_of_threads").get_storedSize_tValue();
         // farsiteAPI variables
-    burn_start_month = inputs->get_inputVariableDateValueMonth("burn_start_time");
-    burn_start_day = inputs->get_inputVariableDateValueDay("burn_start_time");
-    burn_start_year = inputs->get_inputVariableDateValueYear("burn_start_time");
-    burn_start_hour = inputs->get_inputVariableDateValueHour("burn_start_time");
-    burn_start_minute = inputs->get_inputVariableDateValueMinute("burn_start_time");
-    burn_end_month = inputs->get_inputVariableDateValueMonth("burn_end_time");
-    burn_end_day = inputs->get_inputVariableDateValueDay("burn_end_time");
-    burn_end_year = inputs->get_inputVariableDateValueYear("burn_end_time");
-    burn_end_hour = inputs->get_inputVariableDateValueHour("burn_end_time");
-    burn_end_minute = inputs->get_inputVariableDateValueMinute("burn_end_time");
-    farsite_barrier_shapefile = inputs->get_inputVariableFilenameValue("farsite_barrier_shapefile");
-    farsite_spot_probability = inputs->get_inputVariableDoubleValue("farsite_spot_probability");
-    farsite_spot_ignition_delay = inputs->get_inputVariableSize_tValue("farsite_spot_ignition_delay");
-    farsite_spotting_seed = inputs->get_inputVariableSize_tValue("farsite_spotting_seed");
-    farsite_earliest_burn_time_hour = inputs->get_inputVariableHour_MinValueHour("farsite_earliest_burn_time");
-    farsite_earliest_burn_time_minute = inputs->get_inputVariableHour_MinValueMinute("farsite_earliest_burn_time");
-    farsite_latest_burn_time_hour = inputs->get_inputVariableHour_MinValueHour("farsite_latest_burn_time");
-    farsite_latest_burn_time_minute = inputs->get_inputVariableHour_MinValueMinute("farsite_latest_burn_time");
-    farsite_foliar_moisture_content = inputs->get_inputVariableDoubleValue("farsite_foliar_moisture_content");
-    farsite_crown_fire_method = inputs->get_inputVariableStringValue("farsite_crown_fire_method");
+    burn_start_month = inputs->get_dateValue("burn_start_time").get_storedMonthValue();
+    burn_start_day = inputs->get_dateValue("burn_start_time").get_storedDayValue();
+    burn_start_year = inputs->get_dateValue("burn_start_time").get_storedYearValue();
+    burn_start_hour = inputs->get_dateValue("burn_start_time").get_storedHourValue();
+    burn_start_minute = inputs->get_dateValue("burn_start_time").get_storedMinuteValue();
+    burn_end_month = inputs->get_dateValue("burn_end_time").get_storedMonthValue();
+    burn_end_day = inputs->get_dateValue("burn_end_time").get_storedDayValue();
+    burn_end_year = inputs->get_dateValue("burn_end_time").get_storedYearValue();
+    burn_end_hour = inputs->get_dateValue("burn_end_time").get_storedHourValue();
+    burn_end_minute = inputs->get_dateValue("burn_end_time").get_storedMinuteValue();
+    farsite_barrier_shapefile = inputs->get_shapeFileValue("farsite_barrier_shapefile").get_storedShapeFileValue();
+    farsite_spot_probability = inputs->get_doubleValue("farsite_spot_probability").get_storedDoubleValue();
+    farsite_spot_ignition_delay = inputs->get_size_tValue("farsite_spot_ignition_delay").get_storedSize_tValue();
+    farsite_spotting_seed = inputs->get_size_tValue("farsite_spotting_seed").get_storedSize_tValue();
+    farsite_earliest_burn_time_hour = inputs->get_hour_minValue("farsite_earliest_burn_time").get_storedHourValue();
+    farsite_earliest_burn_time_minute = inputs->get_hour_minValue("farsite_earliest_burn_time").get_storedMinuteValue();
+    farsite_latest_burn_time_hour = inputs->get_hour_minValue("farsite_latest_burn_time").get_storedHourValue();
+    farsite_latest_burn_time_minute = inputs->get_hour_minValue("farsite_latest_burn_time").get_storedMinuteValue();
+    farsite_foliar_moisture_content = inputs->get_doubleValue("farsite_foliar_moisture_content").get_storedDoubleValue();
+    farsite_crown_fire_method = inputs->get_stringValue("farsite_crown_fire_method").get_storedStringValue();
 
     // now load all variables needed from the createIgnitions class
     ignitionShapefilesForSimulations = ignitions->get_ignitionShapefilesForSimulations();

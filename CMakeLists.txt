@@ -48,7 +48,13 @@ endif()
 
 #file(GLOB_RECURSE SOURCES "src/*")
 set(SOURCES "src/main.cpp" "src/inputVariablesHandler.cpp" "src/inputVariable_info.cpp" "src/inputVariables_infoStorage.cpp" "src/inputVariables_valueStorage.cpp"
-    "src/inputParser.cpp" "src/lcpDownloader.cpp" "src/createIgnitions.cpp" "src/WindNinjaAPI.cpp" "src/wrfGetWeather.cpp" "src/farsiteAPI.cpp")
+    "src/inputParser.cpp" "src/lcpDownloader.cpp" "src/createIgnitions.cpp" "src/WindNinjaAPI.cpp" "src/wrfGetWeather.cpp" "src/farsiteAPI.cpp"
+    "src/inputDataTypes/boolValue.cpp" "src/inputDataTypes/size_tValue.cpp" "src/inputDataTypes/intValue.cpp" "src/inputDataTypes/doubleValue.cpp"
+    "src/inputDataTypes/stringValue.cpp" "src/inputDataTypes/pathNameValue.cpp" "src/inputDataTypes/lcpFileValue.cpp" "src/inputDataTypes/shapeFileValue.cpp"
+    "src/inputDataTypes/wrfFileValue.cpp" "src/inputDataTypes/lat_longValue.cpp" "src/inputDataTypes/dateValue.cpp" "src/inputDataTypes/hour_minValue.cpp"
+    "src/inputDataTypes/createIgnitionFromLatLongsStorage.cpp" "src/inputDataTypes/polygonIgnitShapeFileStorage.cpp" "src/inputDataTypes/GeoMACfirePerimeterFileStorage.cpp"
+    "src/inputDataTypes/farsiteOutputFirePerimeterFileStorage.cpp" "src/inputDataTypes/wrfFileStorage.cpp" "src/inputDataTypes/additionalWindNinjaOutputs_googleStorage.cpp"
+    "src/inputDataTypes/additionalWindNinjaOutputs_shapefileStorage.cpp" "src/inputDataTypes/additionalWindNinjaOutputs_pdfStorage.cpp")
 include_directories("include" SYSTEM ${INCLUDE_DIRS})
 link_libraries(${LIBS})
 #add_executable(utahlsm ${SOURCES})

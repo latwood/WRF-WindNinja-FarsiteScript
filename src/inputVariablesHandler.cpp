@@ -147,112 +147,139 @@ void inputVariablesHandler::printFoundInput()
         }
         if(currentCountType == "bool")
         {
-            printf("%s: %d%s\n",currentVarName.c_str(),get_inputVariableBoolValue(currentVarName),isFoundInInputFile.c_str());
+            printf("%s: %d%s\n",currentVarName.c_str(),get_boolValue(currentVarName).get_storedBoolValue(),isFoundInInputFile.c_str());
         } else if(currentCountType == "size_t")
         {
-            printf("%s: %zu%s\n",currentVarName.c_str(),get_inputVariableSize_tValue(currentVarName),isFoundInInputFile.c_str());
+            printf("%s: %zu%s\n",currentVarName.c_str(),get_size_tValue(currentVarName).get_storedSize_tValue(),isFoundInInputFile.c_str());
         } else if(currentCountType == "int")
         {
-            printf("%s: %d%s\n",currentVarName.c_str(),get_inputVariableIntValue(currentVarName),isFoundInInputFile.c_str());
+            printf("%s: %d%s\n",currentVarName.c_str(),get_intValue(currentVarName).get_storedIntValue(),isFoundInInputFile.c_str());
         } else if(currentCountType == "double")
         {
-            printf("%s: %f%s\n",currentVarName.c_str(),get_inputVariableDoubleValue(currentVarName),isFoundInInputFile.c_str());
+            printf("%s: %f%s\n",currentVarName.c_str(),get_doubleValue(currentVarName).get_storedDoubleValue(),isFoundInInputFile.c_str());
         } else if(currentCountType == "positive double")
         {
-            printf("%s: %f%s\n",currentVarName.c_str(),get_inputVariableDoubleValue(currentVarName),isFoundInInputFile.c_str());
+            printf("%s: %f%s\n",currentVarName.c_str(),get_doubleValue(currentVarName).get_storedDoubleValue(),isFoundInInputFile.c_str());
         } else if(currentCountType == "signless percent")
         {
-            printf("%s: %f%s\n",currentVarName.c_str(),get_inputVariableDoubleValue(currentVarName),isFoundInInputFile.c_str());
+            printf("%s: %f%s\n",currentVarName.c_str(),get_doubleValue(currentVarName).get_storedDoubleValue(),isFoundInInputFile.c_str());
         } else if(currentCountType == "string")
         {
-            printf("%s: %s%s\n",currentVarName.c_str(),get_inputVariableStringValue(currentVarName).c_str(),isFoundInInputFile.c_str());
+            printf("%s: %s%s\n",currentVarName.c_str(),get_stringValue(currentVarName).get_storedStringValue().c_str(),isFoundInInputFile.c_str());
         } else if(currentCountType == "pathname")
         {
-            printf("%s: %s%s\n",currentVarName.c_str(),get_inputVariablePathnameValue(currentVarName).c_str(),isFoundInInputFile.c_str());
+            printf("%s: %s%s\n",currentVarName.c_str(),get_pathNameValue(currentVarName).get_storedPathNameValue().c_str(),isFoundInInputFile.c_str());
         } else if(currentCountType == "lcp filename")
         {
-            printf("%s: %s%s\n",currentVarName.c_str(),get_inputVariableFilenameValue(currentVarName).c_str(),isFoundInInputFile.c_str());
+            printf("%s: %s%s\n",currentVarName.c_str(),get_lcpFileValue(currentVarName).get_storedLcpFileValue().c_str(),isFoundInInputFile.c_str());
         } else if(currentCountType == "shape filename")
         {
-            printf("%s: %s%s\n",currentVarName.c_str(),get_inputVariableFilenameValue(currentVarName).c_str(),isFoundInInputFile.c_str());
+            printf("%s: %s%s\n",currentVarName.c_str(),get_shapeFileValue(currentVarName).get_storedShapeFileValue().c_str(),isFoundInInputFile.c_str());
+        } else if(currentCountType == "wrf filename")
+        {
+            printf("%s: %s%s\n",currentVarName.c_str(),get_wrfFileValue(currentVarName).get_storedWrfFileName().c_str(),isFoundInInputFile.c_str());
         } else if(currentCountType == "lat_coord")
         {
-            printf("%s: %f%s\n",currentVarName.c_str(),get_inputVariableDoubleValue(currentVarName),isFoundInInputFile.c_str());
+            printf("%s: %f%s\n",currentVarName.c_str(),get_doubleValue(currentVarName).get_storedDoubleValue(),isFoundInInputFile.c_str());
         } else if(currentCountType == "long_coord")
         {
-            printf("%s: %f%s\n",currentVarName.c_str(),get_inputVariableDoubleValue(currentVarName),isFoundInInputFile.c_str());
+            printf("%s: %f%s\n",currentVarName.c_str(),get_doubleValue(currentVarName).get_storedDoubleValue(),isFoundInInputFile.c_str());
         } else if(currentCountType == "lat_long_point")
         {
-            printf("%s: %f %f%s\n",currentVarName.c_str(),get_inputVariableLat_Long_PointValueLat_Coord(currentVarName),get_inputVariableLat_Long_PointValueLong_Coord(currentVarName),isFoundInInputFile.c_str());
+            printf("%s: %f %f%s\n",currentVarName.c_str(),get_lat_longValue(currentVarName).get_storedLatValue(),get_lat_longValue(currentVarName).get_storedLongValue(),isFoundInInputFile.c_str());
         } else if(currentCountType == "date")
         {
-            printf("%s: %d %d %d %d:%d%s\n",currentVarName.c_str(),get_inputVariableDateValueMonth(currentVarName),get_inputVariableDateValueDay(currentVarName),get_inputVariableDateValueYear(currentVarName),get_inputVariableDateValueHour(currentVarName),get_inputVariableDateValueMinute(currentVarName),isFoundInInputFile.c_str());
+            dateValue currentDate = get_dateValue(currentVarName);
+            printf("%s: %d %d %d %d:%d%s\n",currentVarName.c_str(),currentDate.get_storedMonthValue(),currentDate.get_storedDayValue(),currentDate.get_storedYearValue(),currentDate.get_storedHourValue(),currentDate.get_storedMinuteValue(),isFoundInInputFile.c_str());
         } else if(currentCountType == "hour_min")
         {
-            printf("%s: %d%d%s\n",currentVarName.c_str(),get_inputVariableHour_MinValueHour(currentVarName),get_inputVariableHour_MinValueMinute(currentVarName),isFoundInInputFile.c_str());
+            printf("%s: %d%d%s\n",currentVarName.c_str(),get_hour_minValue(currentVarName).get_storedHourValue(),get_hour_minValue(currentVarName).get_storedMinuteValue(),isFoundInInputFile.c_str());
         } else if(currentCountType == "count")
         {
             // hm, this function is revealing the complexities and confusingness of even more input stuff
             // do I try to repeat all the rest of the inputs checking that WindNinja and Farsite do?
-            std::string currentLoaderFunction = inputVariableInfo[varIdx].get_loaderFunctionName();
-            printf("%s: %zu%s\n",currentVarName.c_str(),inputVariableValues.getTypeCount_CountVar(currentVarName,currentLoaderFunction),isFoundInInputFile.c_str());
-            if(currentLoaderFunction == "load_create_ignition_from_latlongs")
+            printf("%s: %zu%s\n",currentVarName.c_str(),inputVariableValues.getTypeCount_CountVar(currentVarName),isFoundInInputFile.c_str());
+            if(currentVarName == "create_ignition_from_latlongs")
             {
-                for(size_t countVarIdx = 0; countVarIdx < get_create_ignition_from_latlongs().size(); countVarIdx++)
+                for(size_t countVarIdx = 0; countVarIdx < get_createIgnitionFromLatLongsStorage().get_storedCreateIgnitionLatLongValues().size(); countVarIdx++)
                 {
-                    printf("%f %f\n",get_create_ignition_from_latlongs()[countVarIdx].lat_coord,get_create_ignition_from_latlongs()[countVarIdx].long_coord);
+                    printf("%f %f\n",get_createIgnitionFromLatLongsStorage().get_storedCreateIgnitionLatLongValues()[countVarIdx].get_storedLatValue(),get_createIgnitionFromLatLongsStorage().get_storedCreateIgnitionLatLongValues()[countVarIdx].get_storedLongValue());
                 }
-            } else if(currentLoaderFunction == "load_polygon_ignit_shape_files")
+            } else if(currentVarName == "polygon_ignit_shape_files")
             {
-                for(size_t countVarIdx = 0; countVarIdx < get_polygon_ignit_shape_files().size(); countVarIdx++)
+                for(size_t countVarIdx = 0; countVarIdx < get_polygonIgnitShapeFileStorage().get_storedPolygonIgnitShapeFiles().size(); countVarIdx++)
                 {
-                    printf("%s\n",get_polygon_ignit_shape_files()[countVarIdx].c_str());
+                    printf("%s\n",get_polygonIgnitShapeFileStorage().get_storedPolygonIgnitShapeFiles()[countVarIdx].get_storedShapeFileValue().c_str());
                 }
-            } else if(currentLoaderFunction == "load_GeoMAC_fire_perimeter_files")
+            } else if(currentVarName == "GeoMAC_fire_perimeter_files")
             {
-                for(size_t countVarIdx = 0; countVarIdx < get_GeoMAC_fire_perimeter_files().size(); countVarIdx++)
+                for(size_t countVarIdx = 0; countVarIdx < get_GeoMACfirePerimeterFileStorage().get_storedGeoMACfirePerimeterFiles().size(); countVarIdx++)
                 {
-                    printf("%s\n",get_GeoMAC_fire_perimeter_files()[countVarIdx].c_str());
+                    printf("%s\n",get_GeoMACfirePerimeterFileStorage().get_storedGeoMACfirePerimeterFiles()[countVarIdx].get_storedShapeFileValue().c_str());
                 }
-            } else if(currentLoaderFunction == "load_farsite_output_fire_perimeter_files")
+            } else if(currentVarName == "farsite_output_fire_perimeter_files")
             {
-                for(size_t countVarIdx = 0; countVarIdx < get_farsite_output_fire_perimeter_files().size(); countVarIdx++)
+                for(size_t countVarIdx = 0; countVarIdx < get_farsiteOutputFirePerimeterFileStorage().get_storedFarsiteOutputFirePerimeterFiles().size(); countVarIdx++)
                 {
-                    printf("%s\n",get_farsite_output_fire_perimeter_files()[countVarIdx].c_str());
+                    printf("%s\n",get_farsiteOutputFirePerimeterFileStorage().get_storedFarsiteOutputFirePerimeterFiles()[countVarIdx].get_storedShapeFileValue().c_str());
                 }
-            } else if(currentLoaderFunction == "load_wrf_files")
+            } else if(currentVarName == "wrf_files")
             {
-                for(size_t countVarIdx = 0; countVarIdx < get_wrf_files().size(); countVarIdx++)
+                for(size_t countVarIdx = 0; countVarIdx < get_wrfFileStorage().get_storedWrfFiles().size(); countVarIdx++)
                 {
-                    printf("%s\n",get_wrf_files()[countVarIdx].c_str());
+                    printf("%s\n",get_wrfFileStorage().get_storedWrfFiles()[countVarIdx].get_storedWrfFileName().c_str());
                 }
-            } else if(currentLoaderFunction == "load_additional_WindNinja_outputs_google")
+            } else if(currentVarName == "additional_WindNinja_outputs_google")
             {
-                std::vector<std::string> current_wrf_files = get_additional_WindNinja_outputs_googleValues_wrf_file_names();
+                std::vector<std::string> current_wrf_files = get_additionalWindNinjaOutputs_googleStorage().get_stored_wrfFileNames();
+                std::vector<boolValue> current_write_wx_model_goog_output_values = get_additionalWindNinjaOutputs_googleStorage().get_stored_write_wx_model_goog_output_values();
+                std::vector<boolValue> current_write_goog_output_values = get_additionalWindNinjaOutputs_googleStorage().get_stored_write_goog_output_values();
+                std::vector<doubleValue> current_goog_out_resolution_values = get_additionalWindNinjaOutputs_googleStorage().get_stored_goog_out_resolution_values();
+                std::vector<stringValue> current_units_goog_out_resolution_values = get_additionalWindNinjaOutputs_googleStorage().get_stored_units_goog_out_resolution_values();
+                std::vector<stringValue> current_goog_out_color_scheme_values = get_additionalWindNinjaOutputs_googleStorage().get_stored_goog_out_color_scheme_values();
+                std::vector<boolValue> current_goog_out_vector_scaling_values = get_additionalWindNinjaOutputs_googleStorage().get_stored_goog_out_vector_scaling_values();
                 for(size_t countVarIdx = 0; countVarIdx < current_wrf_files.size(); countVarIdx++)
                 {
-                    std::string wrfFile = current_wrf_files[countVarIdx];
-                    printf("%s %d %d %f %s %s %d\n",wrfFile.c_str(),get_write_wx_model_goog_output(wrfFile),get_write_goog_output(wrfFile),get_goog_out_resolution(wrfFile),get_units_goog_out_resolution(wrfFile).c_str(),get_goog_out_color_scheme(wrfFile).c_str(),get_goog_out_vector_scaling(wrfFile));
+                    printf("%s %d %d %f %s %s %d\n",current_wrf_files[countVarIdx].c_str(),current_write_wx_model_goog_output_values[countVarIdx].get_storedBoolValue(),
+                           current_write_goog_output_values[countVarIdx].get_storedBoolValue(),current_goog_out_resolution_values[countVarIdx].get_storedDoubleValue(),
+                           current_units_goog_out_resolution_values[countVarIdx].get_storedStringValue().c_str(),current_goog_out_color_scheme_values[countVarIdx].get_storedStringValue().c_str(),
+                           current_goog_out_vector_scaling_values[countVarIdx].get_storedBoolValue());
                 }
-            } else if(currentLoaderFunction == "load_additional_WindNinja_outputs_shapefile")
+            } else if(currentVarName == "additional_WindNinja_outputs_shapefile")
             {
-                std::vector<std::string> current_wrf_files = get_additional_WindNinja_outputs_shapefileValues_wrf_file_names();
+                std::vector<std::string> current_wrf_files = get_additionalWindNinjaOutputs_shapefileStorage().get_stored_wrfFileNames();
+                std::vector<boolValue> current_write_wx_model_shapefile_output_values = get_additionalWindNinjaOutputs_shapefileStorage().get_stored_write_wx_model_shapefile_output_values();
+                std::vector<boolValue> current_write_shapefile_output_values = get_additionalWindNinjaOutputs_shapefileStorage().get_stored_write_shapefile_output_values();
+                std::vector<doubleValue> current_shape_out_resolution_values = get_additionalWindNinjaOutputs_shapefileStorage().get_stored_shape_out_resolution_values();
+                std::vector<stringValue> current_units_shape_out_resolution_values = get_additionalWindNinjaOutputs_shapefileStorage().get_stored_units_shape_out_resolution_values();
                 for(size_t countVarIdx = 0; countVarIdx < current_wrf_files.size(); countVarIdx++)
                 {
-                    std::string wrfFile = current_wrf_files[countVarIdx];
-                    printf("%s %d %d %f %s\n",wrfFile.c_str(),get_write_wx_model_shapefile_output(wrfFile),get_write_shapefile_output(wrfFile),get_shape_out_resolution(wrfFile),get_units_shape_out_resolution(wrfFile).c_str());
+                    printf("%s %d %d %f %s\n",current_wrf_files[countVarIdx].c_str(),current_write_wx_model_shapefile_output_values[countVarIdx].get_storedBoolValue(),
+                           current_write_shapefile_output_values[countVarIdx].get_storedBoolValue(),current_shape_out_resolution_values[countVarIdx].get_storedDoubleValue(),
+                           current_units_shape_out_resolution_values[countVarIdx].get_storedStringValue().c_str());
                 }
-            } else if(currentLoaderFunction == "load_additional_WindNinja_outputs_pdf")
+            } else if(currentVarName == "additional_WindNinja_outputs_pdf")
             {
-                std::vector<std::string> current_wrf_files = get_additional_WindNinja_outputs_pdfValues_wrf_file_names();
+                std::vector<std::string> current_wrf_files = get_additionalWindNinjaOutputs_pdfStorage().get_stored_wrfFileNames();
+                std::vector<boolValue> current_write_pdf_output_values = get_additionalWindNinjaOutputs_pdfStorage().get_stored_write_pdf_output_values();
+                std::vector<doubleValue> current_pdf_out_resolution_values = get_additionalWindNinjaOutputs_pdfStorage().get_stored_pdf_out_resolution_values();
+                std::vector<stringValue> current_units_pdf_out_resolution_values = get_additionalWindNinjaOutputs_pdfStorage().get_stored_units_pdf_out_resolution_values();
+                std::vector<doubleValue> current_pdf_linewidth_values = get_additionalWindNinjaOutputs_pdfStorage().get_stored_pdf_linewidth_values();
+                std::vector<stringValue> current_pdf_basemap_values = get_additionalWindNinjaOutputs_pdfStorage().get_stored_pdf_basemap_values();
+                std::vector<doubleValue> current_pdf_height_values = get_additionalWindNinjaOutputs_pdfStorage().get_stored_pdf_height_values();
+                std::vector<doubleValue> current_pdf_width_values = get_additionalWindNinjaOutputs_pdfStorage().get_stored_pdf_width_values();
+                std::vector<stringValue> current_pdf_size_values = get_additionalWindNinjaOutputs_pdfStorage().get_stored_pdf_size_values();
                 for(size_t countVarIdx = 0; countVarIdx < current_wrf_files.size(); countVarIdx++)
                 {
-                    std::string wrfFile = current_wrf_files[countVarIdx];
-                    printf("%s %d %f %s %f %s %f %f %s\n",wrfFile.c_str(),get_write_pdf_output(wrfFile),get_pdf_out_resolution(wrfFile),get_units_pdf_out_resolution(wrfFile).c_str(),get_pdf_linewidth(wrfFile),get_pdf_basemap(wrfFile).c_str(),get_pdf_height(wrfFile),get_pdf_width(wrfFile),get_pdf_size(wrfFile).c_str());
+                    printf("%s %d %f %s %f %s %f %f %s\n",current_wrf_files[countVarIdx].c_str(),current_write_pdf_output_values[countVarIdx].get_storedBoolValue(),
+                           current_pdf_out_resolution_values[countVarIdx].get_storedDoubleValue(),current_units_pdf_out_resolution_values[countVarIdx].get_storedStringValue().c_str(),
+                           current_pdf_linewidth_values[countVarIdx].get_storedDoubleValue(),current_pdf_basemap_values[countVarIdx].get_storedStringValue().c_str(),
+                           current_pdf_height_values[countVarIdx].get_storedDoubleValue(),current_pdf_width_values[countVarIdx].get_storedDoubleValue(),
+                           current_pdf_size_values[countVarIdx].get_storedStringValue().c_str());
                 }
             } else
             {
-                printf("loader function \"%s\" for variable \"%s\" has not been implemented in the code yet!\n",currentLoaderFunction.c_str(),currentVarName.c_str());
+                printf("loader function stuff for variable \"%s\" has not been implemented in the code yet!\n",currentVarName.c_str());
             }
         } else
         {
@@ -284,229 +311,107 @@ std::string inputVariablesHandler::get_actualLcpPath()
 /*** end  functions ***/
 
 /*** get variable value functions for single values ***/
-bool inputVariablesHandler::get_inputVariableBoolValue(std::string varName)
+boolValue inputVariablesHandler::get_boolValue(std::string varName)
 {
-    return inputVariableValues.get_inputVariableBoolValue(varName);
+    return inputVariableValues.get_boolValue(varName);
 }
 
-size_t inputVariablesHandler::get_inputVariableSize_tValue(std::string varName)
+size_tValue inputVariablesHandler::get_size_tValue(std::string varName)
 {
-    return inputVariableValues.get_inputVariableSize_tValue(varName);
+    return inputVariableValues.get_size_tValue(varName);
 }
 
-int inputVariablesHandler::get_inputVariableIntValue(std::string varName)
+intValue inputVariablesHandler::get_intValue(std::string varName)
 {
-    return inputVariableValues.get_inputVariableIntValue(varName);
+    return inputVariableValues.get_intValue(varName);
 }
 
-double inputVariablesHandler::get_inputVariableDoubleValue(std::string varName)
+doubleValue inputVariablesHandler::get_doubleValue(std::string varName)
 {
-    return inputVariableValues.get_inputVariableDoubleValue(varName);
+    return inputVariableValues.get_doubleValue(varName);
 }
 
-std::string inputVariablesHandler::get_inputVariableStringValue(std::string varName)
+stringValue inputVariablesHandler::get_stringValue(std::string varName)
 {
-    return inputVariableValues.get_inputVariableStringValue(varName);
+    return inputVariableValues.get_stringValue(varName);
 }
 
-std::string inputVariablesHandler::get_inputVariablePathnameValue(std::string varName)
+pathNameValue inputVariablesHandler::get_pathNameValue(std::string varName)
 {
-    return inputVariableValues.get_inputVariablePathnameValue(varName);
+    return inputVariableValues.get_pathNameValue(varName);
 }
 
-std::string inputVariablesHandler::get_inputVariableFilenameValue(std::string varName)
+lcpFileValue inputVariablesHandler::get_lcpFileValue(std::string varName)
 {
-    return inputVariableValues.get_inputVariableFilenameValue(varName);
+    return inputVariableValues.get_lcpFileValue(varName);
 }
 
-double inputVariablesHandler::get_inputVariableLat_Long_PointValueLat_Coord(std::string varName)
+shapeFileValue inputVariablesHandler::get_shapeFileValue(std::string varName)
 {
-    return inputVariableValues.get_inputVariableLat_Long_PointValueLat_Coord(varName);
+    return inputVariableValues.get_shapeFileValue(varName);
 }
 
-double inputVariablesHandler::get_inputVariableLat_Long_PointValueLong_Coord(std::string varName)
+wrfFileValue inputVariablesHandler::get_wrfFileValue(std::string varName)
 {
-    return inputVariableValues.get_inputVariableLat_Long_PointValueLong_Coord(varName);
+    return inputVariableValues.get_wrfFileValue(varName);
 }
 
-dateValue inputVariablesHandler::get_inputVariableDateValue(std::string varName)
+lat_longValue inputVariablesHandler::get_lat_longValue(std::string varName)
 {
-    return inputVariableValues.get_inputVariableDateValue(varName);
+    return inputVariableValues.get_lat_longValue(varName);
 }
 
-int inputVariablesHandler::get_inputVariableDateValueYear(std::string varName)
+dateValue inputVariablesHandler::get_dateValue(std::string varName)
 {
-    return inputVariableValues.get_inputVariableDateValueYear(varName);
+    return inputVariableValues.get_dateValue(varName);
 }
 
-int inputVariablesHandler::get_inputVariableDateValueMonth(std::string varName)
+hour_minValue inputVariablesHandler::get_hour_minValue(std::string varName)
 {
-    return inputVariableValues.get_inputVariableDateValueMonth(varName);
-}
-
-int inputVariablesHandler::get_inputVariableDateValueDay(std::string varName)
-{
-    return inputVariableValues.get_inputVariableDateValueDay(varName);
-}
-
-int inputVariablesHandler::get_inputVariableDateValueHour(std::string varName)
-{
-    return inputVariableValues.get_inputVariableDateValueHour(varName);
-}
-
-int inputVariablesHandler::get_inputVariableDateValueMinute(std::string varName)
-{
-    return inputVariableValues.get_inputVariableDateValueMinute(varName);
-}
-
-int inputVariablesHandler::get_inputVariableHour_MinValueHour(std::string varName)
-{
-    return inputVariableValues.get_inputVariableHour_MinValueHour(varName);
-}
-
-int inputVariablesHandler::get_inputVariableHour_MinValueMinute(std::string varName)
-{
-    return inputVariableValues.get_inputVariableHour_MinValueMinute(varName);
+    return inputVariableValues.get_hour_minValue(varName);
 }
 /*** end get variable value functions for single values ***/
 
 /*** get variable value functions for count values ***/
-std::vector<lat_long_pointValue> inputVariablesHandler::get_create_ignition_from_latlongs()
+createIgnitionFromLatLongsStorage inputVariablesHandler::get_createIgnitionFromLatLongsStorage()
 {
-    return inputVariableValues.get_create_ignition_from_latlongs();
+    return inputVariableValues.get_createIgnitionFromLatLongsStorage();
 }
 
-std::vector<std::string> inputVariablesHandler::get_polygon_ignit_shape_files()
+polygonIgnitShapeFileStorage inputVariablesHandler::get_polygonIgnitShapeFileStorage()
 {
-    return inputVariableValues.get_polygon_ignit_shape_files();
+    return inputVariableValues.get_polygonIgnitShapeFileStorage();
 }
 
-std::vector<std::string> inputVariablesHandler::get_GeoMAC_fire_perimeter_files()
+GeoMACfirePerimeterFileStorage inputVariablesHandler::get_GeoMACfirePerimeterFileStorage()
 {
-    return inputVariableValues.get_GeoMAC_fire_perimeter_files();
+    return inputVariableValues.get_GeoMACfirePerimeterFileStorage();
 }
 
-std::vector<std::string> inputVariablesHandler::get_farsite_output_fire_perimeter_files()
+farsiteOutputFirePerimeterFileStorage inputVariablesHandler::get_farsiteOutputFirePerimeterFileStorage()
 {
-    return inputVariableValues.get_farsite_output_fire_perimeter_files();
+    return inputVariableValues.get_farsiteOutputFirePerimeterFileStorage();
 }
 
-std::vector<std::string> inputVariablesHandler::get_wrf_files()
+wrfFileStorage inputVariablesHandler::get_wrfFileStorage()
 {
-    return inputVariableValues.get_wrf_files();
+    return inputVariableValues.get_wrfFileStorage();
 }
 
-/* additional_WindNinja_outputs_google get functions */
-std::vector<std::string> inputVariablesHandler::get_additional_WindNinja_outputs_googleValues_wrf_file_names()
+additionalWindNinjaOutputs_googleStorage inputVariablesHandler::get_additionalWindNinjaOutputs_googleStorage()
 {
-    return inputVariableValues.get_additional_WindNinja_outputs_googleValues_wrf_file_names();
+    return inputVariableValues.get_additionalWindNinjaOutputs_googleStorage();
 }
 
-bool inputVariablesHandler::get_write_wx_model_goog_output(std::string wrf_file_name)
+additionalWindNinjaOutputs_shapefileStorage inputVariablesHandler::get_additionalWindNinjaOutputs_shapefileStorage()
 {
-    return inputVariableValues.get_write_wx_model_goog_output(wrf_file_name);
+    return inputVariableValues.get_additionalWindNinjaOutputs_shapefileStorage();
 }
 
-bool inputVariablesHandler::get_write_goog_output(std::string wrf_file_name)
+additionalWindNinjaOutputs_pdfStorage inputVariablesHandler::get_additionalWindNinjaOutputs_pdfStorage()
 {
-    return inputVariableValues.get_write_goog_output(wrf_file_name);
+    return inputVariableValues.get_additionalWindNinjaOutputs_pdfStorage();
 }
-
-double inputVariablesHandler::get_goog_out_resolution(std::string wrf_file_name)
-{
-    return inputVariableValues.get_goog_out_resolution(wrf_file_name);
-}
-
-std::string inputVariablesHandler::get_units_goog_out_resolution(std::string wrf_file_name)
-{
-    return inputVariableValues.get_units_goog_out_resolution(wrf_file_name);
-}
-
-std::string inputVariablesHandler::get_goog_out_color_scheme(std::string wrf_file_name)
-{
-    return inputVariableValues.get_goog_out_color_scheme(wrf_file_name);
-}
-
-bool inputVariablesHandler::get_goog_out_vector_scaling(std::string wrf_file_name)
-{
-    return inputVariableValues.get_goog_out_vector_scaling(wrf_file_name);
-}
-/* end additional_WindNinja_outputs_google get functions */
-
-/* additional_WindNinja_outputs_shapefile get functions */
-std::vector<std::string> inputVariablesHandler::get_additional_WindNinja_outputs_shapefileValues_wrf_file_names()
-{
-    return inputVariableValues.get_additional_WindNinja_outputs_shapefileValues_wrf_file_names();
-}
-
-bool inputVariablesHandler::get_write_wx_model_shapefile_output(std::string wrf_file_name)
-{
-    return inputVariableValues.get_write_wx_model_shapefile_output(wrf_file_name);
-}
-
-bool inputVariablesHandler::get_write_shapefile_output(std::string wrf_file_name)
-{
-    return inputVariableValues.get_write_shapefile_output(wrf_file_name);
-}
-
-double inputVariablesHandler::get_shape_out_resolution(std::string wrf_file_name)
-{
-    return inputVariableValues.get_shape_out_resolution(wrf_file_name);
-}
-
-std::string inputVariablesHandler::get_units_shape_out_resolution(std::string wrf_file_name)
-{
-    return inputVariableValues.get_units_shape_out_resolution(wrf_file_name);
-}
-/* end additional_WindNinja_outputs_shapefile get functions */
-
-/* additional_WindNinja_outputs_pdf get functions */
-std::vector<std::string> inputVariablesHandler::get_additional_WindNinja_outputs_pdfValues_wrf_file_names()
-{
-    return inputVariableValues.get_additional_WindNinja_outputs_pdfValues_wrf_file_names();
-}
-
-bool inputVariablesHandler::get_write_pdf_output(std::string wrf_file_name)
-{
-    return inputVariableValues.get_write_pdf_output(wrf_file_name);
-}
-
-double inputVariablesHandler::get_pdf_out_resolution(std::string wrf_file_name)
-{
-    return inputVariableValues.get_pdf_out_resolution(wrf_file_name);
-}
-
-std::string inputVariablesHandler::get_units_pdf_out_resolution(std::string wrf_file_name)
-{
-    return inputVariableValues.get_units_pdf_out_resolution(wrf_file_name);
-}
-
-double inputVariablesHandler::get_pdf_linewidth(std::string wrf_file_name)
-{
-    return inputVariableValues.get_pdf_linewidth(wrf_file_name);
-}
-
-std::string inputVariablesHandler::get_pdf_basemap(std::string wrf_file_name)
-{
-    return inputVariableValues.get_pdf_basemap(wrf_file_name);
-}
-
-double inputVariablesHandler::get_pdf_height(std::string wrf_file_name)
-{
-    return inputVariableValues.get_pdf_height(wrf_file_name);
-}
-
-double inputVariablesHandler::get_pdf_width(std::string wrf_file_name)
-{
-    return inputVariableValues.get_pdf_width(wrf_file_name);
-}
-
-std::string inputVariablesHandler::get_pdf_size(std::string wrf_file_name)
-{
-    return inputVariableValues.get_pdf_size(wrf_file_name);
-}
-/* end additional_WindNinja_outputs_pdf get functions */
-
 /*** end get variable value functions for count values ***/
 
 
@@ -522,6 +427,8 @@ bool inputVariablesHandler::reset()
 
     actualCreateInputs_path = "";
     actualFinalOutput_path = "";
+    actual_run_base_name = "";
+    actualLcpPath = "";
 
     for(size_t varIdx = 0; varIdx < inputVariableInfo.size(); varIdx++)
     {
@@ -572,8 +479,8 @@ bool inputVariablesHandler::findActualCreateInputsAndFinalOutputsPaths()
 {
     bool success = true;
 
-    std::string foundCreateInputs_path = inputVariableValues.get_inputVariablePathnameValue("createInputs_path") + "/";
-    std::string foundFinalOutput_path = inputVariableValues.get_inputVariablePathnameValue("finalOutput_path") + "/";
+    std::string foundCreateInputs_path = get_pathNameValue("createInputs_path").get_storedPathNameValue() + "/";
+    std::string foundFinalOutput_path = get_pathNameValue("finalOutput_path").get_storedPathNameValue() + "/";
 
     // check for "/" symbols
     if(foundCreateInputs_path.substr(foundCreateInputs_path.length()-2,foundCreateInputs_path.length()-1) == "/")
@@ -588,7 +495,7 @@ bool inputVariablesHandler::findActualCreateInputsAndFinalOutputsPaths()
     foundCreateInputs_path = foundCreateInputs_path + "createInputs";
     foundFinalOutput_path = foundFinalOutput_path + "finalOutput";
 
-    if(inputVariableValues.get_inputVariableBoolValue("overwrite_past_outputs") == true)
+    if(get_boolValue("overwrite_past_outputs").get_storedBoolValue() == true)
     {
         actualCreateInputs_path = foundCreateInputs_path;
         actualFinalOutput_path = foundFinalOutput_path;
@@ -623,13 +530,13 @@ bool inputVariablesHandler::findActualLcpPathAndBaseName()
 {
     bool success = true;
 
-    if(inputVariableValues.get_inputVariableBoolValue("use_past_lcp") == true)
+    if(get_boolValue("use_past_lcp").get_storedBoolValue() == true)
     {
-        actualLcpPath = inputVariableValues.get_inputVariableFilenameValue("lcp_file_path");
+        actualLcpPath = get_lcpFileValue("lcp_file_path").get_storedLcpFileValue();
         actual_run_base_name = actualLcpPath.substr(0,actualLcpPath.length()-4);
     } else
     {
-        actual_run_base_name = get_inputVariableStringValue("run_base_name");
+        actual_run_base_name = get_stringValue("run_base_name").get_storedStringValue();
         actualLcpPath = get_actualCreateInputs_path() + actual_run_base_name + ".lcp";
     }
 

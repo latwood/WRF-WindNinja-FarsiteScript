@@ -68,7 +68,7 @@ bool inputParser::findVariableNamesAndCountValues(std::string inputFileName)
                             success = false;
                         } else
                         {
-                            if(inputVariableValueStorage->set_inputVariableBoolValue(currentVarName,currentVarCount) == false)
+                            if(inputVariableValueStorage->set_boolValue(currentVarName,currentVarCount) == false)
                             {
                                 printf("problem setting bool value \"%d\" to variable \"%s\"!\n",currentVarCount,currentVarName.c_str());
                                 success = false;
@@ -87,7 +87,7 @@ bool inputParser::findVariableNamesAndCountValues(std::string inputFileName)
                             success = false;
                         } else
                         {
-                            if(inputVariableValueStorage->set_inputVariableSize_tValue(currentVarName,currentVarCount) == false)
+                            if(inputVariableValueStorage->set_size_tValue(currentVarName,currentVarCount) == false)
                             {
                                 printf("problem setting size_t value \"%zu\" to variable \"%s\"!\n",currentVarCount,currentVarName.c_str());
                                 success = false;
@@ -106,7 +106,7 @@ bool inputParser::findVariableNamesAndCountValues(std::string inputFileName)
                             success = false;
                         } else
                         {
-                            if(inputVariableValueStorage->set_inputVariableIntValue(currentVarName,currentVarCount) == false)
+                            if(inputVariableValueStorage->set_intValue(currentVarName,currentVarCount) == false)
                             {
                                 printf("problem setting int value \"%d\" to variable \"%s\"!\n",currentVarCount,currentVarName.c_str());
                                 success = false;
@@ -125,7 +125,7 @@ bool inputParser::findVariableNamesAndCountValues(std::string inputFileName)
                             success = false;
                         } else
                         {
-                            if(inputVariableValueStorage->set_inputVariableDoubleValue(currentVarName,currentVarCount) == false)
+                            if(inputVariableValueStorage->set_doubleValue(currentVarName,currentVarCount,"regular") == false)
                             {
                                 printf("problem setting double value \"%f\" to variable \"%s\"!\n",currentVarCount,currentVarName.c_str());
                                 success = false;
@@ -144,7 +144,7 @@ bool inputParser::findVariableNamesAndCountValues(std::string inputFileName)
                             success = false;
                         } else
                         {
-                            if(inputVariableValueStorage->set_inputVariableDoubleValue(currentVarName,currentVarCount) == false)
+                            if(inputVariableValueStorage->set_doubleValue(currentVarName,currentVarCount,"positive") == false)
                             {
                                 printf("problem setting positive double value \"%f\" to variable \"%s\"!\n",currentVarCount,currentVarName.c_str());
                                 success = false;
@@ -163,7 +163,7 @@ bool inputParser::findVariableNamesAndCountValues(std::string inputFileName)
                             success = false;
                         } else
                         {
-                            if(inputVariableValueStorage->set_inputVariableDoubleValue(currentVarName,currentVarCount) == false)
+                            if(inputVariableValueStorage->set_doubleValue(currentVarName,currentVarCount,"signless percent") == false)
                             {
                                 printf("problem setting signless percent value \"%f\" to variable \"%s\"!\n",currentVarCount,currentVarName.c_str());
                                 success = false;
@@ -182,7 +182,7 @@ bool inputParser::findVariableNamesAndCountValues(std::string inputFileName)
                             success = false;
                         } else
                         {
-                            if(inputVariableValueStorage->set_inputVariableStringValue(currentVarName,currentVarCountString) == false)
+                            if(inputVariableValueStorage->set_stringValue(currentVarName,currentVarCountString) == false)
                             {
                                 printf("problem setting string\"%s\" to variable \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str());
                                 success = false;
@@ -201,7 +201,7 @@ bool inputParser::findVariableNamesAndCountValues(std::string inputFileName)
                             success = false;
                         } else
                         {
-                            if(inputVariableValueStorage->set_inputVariablePathnameValue(currentVarName,currentVarCountString) == false)
+                            if(inputVariableValueStorage->set_pathNameValue(currentVarName,currentVarCountString) == false)
                             {
                                 printf("problem setting pathname \"%s\" to variable \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str());
                                 success = false;
@@ -220,7 +220,7 @@ bool inputParser::findVariableNamesAndCountValues(std::string inputFileName)
                             success = false;
                         } else
                         {
-                            if(inputVariableValueStorage->set_inputVariableFilenameValue(currentVarName,currentVarCountString) == false)
+                            if(inputVariableValueStorage->set_lcpFileValue(currentVarName,currentVarCountString) == false)
                             {
                                 printf("problem setting lcp filename \"%s\" to variable \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str());
                                 success = false;
@@ -239,7 +239,7 @@ bool inputParser::findVariableNamesAndCountValues(std::string inputFileName)
                             success = false;
                         } else
                         {
-                            if(inputVariableValueStorage->set_inputVariableFilenameValue(currentVarName,currentVarCountString) == false)
+                            if(inputVariableValueStorage->set_shapeFileValue(currentVarName,currentVarCountString) == false)
                             {
                                 printf("problem setting shape filename \"%s\" to variable \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str());
                                 success = false;
@@ -258,7 +258,7 @@ bool inputParser::findVariableNamesAndCountValues(std::string inputFileName)
                             success = false;
                         } else
                         {
-                            if(inputVariableValueStorage->set_inputVariableDoubleValue(currentVarName,currentVarCount) == false)
+                            if(inputVariableValueStorage->set_doubleValue(currentVarName,currentVarCount,"lat_coord") == false)
                             {
                                 printf("problem setting lat_coord value \"%f\" to variable \"%s\"!\n",currentVarCount,currentVarName.c_str());
                                 success = false;
@@ -277,7 +277,7 @@ bool inputParser::findVariableNamesAndCountValues(std::string inputFileName)
                             success = false;
                         } else
                         {
-                            if(inputVariableValueStorage->set_inputVariableDoubleValue(currentVarName,currentVarCount) == false)
+                            if(inputVariableValueStorage->set_doubleValue(currentVarName,currentVarCount,"long_coord") == false)
                             {
                                 printf("problem setting long_coord value \"%f\" to variable \"%s\"!\n",currentVarCount,currentVarName.c_str());
                                 success = false;
@@ -298,7 +298,7 @@ bool inputParser::findVariableNamesAndCountValues(std::string inputFileName)
                             success = false;
                         } else
                         {
-                            if(inputVariableValueStorage->set_inputVariableLat_Long_PointValue(currentVarName,currentLat_Coord,currentLong_Coord) == false)
+                            if(inputVariableValueStorage->set_lat_longValue(currentVarName,currentLat_Coord,currentLong_Coord) == false)
                             {
                                 printf("problem setting lat_long_point value \"%f %f\" \"(lat long)\" to variable \"%s\"!\n",currentLat_Coord,currentLong_Coord,currentVarName.c_str());
                                 success = false;
@@ -322,7 +322,7 @@ bool inputParser::findVariableNamesAndCountValues(std::string inputFileName)
                             success = false;
                         } else
                         {
-                            if(inputVariableValueStorage->set_inputVariableDateValue(currentVarName,currentYear,currentMonth,currentDay,currentHour,currentMinute) == false)
+                            if(inputVariableValueStorage->set_dateValue(currentVarName,currentYear,currentMonth,currentDay,currentHour,currentMinute) == false)
                             {
                                 printf("problem setting date value \"%d %d %d %d:%d\" \"(month day year hour:minute)\" to variable \"%s\"!\n",currentMonth,currentDay,currentYear,currentHour,currentMinute,currentVarName.c_str());
                                 success = false;
@@ -343,7 +343,7 @@ bool inputParser::findVariableNamesAndCountValues(std::string inputFileName)
                             success = false;
                         } else
                         {
-                            if(inputVariableValueStorage->set_inputVariableHour_MinValue(currentVarName,currentHour,currentMinute) == false)
+                            if(inputVariableValueStorage->set_hour_minValue(currentVarName,currentHour,currentMinute) == false)
                             {
                                 printf("problem setting hour_min value \"%d %d\" \"(hour:minute)\" to variable \"%s\"!\n",currentHour,currentMinute,currentVarName.c_str());
                                 success = false;
@@ -355,7 +355,6 @@ bool inputParser::findVariableNamesAndCountValues(std::string inputFileName)
                         }
                     } else if(currentCountType == "count")
                     {
-                        std::string currentLoaderFunction = inputVariablesInfo[varIdx].get_loaderFunctionName();
                         size_t currentVarCount = strToSize_t(currentVarCountString,conversionSuccess);
                         if(conversionSuccess == false)
                         {
@@ -363,9 +362,9 @@ bool inputParser::findVariableNamesAndCountValues(std::string inputFileName)
                             success = false;
                         } else
                         {
-                            if(inputVariableValueStorage->setTypeCount_CountVar(currentVarName,currentLoaderFunction,currentVarCount) == false)
+                            if(inputVariableValueStorage->setTypeCount_CountVar(currentVarName,currentVarCount) == false)
                             {
-                                printf("couldn't set count value \"%s\" to variable \"%s\" with loader function \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str(),currentLoaderFunction.c_str());
+                                printf("couldn't set count value \"%s\" to variable \"%s\" !\n",currentVarCountString.c_str(),currentVarName.c_str());
                                 success = false;
                             }
                         }
@@ -400,58 +399,57 @@ bool inputParser::loadAllInputs(std::string inputFileName)
             std::string currentVarCountString = "";
             if(inputVariablesInfo[varIdx].get_isFoundInInputFile() == true)
             {
-                std::string currentLoaderFunction = inputVariablesInfo[varIdx].get_loaderFunctionName();
-                size_t currentVarCount = inputVariableValueStorage->getTypeCount_CountVar(currentVarName,currentLoaderFunction);
-                if(currentLoaderFunction == "load_create_ignition_from_latlongs")
+                size_t currentVarCount = inputVariableValueStorage->getTypeCount_CountVar(currentVarName);
+                if(currentVarName == "create_ignition_from_latlongs")
                 {
                     if(load_create_ignition_from_latlongs(inputFileName,currentVarCount,currentCountLine) == false)
                     {
                         printf("failed to load create_ignition_from_latlongs. Make sure the count number matches the number of lines of data and data is valid!\n");
                         success = false;
                     }
-                } else if(currentLoaderFunction == "load_polygon_ignit_shape_files")
+                } else if(currentVarName == "polygon_ignit_shape_files")
                 {
                     if(load_polygon_ignit_shape_files(inputFileName,currentVarCount,currentCountLine) == false)
                     {
                         printf("failed to load polygon_ignit_shape_files. Make sure the count number matches the number of lines of data and data is valid!\n");
                         success = false;
                     }
-                } else if(currentLoaderFunction == "load_GeoMAC_fire_perimeter_files")
+                } else if(currentVarName == "GeoMAC_fire_perimeter_files")
                 {
                     if(load_GeoMAC_fire_perimeter_files(inputFileName,currentVarCount,currentCountLine) == false)
                     {
                         printf("failed to load GeoMAC_fire_perimeter_files. Make sure the count number matches the number of lines of data and data is valid!\n");
                         success = false;
                     }
-                } else if(currentLoaderFunction == "load_farsite_output_fire_perimeter_files")
+                } else if(currentVarName == "farsite_output_fire_perimeter_files")
                 {
                     if(load_farsite_output_fire_perimeter_files(inputFileName,currentVarCount,currentCountLine) == false)
                     {
                         printf("failed to load farsite_output_fire_perimeter_files. Make sure the count number matches the number of lines of data and data is valid!\n");
                         success = false;
                     }
-                } else if(currentLoaderFunction == "load_wrf_files")
+                } else if(currentVarName == "wrf_files")
                 {
                     if(load_wrf_files(inputFileName,currentVarCount,currentCountLine) == false)
                     {
                         printf("failed to load wrf_files. Make sure the count number matches the number of lines of data and data is valid!\n");
                         success = false;
                     }
-                } else if(currentLoaderFunction == "load_additional_WindNinja_outputs_google")
+                } else if(currentVarName == "additional_WindNinja_outputs_google")
                 {
                     if(load_additional_WindNinja_outputs_google(inputFileName,currentVarCount,currentCountLine) == false)
                     {
                         printf("failed to load additional_WindNinja_outputs_google. Make sure the count number matches the number of lines of data and data is valid!\n");
                         success = false;
                     }
-                } else if(currentLoaderFunction == "load_additional_WindNinja_outputs_shapefile")
+                } else if(currentVarName == "additional_WindNinja_outputs_shapefile")
                 {
                     if(load_additional_WindNinja_outputs_shapefile(inputFileName,currentVarCount,currentCountLine) == false)
                     {
                         printf("failed to load additional_WindNinja_outputs_shapefile. Make sure the count number matches the number of lines of data and data is valid!\n");
                         success = false;
                     }
-                } else if(currentLoaderFunction == "load_additional_WindNinja_outputs_pdf")
+                } else if(currentVarName == "additional_WindNinja_outputs_pdf")
                 {
                     if(load_additional_WindNinja_outputs_pdf(inputFileName,currentVarCount,currentCountLine) == false)
                     {
@@ -460,7 +458,7 @@ bool inputParser::loadAllInputs(std::string inputFileName)
                     }
                 } else
                 {
-                    printf("loader function \"%s\" for variable \"%s\" has not been implemented in the code yet!\n",currentLoaderFunction.c_str(),currentVarName.c_str());
+                    printf("loader function for variable \"%s\" has not been implemented in the code yet!\n",currentVarName.c_str());
                     success = false;
                 }
             }
@@ -2093,7 +2091,7 @@ bool inputParser::load_create_ignition_from_latlongs(std::string inputFileName, 
                         break;
                     } else
                     {
-                        inputVariableValueStorage->add_create_ignition_from_latlongs_coord("",foundLatCoord,foundLongCoord);   // only adds files if it is a valid line of data and is valid data
+                        inputVariableValueStorage->add_createIgnitionLatLongValue(foundLatCoord,foundLongCoord);   // only adds files if it is a valid line of data and is valid data
                     }
                 }
             }
@@ -2193,7 +2191,7 @@ bool inputParser::load_polygon_ignit_shape_files(std::string inputFileName, size
                         break;
                     } else
                     {
-                        inputVariableValueStorage->add_polygon_ignit_shape_file(currentLine);   // only adds files if it is a valid line of data and is valid data
+                        inputVariableValueStorage->add_polygonIgnitShapeFile(currentLine);   // only adds files if it is a valid line of data and is valid data
                     }
                 }
             }
@@ -2293,7 +2291,7 @@ bool inputParser::load_GeoMAC_fire_perimeter_files(std::string inputFileName, si
                         break;
                     } else
                     {
-                        inputVariableValueStorage->add_GeoMAC_fire_perimeter_file(currentLine);   // only adds files if it is a valid line of data and is valid data
+                        inputVariableValueStorage->add_GeoMACfirePerimeterFile(currentLine);   // only adds files if it is a valid line of data and is valid data
                     }
                 }
             }
@@ -2393,7 +2391,7 @@ bool inputParser::load_farsite_output_fire_perimeter_files(std::string inputFile
                         break;
                     } else
                     {
-                        inputVariableValueStorage->add_farsite_output_fire_perimeter_file(currentLine);   // only adds files if it is a valid line of data and is valid data
+                        inputVariableValueStorage->add_farsiteOutputFirePerimeterFile(currentLine);   // only adds files if it is a valid line of data and is valid data
                     }
                 }
             }
@@ -2493,7 +2491,7 @@ bool inputParser::load_wrf_files(std::string inputFileName, size_t varCount, siz
                         break;
                     } else
                     {
-                        inputVariableValueStorage->add_wrf_file(currentLine);   // only adds files if it is a valid line of data and is valid data
+                        inputVariableValueStorage->add_wrfFile(currentLine);   // only adds files if it is a valid line of data and is valid data
                     }
                 }
             }
@@ -2720,7 +2718,7 @@ bool inputParser::load_additional_WindNinja_outputs_google(std::string inputFile
                         break;
                     } else
                     {
-                        inputVariableValueStorage->add_additional_WindNinja_outputs_googleValues(found_wrf_file_name,found_write_wx_model_goog_output,found_write_goog_output,
+                        inputVariableValueStorage->add_additionalWindNinjaOutputs_googleValueSet(found_wrf_file_name,found_write_wx_model_goog_output,found_write_goog_output,
                                                                                                  found_goog_out_resolution,found_units_goog_out_resolution,found_goog_out_color_scheme,
                                                                                                  found_goog_out_vector_scaling);   // only adds files if it is a valid line of data and is valid data
                     }
@@ -2925,7 +2923,7 @@ bool inputParser::load_additional_WindNinja_outputs_shapefile(std::string inputF
                         break;
                     } else
                     {
-                        inputVariableValueStorage->add_additional_WindNinja_outputs_shapefileValues(found_wrf_file_name,found_write_wx_model_shapefile_output,found_write_shapefile_output,
+                        inputVariableValueStorage->add_additionalWindNinjaOutputs_shapefileValueSet(found_wrf_file_name,found_write_wx_model_shapefile_output,found_write_shapefile_output,
                                                                                                     found_shape_out_resolution,found_units_shape_out_resolution);   // only adds files if it is a valid line of data and is valid data
                     }
                 }
@@ -3179,7 +3177,7 @@ bool inputParser::load_additional_WindNinja_outputs_pdf(std::string inputFileNam
                         break;
                     } else
                     {
-                        inputVariableValueStorage->add_additional_WindNinja_outputs_pdfValues(found_wrf_file_name,found_write_pdf_output,found_pdf_out_resolution,
+                        inputVariableValueStorage->add_additionalWindNinjaOutputs_pdfValueSet(found_wrf_file_name,found_write_pdf_output,found_pdf_out_resolution,
                                                                                               found_units_pdf_out_resolution,found_pdf_linewidth,found_pdf_basemap,
                                                                                               found_pdf_height,found_pdf_width,found_pdf_size);   // only adds files if it is a valid line of data and is valid data
                     }

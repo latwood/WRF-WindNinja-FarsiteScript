@@ -19,19 +19,19 @@ bool lcpDownloader::load_required_inputs(inputVariablesHandler *inputs, double n
     actualLcpPath = inputs->get_actualLcpPath();
         // lcp download variables (WindNinja related)
     // going to do this one later after everything is finished. Not sure if use WindNinja api for lcp download or if setup separate lcp class
-    automate_lcp_download = inputs->get_inputVariableBoolValue("automate_lcp_download");
-    fireperim_to_lcp_scalefactor = inputs->get_inputVariableDoubleValue("fireperim_to_lcp_scalefactor");
-    use_past_lcp = inputs->get_inputVariableBoolValue("use_past_lcp");
-    specify_lcp_download = inputs->get_inputVariableBoolValue("specify_lcp_download");
-    lcp_download_lat_point = inputs->get_inputVariableLat_Long_PointValueLat_Coord("lcp_download_lat_long_point");
-    lcp_download_long_point = inputs->get_inputVariableLat_Long_PointValueLong_Coord("lcp_download_lat_long_point");
-    lcp_download_northsouth_buffer = inputs->get_inputVariableDoubleValue("lcp_download_northsouth_buffer");
-    lcp_download_westeast_buffer = inputs->get_inputVariableDoubleValue("lcp_download_westeast_buffer");
-    lcp_download_buffer_units = inputs->get_inputVariableStringValue("lcp_download_buffer_units");
-    lcp_download_north_lat_bound = inputs->get_inputVariableDoubleValue("lcp_download_north_lat_bound");
-    lcp_download_south_lat_bound = inputs->get_inputVariableDoubleValue("lcp_download_south_lat_bound");
-    lcp_download_east_long_bound = inputs->get_inputVariableDoubleValue("lcp_download_east_long_bound");
-    lcp_download_west_long_bound = inputs->get_inputVariableDoubleValue("lcp_download_west_long_bound");
+    automate_lcp_download = inputs->get_boolValue("automate_lcp_download").get_storedBoolValue();
+    fireperim_to_lcp_scalefactor = inputs->get_doubleValue("fireperim_to_lcp_scalefactor").get_storedDoubleValue();
+    use_past_lcp = inputs->get_boolValue("use_past_lcp").get_storedBoolValue();
+    specify_lcp_download = inputs->get_boolValue("specify_lcp_download").get_storedBoolValue();
+    lcp_download_lat_point = inputs->get_lat_longValue("lcp_download_lat_long_point").get_storedLatValue();
+    lcp_download_long_point = inputs->get_lat_longValue("lcp_download_lat_long_point").get_storedLongValue();
+    lcp_download_northsouth_buffer = inputs->get_doubleValue("lcp_download_northsouth_buffer").get_storedDoubleValue();
+    lcp_download_westeast_buffer = inputs->get_doubleValue("lcp_download_westeast_buffer").get_storedDoubleValue();
+    lcp_download_buffer_units = inputs->get_stringValue("lcp_download_buffer_units").get_storedStringValue();
+    lcp_download_north_lat_bound = inputs->get_doubleValue("lcp_download_north_lat_bound").get_storedDoubleValue();
+    lcp_download_south_lat_bound = inputs->get_doubleValue("lcp_download_south_lat_bound").get_storedDoubleValue();
+    lcp_download_east_long_bound = inputs->get_doubleValue("lcp_download_east_long_bound").get_storedDoubleValue();
+    lcp_download_west_long_bound = inputs->get_doubleValue("lcp_download_west_long_bound").get_storedDoubleValue();
         // createIgnition variables
     firePerimMinLat = newFirePerimMinLat;
     firePerimMinLong = newFirePerimMinLong;
