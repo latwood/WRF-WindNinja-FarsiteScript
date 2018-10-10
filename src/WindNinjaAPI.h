@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "inputVariablesHandler.h"
+#include "inputClasses/inputVariablesHandler.h"
 
 #include "cpl_spawn.h"
 #include <glob.h>

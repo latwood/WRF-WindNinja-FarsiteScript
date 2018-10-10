@@ -2,7 +2,7 @@
 #define FARSITEAPI_H
 
 
-#include "inputVariablesHandler.h"
+#include "inputClasses/inputVariablesHandler.h"
 #include "createIgnitions.h"
 #include "WindNinjaAPI.h"
 #include "wrfGetWeather.h"

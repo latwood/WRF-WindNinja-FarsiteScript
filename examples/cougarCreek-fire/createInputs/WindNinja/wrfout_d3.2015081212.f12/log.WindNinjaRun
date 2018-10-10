@@ -12,10 +12,10 @@ Run 0 (solver): 67% complete
 Run 0 (solver): 89% complete
 Run 0 (solver): 100% complete
 Run 0: Writing output files...
-Run 0: Meshing time was 0.039263 seconds.
-Run 0: Initialization time was 0.997182 seconds.
-Run 0: Equation building time was 1.383754 seconds.
-Run 0: Solver time was 5.351936 seconds.
-Run 0: Output writing time was 0.021572 seconds.
-Run 0: Total simulation time was 8.339583 seconds.
+Run 0: Meshing time was 0.088244 seconds.
+Run 0: Initialization time was 2.271225 seconds.
+Run 0: Equation building time was 2.991423 seconds.
+Run 0: Solver time was 11.816660 seconds.
+Run 0: Output writing time was 0.048672 seconds.
+Run 0: Total simulation time was 18.312592 seconds.
 Run 0: Run number 0 done!

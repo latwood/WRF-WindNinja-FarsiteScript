@@ -1,7 +1,7 @@
 #ifndef LCPDOWNLOADER_H
 #define LCPDOWNLOADER_H
 
-#include "inputVariablesHandler.h"
+#include "inputClasses/inputVariablesHandler.h"
 
 class lcpDownloader
 {

@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include "inputVariablesHandler.h"
+#include "inputClasses/inputVariablesHandler.h"
 
 #include "netcdf.h"
 #include <ogr_spatialref.h>

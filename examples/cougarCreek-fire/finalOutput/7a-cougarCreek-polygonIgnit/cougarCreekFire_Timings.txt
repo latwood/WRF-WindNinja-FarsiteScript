@@ -113,4 +113,4 @@ Simulation Info:
 8 13 1200 150 180 0
 8 13 1800 150 180 0
 
-	Total Farsite Run Time: 44.788 Seconds
+	Total Farsite Run Time: 101.925 Seconds

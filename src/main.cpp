@@ -1,7 +1,7 @@
 
 #include <iostream>
 
-#include "inputVariablesHandler.h"
+#include "inputClasses/inputVariablesHandler.h"
 #include "lcpDownloader.h"
 #include "createIgnitions.h"
 #include "WindNinjaAPI.h"
