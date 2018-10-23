@@ -49,32 +49,37 @@ bool inputVariablesHandler::loadScriptInputs(std::string inputFileName)
 {
     bool success = true;
 
-    /* clean up all data that isn't just defined once for all uses */
+    // clean up all data that isn't just defined once for all uses
     if(reset() == false)
     {
         printf("problem resetting variables!\n");
         success = false;
     }
 
-    //open file and load all variable names with parser
+    // open file and load all found text into the input parser
     if(success == true)
     {
-        if(theInputParser.findVariableNamesAndCountValues(inputFileName) == false)
+        if(theInputParser.readInputFile(inputFileName) == false)
         {
-            printf("problem loading variable names and variable count values!\n");
+            printf("problem loading all text into the input parser class!\n");
             success = false;
-        } else
-        {
-            transferVariableInfo(); // don't be caught off gaurd, runs theInputParser.findVariableNamesAndCountValues if success is true, if that succeeds runs transferVariableInfo
         }
     }
 
-    // need an additional function checking count type "string" info. Oh heck, this assumes I read in count values by this point.
-    // maybe should just put it in findVariableNames for if count type is "string" do a bunch of other extra stuff
-
-    //check for conflicting options and stop and warn for all conflicts. Oh heck, this assumes I read in count values by this point.
+    // load all found variable names and variable count values into input parser as strings
     if(success == true)
     {
+        if(theInputParser.readVarNamesAndCountValues() == false)
+        {
+            printf("problem loading all variable names and count values into input parser class as strings!\n");
+            success = false;
+        }
+    }
+
+    //check for conflicting options and stop and warn for all conflicts
+    if(success == true)
+    {
+        transferVariableInfo(); // don't be caught off gaurd, runs theInputParser.loadAllInputs if success is true, if that succeeds runs transferVariableInfo
         if(verifyFoundInputCombinations() == false)
         {
             printf("found conflicting options!\n");
@@ -82,17 +87,36 @@ bool inputVariablesHandler::loadScriptInputs(std::string inputFileName)
         }
     }
 
-    //if no conflicting options, open file and load each input with parser, error if any cannot be loaded correctly
+    // now set all count values to their respective input storage classes
     if(success == true)
     {
-        if(theInputParser.loadAllInputs(inputFileName) == false)
+        if(theInputParser.loadCountValues() == false)
         {
-            printf("problem loading inputs!\n");
+            printf("problem setting count values into their respective input storage classes!\n");
             success = false;
-        } else
-        {
-            transferVariableInfo(); // don't be caught off gaurd, runs theInputParser.loadAllInputs if success is true, if that succeeds runs transferVariableInfo
         }
+    }
+
+    // now make sure there are enough lines of data for all type count variables
+    if(success == true)
+    {
+        if(theInputParser.checkCountVsLinesOfData() == false)
+        {
+            printf("problem with input number of lines of input data for type count variables!\n");
+            success = false;
+        }
+    }
+
+    // if no conflicting options, open file and load each input with parser, error if any cannot be loaded correctly
+    if(success == true)
+    {
+        if(theInputParser.loadLoaderFunctionData() == false)
+        {
+            printf("problem loading multiple line data inputs!\n");
+            success = false;
+        }
+        // transfer final data back before doing any printing or whatever
+        transferVariableInfo(); // don't be caught off gaurd, runs theInputParser.loadAllInputs if success is true, if that succeeds runs transferVariableInfo
         // comment this out unless debugging
         printFoundInput();
     }

@@ -20,6 +20,7 @@ public:
 
     // set value functions
     bool add_createIgnitionLatLongValue(double newLat_CoordValue, double newLong_CoordValue);
+    bool add_createIgnitionLatLongValue_Line(std::string inputDataLine);
 
     // get value functions
     std::vector<lat_longValue> get_storedCreateIgnitionLatLongValues();

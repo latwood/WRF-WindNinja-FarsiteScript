@@ -672,9 +672,19 @@ bool inputVariables_valueStorage::add_createIgnitionLatLongValue(double newLat_C
     return stored_create_ignition_from_latlongs.add_createIgnitionLatLongValue(newLat_CoordValue,newLong_CoordValue);
 }
 
+bool inputVariables_valueStorage::add_createIgnitionLatLongValue_Line(std::string inputDataLine)
+{
+    return stored_create_ignition_from_latlongs.add_createIgnitionLatLongValue_Line(inputDataLine);
+}
+
 bool inputVariables_valueStorage::add_polygonIgnitShapeFile(std::string new_polygon_ignit_shape_file)
 {
     return stored_polygon_ignit_shape_files.add_polygonIgnitShapeFile(new_polygon_ignit_shape_file);
+}
+
+bool inputVariables_valueStorage::add_polygonIgnitShapeFile_Line(std::string inputDataLine)
+{
+    return stored_polygon_ignit_shape_files.add_polygonIgnitShapeFile_Line(inputDataLine);
 }
 
 bool inputVariables_valueStorage::add_GeoMACfirePerimeterFile(std::string new_GeoMAC_fire_perimeter_file)
@@ -682,14 +692,29 @@ bool inputVariables_valueStorage::add_GeoMACfirePerimeterFile(std::string new_Ge
     return stored_GeoMAC_fire_perimeter_files.add_GeoMACfirePerimeterFile(new_GeoMAC_fire_perimeter_file);
 }
 
+bool inputVariables_valueStorage::add_GeoMACfirePerimeterFile_Line(std::string inputDataLine)
+{
+    return stored_GeoMAC_fire_perimeter_files.add_GeoMACfirePerimeterFile_Line(inputDataLine);
+}
+
 bool inputVariables_valueStorage::add_farsiteOutputFirePerimeterFile(std::string new_farsite_output_fire_perimeter_file)
 {
     return stored_farsite_output_fire_perimeter_files.add_farsiteOutputFirePerimeterFile(new_farsite_output_fire_perimeter_file);
 }
 
+bool inputVariables_valueStorage::add_farsiteOutputFirePerimeterFile_Line(std::string inputDataLine)
+{
+    return stored_farsite_output_fire_perimeter_files.add_farsiteOutputFirePerimeterFile_Line(inputDataLine);
+}
+
 bool inputVariables_valueStorage::add_wrfFile(std::string new_wrf_file)
 {
     return stored_wrf_files.add_wrfFile(new_wrf_file);
+}
+
+bool inputVariables_valueStorage::add_wrfFile_Line(std::string inputDataLine)
+{
+    return stored_wrf_files.add_wrfFile_Line(inputDataLine);
 }
 
 bool inputVariables_valueStorage::add_additionalWindNinjaOutputs_googleValueSet(std::string new_wrf_file_name, bool new_write_wx_model_goog_output, bool new_write_goog_output, double new_goog_out_resolution,
@@ -700,11 +725,21 @@ bool inputVariables_valueStorage::add_additionalWindNinjaOutputs_googleValueSet(
                                                                                              new_goog_out_vector_scaling);
 }
 
+bool inputVariables_valueStorage::add_additionalWindNinjaOutputs_googleValue_Line(std::string inputDataLine)
+{
+    return stored_additional_WindNinja_Outputs_google.add_additionalWindNinjaOutputs_googleValue_Line(inputDataLine);
+}
+
 bool inputVariables_valueStorage::add_additionalWindNinjaOutputs_shapefileValueSet(std::string new_wrf_file_name, bool new_write_wx_model_shapefile_output, bool new_write_shapefile_output,
                                                       double new_shape_out_resolution, std::string new_units_shape_out_resolution)
 {
     return stored_additional_WindNinja_Outputs_shapefile.add_additionalWindNinjaOutputs_shapefileValueSet(new_wrf_file_name,new_write_wx_model_shapefile_output,
                                                                                                    new_write_shapefile_output,new_shape_out_resolution,new_units_shape_out_resolution);
+}
+
+bool inputVariables_valueStorage::add_additionalWindNinjaOutputs_shapeValue_Line(std::string inputDataLine)
+{
+    return stored_additional_WindNinja_Outputs_shapefile.add_additionalWindNinjaOutputs_shapeValue_Line(inputDataLine);
 }
 
 bool inputVariables_valueStorage::add_additionalWindNinjaOutputs_pdfValueSet(std::string new_wrf_file_name, bool new_write_pdf_output, double new_pdf_out_resolution, std::string new_units_pdf_out_resolution,
@@ -713,6 +748,11 @@ bool inputVariables_valueStorage::add_additionalWindNinjaOutputs_pdfValueSet(std
     return stored_additional_WindNinja_Outputs_pdf.add_additionalWindNinjaOutputs_pdfValueSet(new_wrf_file_name,new_write_pdf_output,new_pdf_out_resolution,
                                                                                        new_units_pdf_out_resolution,new_pdf_linewidth,new_pdf_basemap,new_pdf_height,
                                                                                        new_pdf_width,new_pdf_size);
+}
+
+bool inputVariables_valueStorage::add_additionalWindNinjaOutputs_pdfValue_Line(std::string inputDataLine)
+{
+    return stored_additional_WindNinja_Outputs_pdf.add_additionalWindNinjaOutputs_pdfValue_Line(inputDataLine);
 }
 /*** end load function stuff for count type variables ***/
 

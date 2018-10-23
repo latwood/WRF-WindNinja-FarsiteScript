@@ -67,16 +67,24 @@ public:
 
     // load function stuff for count type variables
     bool add_createIgnitionLatLongValue(double newLat_CoordValue, double newLong_CoordValue);
+    bool add_createIgnitionLatLongValue_Line(std::string inputDataLine);
     bool add_polygonIgnitShapeFile(std::string new_polygon_ignit_shape_file);
+    bool add_polygonIgnitShapeFile_Line(std::string inputDataLine);
     bool add_GeoMACfirePerimeterFile(std::string new_GeoMAC_fire_perimeter_file);
+    bool add_GeoMACfirePerimeterFile_Line(std::string inputDataLine);
     bool add_farsiteOutputFirePerimeterFile(std::string new_farsite_output_fire_perimeter_file);
+    bool add_farsiteOutputFirePerimeterFile_Line(std::string inputDataLine);
     bool add_wrfFile(std::string new_wrf_file);
+    bool add_wrfFile_Line(std::string inputDataLine);
     bool add_additionalWindNinjaOutputs_googleValueSet(std::string new_wrf_file_name, bool new_write_wx_model_goog_output, bool new_write_goog_output, double new_goog_out_resolution,
                                                        std::string new_units_goog_out_resolution, std::string new_goog_out_color_scheme, bool new_goog_out_vector_scaling);
+    bool add_additionalWindNinjaOutputs_googleValue_Line(std::string inputDataLine);
     bool add_additionalWindNinjaOutputs_shapefileValueSet(std::string new_wrf_file_name, bool new_write_wx_model_shapefile_output, bool new_write_shapefile_output,
                                                           double new_shape_out_resolution, std::string new_units_shape_out_resolution);
+    bool add_additionalWindNinjaOutputs_shapeValue_Line(std::string inputDataLine);
     bool add_additionalWindNinjaOutputs_pdfValueSet(std::string new_wrf_file_name, bool new_write_pdf_output, double new_pdf_out_resolution, std::string new_units_pdf_out_resolution,
                                                         double new_pdf_linewidth, std::string new_pdf_basemap, double new_pdf_height, double new_pdf_width, std::string new_pdf_size);
+    bool add_additionalWindNinjaOutputs_pdfValue_Line(std::string inputDataLine);
 
 
     // get variable value functions for single values

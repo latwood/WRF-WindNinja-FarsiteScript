@@ -19,6 +19,7 @@ public:
 
     // set value functions
     bool add_farsiteOutputFirePerimeterFile(std::string new_farsite_output_fire_perimeter_file);
+    bool add_farsiteOutputFirePerimeterFile_Line(std::string inputDataLine);
 
     // get value functions
     std::vector<shapeFileValue> get_storedFarsiteOutputFirePerimeterFiles();

@@ -23,6 +23,7 @@ public:
     // set value functions
     bool add_additionalWindNinjaOutputs_pdfValueSet(std::string new_wrf_file_name, bool new_write_pdf_output, double new_pdf_out_resolution, std::string new_units_pdf_out_resolution,
                                                         double new_pdf_linewidth, std::string new_pdf_basemap, double new_pdf_height, double new_pdf_width, std::string new_pdf_size);
+    bool add_additionalWindNinjaOutputs_pdfValue_Line(std::string inputDataLine);
 
     // get value functions
     std::vector<std::string> get_stored_wrfFileNames();

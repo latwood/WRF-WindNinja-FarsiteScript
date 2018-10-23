@@ -22,6 +22,7 @@ public:
     // set value functions
     bool add_additionalWindNinjaOutputs_googleValueSet(std::string new_wrf_file_name, bool new_write_wx_model_goog_output, bool new_write_goog_output, double new_goog_out_resolution,
                                                        std::string new_units_goog_out_resolution, std::string new_goog_out_color_scheme, bool new_goog_out_vector_scaling);
+    bool add_additionalWindNinjaOutputs_googleValue_Line(std::string inputDataLine);
 
     // get value functions
     std::vector<std::string> get_stored_wrfFileNames();

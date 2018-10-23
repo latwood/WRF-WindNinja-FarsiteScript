@@ -23,6 +23,7 @@ public:
     // set value functions
     bool add_additionalWindNinjaOutputs_shapefileValueSet(std::string new_wrf_file_name, bool new_write_wx_model_shapefile_output, bool new_write_shapefile_output,
                                                           double new_shape_out_resolution, std::string new_units_shape_out_resolution);
+    bool add_additionalWindNinjaOutputs_shapeValue_Line(std::string inputDataLine);
 
     // get value functions
     std::vector<std::string> get_stored_wrfFileNames();

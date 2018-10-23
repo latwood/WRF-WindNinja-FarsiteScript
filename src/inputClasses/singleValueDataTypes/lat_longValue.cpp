@@ -168,11 +168,19 @@ bool lat_longValue::strToLat_Long_Point(std::string inputString, double &current
             startValueSpot = charIdx;
             isValue = true;
         }
-        if(charIdx == inputString.length() && isValue == true)
+        if(charIdx == inputString.length()-1 && isValue == true)
         {
             foundValues.push_back(inputString.substr(startValueSpot,charIdx-startValueSpot));
         }
     }
+
+    /*
+    printf("found values are:");
+    for(size_t valIdx = 0; valIdx < foundValues.size(); valIdx++)
+    {
+        printf(" \"%s\"",foundValues[valIdx].c_str());
+    }
+    printf("\n\n");*/
 
     if(foundValues.size() < 2)
     {

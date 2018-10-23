@@ -32,6 +32,60 @@ bool wrfFileStorage::add_wrfFile(std::string new_wrf_file)
     // if it reaches here, it worked correctly
     return true;
 }
+
+bool wrfFileStorage::add_wrfFile_Line(std::string inputDataLine)
+{
+    bool success = true;
+
+    // first parse through the line to separate all the values as strings
+    bool isValue = true;
+    std::vector<std::string> foundValues;
+    size_t startValueSpot = 0;
+    for(size_t charIdx = 0; charIdx < inputDataLine.length(); charIdx++)
+    {
+        std::string currentChr = inputDataLine.substr(charIdx,1);
+        if(currentChr == " " && isValue == true)
+        {
+            foundValues.push_back(inputDataLine.substr(startValueSpot,charIdx-startValueSpot));
+            isValue = false;
+        }
+        if(currentChr != " " && isValue == false)
+        {
+            startValueSpot = charIdx;
+            isValue = true;
+        }
+        if(charIdx == inputDataLine.length()-1 && isValue == true)
+        {
+            foundValues.push_back(inputDataLine.substr(startValueSpot,charIdx-startValueSpot+1));
+        }
+    }
+
+    /*printf("found values are:");
+    for(size_t valIdx = 0; valIdx < foundValues.size(); valIdx++)
+    {
+        printf(" \"%s\"",foundValues[valIdx].c_str());
+    }
+    printf("\n\n");*/
+
+    // found the right number of values?
+    if(foundValues.size() != 1)
+    {
+        printf("not enough values found in wrfFiles!\n");
+        success = false;
+    } else  // attempt to store the values
+    {
+        wrfFileValue new_wrfFileValue("");
+        if(new_wrfFileValue.set_storedWrfFileName(foundValues[0]) == false)
+        {
+            printf("couldn't set wrf filename \"%s\" to variable \"%s\"!\n",foundValues[0].c_str(),"wrfFiles");
+        } else
+        {
+            storedWrfFiles.push_back(new_wrfFileValue);
+        }
+    }
+
+    return success;
+}
 /*** end set value functions ***/
 
 /*** get value functions ***/

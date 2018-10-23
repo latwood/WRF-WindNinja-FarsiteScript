@@ -19,6 +19,7 @@ public:
 
     // set value functions
     bool add_GeoMACfirePerimeterFile(std::string new_GeoMAC_fire_perimeter_file);
+    bool add_GeoMACfirePerimeterFile_Line(std::string inputDataLine);
 
     // get value functions
     std::vector<shapeFileValue> get_storedGeoMACfirePerimeterFiles();
