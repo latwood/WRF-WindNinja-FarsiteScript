@@ -1,0 +1,8 @@
+The basic idea of this script is that running /include/build_depsh.sh downloads, unpacks, and builds all required libraries and required separate applications, writes a required cmake file to update the paths to all these dependencies, and builds the WRF-WindNinja_FarsiteScript, putting the executable in the bin/ directory. Then you run the script from the command line without a proper input file to get help on what is required in the input file, then run the script from the command line with a path to the required input file to run the script.
+
+If there is anything wrong with the inputs, the input parser should catch the problem and warn if input data is off or more is required. The script also has error checking to stop at any point that it runs into trouble, so if you have problems without getting understandable errors, somehow you've caused an edge case where the programmers need to add some more error checking.
+
+If there is anything wrong with running build_depsh.sh, it should stop and warn where in the process an error has occured so you can go into the file and edit the download source links or any other required unpacked filenames that might have changed. Running build_depsh.sh multiple times should warn if different files are already found so it avoids redoing steps in the process unless you delete files.
+
+If you have any trouble using this script or have any suggestions, email the original developer, Loren Atwood, at pianotocador@gmail.com
+

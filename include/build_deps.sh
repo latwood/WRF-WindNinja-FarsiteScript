@@ -1,5 +1,8 @@
 #!/bin/bash
 
+### the basic idea of this script is that you set the versions and link names for downloading the dependencies, set the directory locations and other stuff as needed for other packages that need built, then you just run this script and it will download and build all 3rd library packages and extra applications used by this script. It will also create a config/cmake file with the paths so that at the end of this script, an attempt to build the program is made using all these extra applications and libraries. If there are any problems found in any of the process, errors will be given so you can pinpoint what paths or variables set at the beginning of the script need changed. Warnings are given if certain steps aren't built in case they already exist, in which case you can decide to keep what you have or delete and retry certain steps, so if the process is interrupted, you can avoid rebuilding everything each time.
+### in order to get the paths correct for the final script build, it turns out you don't need to edit the .bashrc file to add exports to the LD_LIBRARY_PATH for each new path, or even export the paths in such a way in the middle of the process. Instead a config/cmake file is written from scratch with the new paths as found when building everything, so if you need to edit the way that file is made, that stuff isn't specified at the beginning of the script like all the other variables.
+
 echo "" # want a nice clean line
 echo "running build_depsh.sh script"
 echo "running sudo -v so all future sudo commands shouldn't pause the process to ask for a password. Unfortunately the script is sometimes time consuming enough that the section for building WindNinja still asks for a password."
@@ -8,6 +11,9 @@ echo "" # want a nice clean line
 
 # setup base directory variables
 baseDir=$(pwd)
+finalScriptDir=$baseDir"/.."   # this should be the case
+finalBuildDir=$finalScriptDir"/build"
+configCmakeFile=$finalScriptDir"/config/default.cmake"
 extraLibsDir=$baseDir"/extraLibs"
 extraAppsDir=$baseDir"/extraApps"
 
@@ -187,10 +193,10 @@ setupDownloadableLib()
 #  echo "libConfigure = "$libConfigure
 #  echo "" # want a nice clean line
 
+  echo "" # want a nice clean line
   echo "checking for "$libDirName
 
   if [ ! -f "${libTarDir}" ]; then
-    echo "" # want a nice clean line
     echo "downloading zlib from "$libSource
     cd $extraLibsDir
     wget ${libLink}
@@ -203,7 +209,6 @@ setupDownloadableLib()
   fi
 
   if [ ! -d "${libDir}" ]; then
-    echo "" # extra clean line
     echo "unpacking "$libTarDir
     tar -xzf $libTarDir
     if [ ! -d "${libTarDirName}" ]; then
@@ -223,13 +228,11 @@ setupDownloadableLib()
   fi
 
   if [ ! -d "${libBuildDir}" ]; then
-    echo "" # extra clean line
     echo "running configure "$libConfigure
     cd $libDir
     export CPPFLAGS=$libCPPFLAGS
     export LDFLAGS=$libLDFLAGS
     ${libConfigure}  # run the passed in configure command
-    echo "" # add a nice clean line
     echo "building "$libDirName
     make && make install
     if [ ! -d "${libBuildDir}" ]; then
@@ -316,8 +319,9 @@ fi
 
 ## now check for WindNinja and download if needed
 if [ $success == 0 ]; then
+  echo "" # want a nice clean line
+  echo "checking for WindNinja"
   if [ ! -d "${windninjaDir}" ]; then
-    echo "" # want a nice clean line
     echo "downloading WindNinja from "$windninjaSource
     cd $extraAppsDir
     git clone $windninjaLink
@@ -331,16 +335,18 @@ if [ $success == 0 ]; then
 fi
 
 if [ $success == 0 ]; then
-  echo "" # want a nice clean line
-  echo "building WindNinja 3rd party libs"
-  cd $windninjaScriptsDir
-  ./build_deps.sh
-  cd $windninjaDir
+  if [ ! -d "${windninjaBuildDir}" ]; then
+    echo "building WindNinja 3rd party libs"
+    cd $windninjaScriptsDir
+    ./build_deps.sh
+    cd $windninjaDir
+  else
+    echo "!warning, "$windninjaBuildDir" already exists so build_deps.sh for WindNinja should already have been done. Not running build_deps.sh for WindNinja!"
+  fi
 fi
 
 if [ $success == 0 ]; then
   if [ ! -d "${windninjaBuildDir}" ]; then
-    echo "" # want a nice clean line
     echo "creating WindNinja build dir "$windninjaBuildDir
     cd $windninjaDir
     mkdir $windninjaBuildDir
@@ -355,26 +361,29 @@ if [ $success == 0 ]; then
 fi
 
 if [ $success == 0 ]; then
-  echo "" # want a nice clean line
-  echo "building WindNinja"
-  cd $windninjaBuildDir
-  cmake ..
-  echo "" # want a nice clean line
-  make -j4
-  success=$? # result of last action, 0 if good, 1 if failed
-  cd $extraAppsDir
-  if [ $success == 0 ]; then
-    echo "finished building WindNinja"
+  if [ ! -f "${windninjaBuildDir}/src/cli/WindNinja_cli" ]; then
+    echo "building WindNinja"
+    cd $windninjaBuildDir
+    cmake ..
+    make -j4
+    success=$? # result of last action, 0 if good, 1 if failed
+    cd $extraAppsDir
+    if [ $success == 0 ]; then
+      echo "finished building WindNinja"
+    else
+      echo "!!!failed to build WindNinja!!!"
+    fi
   else
-    echo "!!!failed to build WindNinja!!!"
+    echo "!warning, WindNinja executable "${windninjaBuildDir}"/src/cli/WindNinja_cli already exits. Not running cmake or make on WindNinja!"
   fi
 fi
 
 
 ## now check for farsite and download if needed
 if [ $success == 0 ]; then
+  echo "" # want a nice clean line
+  echo "checking for farsite"
   if [ ! -d "${farsiteDir}" ]; then
-    echo "" # want a nice clean line
     echo "downloading farsite from "$farsiteSource
     cd $extraAppsDir
     git clone $farsiteLink
@@ -388,45 +397,136 @@ if [ $success == 0 ]; then
 fi
 
 if [ $success == 0 ]; then
-  echo "" # want a nice clean line
-  echo "building farsite"
-  cd $farsiteSrcDir
-  make
-  success=$? # result of last action, 0 if good, 1 if failed
-  cd $extraAppsDir
-  if [ $success == 0]; then
-    echo "finished building farsite"
+  if [ ! -f "${farsiteSrcDir}/TestFARSITE" ]; then
+    echo "building farsite"
+    cd $farsiteSrcDir
+    make
+    success=$? # result of last action, 0 if good, 1 if failed
+    cd $extraAppsDir
+    if [ $success == 0 ]; then
+      echo "finished building farsite"
+    else
+      echo "!!!failed to build farsite!!!"
+    fi
   else
-    echo "!!!failed to build farsite!!!"
+    echo "!warning, farsite executable "${farsiteSrcDir}"/TestFARSITE already exits. Not running make on farsite!"
   fi
 fi
 
 
+## now write default-cmake file for script to grab the right libraries
+if [ $success == 0 ]; then
+  echo "" # want a nice clean line
+  echo "checking for config cmake file"
+  if [ ! -f "${configCmakeFile}" ]; then
+    echo "writing config cmake file "$configCmakeFile
+    
+    echo "" > $configCmakeFile # first one needs to start a new file, the rest are for appending
+    echo "set(ENV{CC} cc)" >> $configCmakeFile
+    echo "set(ENV{CXX} g++)" >> $configCmakeFile
+    
+    echo "" >> $configCmakeFile
+    
+    echo "set(USER_CXX_FLAGS \"-std=c++11\")" >> $configCmakeFile
+    echo "set(USER_CXX_FLAGS_RELEASE \"-O3\")" >> $configCmakeFile
+    echo "set(USER_CXX_FLAGS_DEBUG \"-debug -g -check=conversions,stack,uninit -fp-stack-check -fp-trap=common -fp-trap-all=common \")" >> $configCmakeFile
+    
+    echo "" >> $configCmakeFile
+    
+    echo "set(NETCDF_C_INCLUDE_DIR \""$netcdf_cBuildDir"/include/\")" >> $configCmakeFile
+    echo "set(NETCDF_CXX_INCLUDE_DIR \""$netcdf_cxxBuildDir"/include/\")" >> $configCmakeFile
+    echo "set(HDF5_INCLUDE_DIR \""$hdf5BuildDir"/include/\")" >> $configCmakeFile
+    echo "set(SZIP_INCLUDE_DIR \""$szlibBuildDir"/include/\")" >> $configCmakeFile
+    echo "set(ZLIB_INCLUDE_DIR \""$zlibBuildDir"/include/\")" >> $configCmakeFile
+    echo "set(CURL_INCLUDE_DIR \""$curlBuildDir"/include/\")" >> $configCmakeFile
+    echo "set(JASPER_INCLUDE_DIR \""$jasperBuildDir"/include/\")" >> $configCmakeFile
+    echo "set(GDAL_INCLUDE_DIR \""$gdalBuildDir"/include/\")" >> $configCmakeFile
+    
+    echo "" >> $configCmakeFile
+    
+    echo "set(NETCDF_LIB_C \""$netcdf_cBuildDir"/lib/libnetcdf.a\")" >> $configCmakeFile
+    echo "set(NETCDF_LIB_CXX \""$netcdf_cxxBuildDir"/lib/libnetcdf_c++4.so\")" >> $configCmakeFile
+    echo "set(HDF5_LIB_1 \""$hdf5BuildDir"/lib/libhdf5.so\")" >> $configCmakeFile
+    echo "set(HDF5_LIB_2 \""$hdf5BuildDir"/lib/libhdf5_hl.so\")" >> $configCmakeFile
+    echo "set(SZIP_LIB \""$szlibBuildDir"/lib/libsz.a\")" >> $configCmakeFile
+    echo "set(ZLIB_LIB \""$zlibBuildDir"/lib/libz.a\")" >> $configCmakeFile
+    echo "set(CURL_LIB \""$curlBuildDir"/lib/libcurl.so\")" >> $configCmakeFile
+    echo "set(JASPER_LIB \""$jasperBuildDir"/lib/libjasper.so\")" >> $configCmakeFile
+    echo "set(GDAL_LIB \""$gdalBuildDir"/lib/libgdal.so\")" >> $configCmakeFile
+    
+    echo "" >> $configCmakeFile
+    
+    echo "set(LIBS \${NETCDF_LIB_CXX} \${NETCDF_LIB_C} \${HDF5_LIB_2} \${HDF5_LIB_1} \${SZIP_LIB} \${ZLIB_LIB} \${CURL_LIB} \${JASPER_LIB} \${GDAL_LIB} m z)" >> $configCmakeFile
+    echo "set(INCLUDE_DIRS \${NETCDF_C_INCLUDE_DIR} \${NETCDF_CXX_INCLUDE_DIR} \${HDF5_INCLUDE_DIR} \${SZIP_INCLUDE_DIR} \${ZLIB_INCLUDE_DIR} \${CURL_INCLUDE_DIR} \${JASPER_INCLUDE_DIR} \${GDAL_INCLUDE_DIR})" >> $configCmakeFile
+    
+    echo "" >> $configCmakeFile
+    
+    echo "add_definitions(-DRESTRICTKEYWORD=restrict)" >> $configCmakeFile
+    
+    echo "" >> $configCmakeFile
+    echo "" >> $configCmakeFile
+    
+    if [ ! -f "${configCmakeFile}" ]; then
+      echo "!!!failed to write config cmake file "$configCmakeFile"!!!"
+      success=1
+    fi
+  else
+    echo "!warning, config cmake file "$configCmakeFile" already exists, so not writing a new one!"
+  fi
+fi
+
+
+## now attempt final build
+if [ $success == 0 ]; then
+  echo "" # want a nice clean line
+  echo "trying to do final build"
+  if [ ! -d "${finalBuildDir}" ]; then
+    echo "creating final script build directory "$finalBuildDir
+    cd $baseDir
+    mkdir $finalBuildDir
+    if [ ! -d "${finalBuildDir}" ]; then
+      echo "!!!failed to create "$finalBuildDir"!!!"
+      $success=1
+    fi
+  else
+    echo "!warning, "$finalBuildDir" already exists!"
+  fi
+fi
+
+if [ $success == 0 ]; then
+  if [ ! -f "${finalScriptDir}/bin/WRF-WindNinja-FarsiteScript" ]; then
+    echo "building final script"
+    cd $finalBuildDir
+    cmake $finalScriptDir
+    make -j4
+    success=$? # result of last action, 0 if good, 1 if failed
+    cd $baseDir
+    if [ $success == 0 ]; then
+      echo "finished building final script"
+    else
+      echo "!!!failed to build final script!!!"
+    fi
+  else
+    echo "!warning, WRF-WindNinja-FarsiteScript executable "${finalScriptDir}"/bin/WRF-WindNinja-FarsiteScript already exits. Not running make on WRF-WindNinja-FarsiteScript!"
+  fi
+fi
+
+
+echo "" # want a nice clean line
 echo "returning to original directory"
 cd $baseDir
 
 if [ $success == 1 ]; then
+  echo "" # want a fresh clean line
   echo "!!! failed at some point during the build process!!!"
 else
   echo "" # want a fresh clean line
   echo "should have finished downloading and building all dependencies up to this point."
-  echo "" # want a fresh clean line
-  echo " Now you need to add the lib paths to your .bashrc file before you make and run the script. Comment these out if you need to switch libraries for other scripts. You can also run command \"ldd ~/someprogram\" after the build process to make sure the libraries got grabbed correctly."
-  echo "add the following to your .bashrc, where these were found using \"pwd\" during the setup done by this script."
-  echo "" # want a fresh clean line
-
-  echo "export LD_LIBRARY_PATH=\""$zlibBuildDir"/lib/:\$LD_LIBRARY_PATH\""
-  echo "export LD_LIBRARY_PATH=\""$szlibBuildDir"/lib/:\$LD_LIBRARY_PATH\""
-  echo "export LD_LIBRARY_PATH=\""$curlBuildDir"/lib/:\$LD_LIBRARY_PATH\""
-  echo "export LD_LIBRARY_PATH=\""$hdf5BuildDir"/lib/:\$LD_LIBRARY_PATH\""
-  echo "export LD_LIBRARY_PATH=\""$netcdf_cBuildDir"/lib/:\$LD_LIBRARY_PATH\""
-  echo "export LD_LIBRARY_PATH=\""$netcdf_cxxBuildDir"/lib/:\$LD_LIBRARY_PATH\""
-  echo "export LD_LIBRARY_PATH=\""$jasperBuildDir"/lib/:\$LD_LIBRARY_PATH\""
-  echo "export LD_LIBRARY_PATH=\""$gdalBuildDir"/lib/:\$LD_LIBRARY_PATH\""
-  echo "" # want a fresh clean line
-
+  echo "you can check to make sure what library paths were grabbed during the make process for your script by running the command \"ldd ~/script_executable\"."
 fi
 
+
+echo "" # want a fresh clean line
 echo "finished build_depsh.sh script"
 echo "" # want a fresh clean line
 
