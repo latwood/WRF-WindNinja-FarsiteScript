@@ -1,0 +1,222 @@
+### /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/firstRunCougarCreekFire-trimmed-simple.txt
+######################
+######## basic idea here is I need to figure out what inputs are necessary and what format they need to have
+####  So list out all the required and optional inputs and figure out their format and dependencies or if optional, what would need to be checked against
+####    Notice that this doesn't contain all the variables required by each of the applications, as some are assumed to be default values for the automation process
+
+
+### application specific variables
+
+# run_base_name is the base name for all created files, so example run_base_name is cougarCreek, all files will be cougarCreek.lcp cougarCreek_ignit.shp so stuff like this. If use_past_lcp is set, this value will be set to the found base name of the lcp file specified in lcp_file_path
+#run_base_name = cougarCreek
+
+# createInputs_path is the path where files created by createIgnitions, WindNinja, wrfGetWeather, and createFarsiteInputs go. createInputs folder Will contain separate folders for each of these outputs
+createInputs_path = /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire
+
+# finalOutput_path is the path where farsite run outputs will be generated
+finalOutput_path = /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire
+
+# overwrite_past_outputs is a boolean specifying whether the output files found in createdInputs and finalOutputs folders should be overwritten. If these output folders exist in createInputs_path or finalOutputs_path and overwrite_past_outputs is true, folders aren't deleted, just if names are the same they will be overwritten. If overwrite_past_outputs is false and these folders exist, a search for either createInputs-# or finalOutputs-# will determine the highest # value, add one to it, and use that as the new output. Default value is false
+overwrite_past_outputs = true
+
+# createIgnition_output_units is a string specifying the types of units to be used by all files outputted by createIgnitions during the script. Values can be english, metric, or input where input is the default value
+createIgnition_output_units = input
+
+# WindNinja_required_output_units is a string specifying the types of units to be used by all files required for later use outputted by WindNinja during the script. Values can be english or metric where metric is the default value. output_wind_height is 20 ft for english and 10 m for metric
+WindNinja_required_output_units = metric
+
+# wrfGetWeather_output_units is a string specifying the types of units to be used by all files outputted by wrfGetWeather during the script. Values can be english, or metric where metric is the default value
+wrfGetWeather_output_units = english
+
+# farsite_output_units is a string specifying the types of units to be used by all files output by farsite at the very end. I suspect this isn't actually allowable yet, so it might just be whatever units are used coming in, or default to english, but we shall see. Values can be english or metric
+farsite_output_units = metric
+
+# use_native_timezone is a boolean specifying whether the timezone should be native to the area or GMT for all created inputs and final output files. Default is false so that the GMT timezone is used by default
+use_native_timezone = false
+
+
+### lcp download variables (WindNinja related)
+
+## choose only one: automate_lcp_download, use_past_lcp, specify_lcp_download
+# automate_lcp_download is a boolean to know whether the lcp should follow automated features for downloading. fireperim_to_lcp_scalefactor is used to increase the lcp bounding box size by a multiple of the largest ignition fire perimeter. Only one of automate_lcp_download, use_past_lcp, and specify_lcp_download can be true and the default to be true if none are specified is automate_lcp_download
+automate_lcp_download = false
+
+# fireperim_to_lcp_scalefactor is a positive integer y used as a scaling factor for the lcp bounding box to make it x*y bigger than the largest ignition fire perimeter, where x is 200 for ignitions that are basically a single point and 200 for all other ignitions. Default value for y is 1.0 if not specified and should only be specified if automate_lcp_download is set to true
+#fireperim_to_lcp_scalefactor = 1.0
+
+# use_past_lcp is a boolean to know whether lcp downloading should be avoided by using an already predownloaded lcp file. If this is true, need to also specify lcp_file_path. Only one of automate_lcp_download, use_past_lcp, and specify_lcp_download can be true and the default to be true if none are specified is automate_lcp_download
+use_past_lcp = true
+
+# lcp_file_path is a path to a predownloaded lcp file to use instead of downloading a new one. Use if use_past_lcp set to true. File name extension is verified to be .lcp and file is verified to be openable by gdal. Second file with same path and name but .prj extension is also verified to exist. Specify only if use_past_lcp is set to true
+lcp_file_path = /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/cougarCreekFire.lcp
+
+# specify_lcp_download is for doing a WindNinja style lat/long point and buffer zone or lat/long box lcp download. If this is true, need to specify all the following: lcp_download_lat_long_point, lcp_download_northsouth_buffer, lcp_download_westeast_buffer, lcp_download_buffer_units OR lcp_download_north_lat_bound, lcp_download_south_lat_bound, lcp_download_east_long_bound, lcp_download_west_long_bound. Only one of automate_lcp_download, use_past_lcp, and specify_lcp_download can be true and the default to be true if none are specified is automate_lcp_download
+specify_lcp_download = false
+
+# lcp_download_lat_long_point is a lat long point of format (lat long) and is the center point of a box used for lcp downloading in WindNinja. Specify only if use_past_lcp is set to true, with conditions as explained for that variable
+#lcp_download_lat_long_point = 46.134 -121.374
+
+# lcp_download_northsouth_buffer is half the height of the box with lcp_download_lat_long_point as the center of the box. Specify only if use_past_lcp is set to true, with conditions as explained for that variable
+#lcp_download_northsouth_buffer = 15.000
+
+# lcp_download_westeast_buffer is half the width of the box with lcp_download_lat_long_point as the center of the box. Specify only if use_past_lcp is set to true, with conditions as explained for that variable
+#lcp_download_westeast_buffer = 15.000
+
+# lcp_download_buffer_units is the units of the buffer box width and height. Can be kilometers or miles. Specify only if use_past_lcp is set to true, with conditions as explained for that variable
+#lcp_download_buffer_units = kilometers
+
+# lcp_download_north_lat_bound is the north latitude coordinate for an lcp download of a box with no center. Is a decimal point value. Specify only if use_past_lcp is set to true, with conditions as explained for that variable
+#lcp_download_north_lat_bound = 46.334
+
+# lcp_download_south_lat_bound is the south latitude coordinate for an lcp download of a box with no center. Is a decimal point value. Specify only if use_past_lcp is set to true, with conditions as explained for that variable. Checks to make sure is less than lcp_download_north_lat_bound
+#lcp_download_south_lat_bound = 45.934
+
+# lcp_download_east_long_bound is the east latitude coordinate for an lcp download of a box with no center. Is a decimal point value. Specify only if use_past_lcp is set to true, with conditions as explained for that variable. Checks to make sure is less than lcp_download_west_long_bound
+#lcp_download_east_long_bound = -121.074
+
+# lcp_download_west_long_bound is the west latitude coordinate for an lcp download of a box with no center. Is a decimal point value. Specify only if use_past_lcp is set to true, with conditions as explained for that variable
+#lcp_download_west_long_bound = -121.674
+
+
+### createIgnition variables
+## four types of ignitions possible, can choose as many of them as desired but at least one has to be specified
+
+# create_ignition_from_latlongs consists of a list of lat long locations from which a single ignition file will be created of format (lat long). Need at least one of create_ignition_from_latlongs, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, or farsite_output_fire_perimeter_files ignition types to run
+create_ignition_from_latlongs = 1
+46.134 -121.374
+
+# polygon_ignit_shape_files consists of a list of precreated ignition shape files (so can be past ones created of any other type). Format of ignition shape files are still checked. Checked to make sure file extension is .shp and that file can be read by ogr/gdal. Need at least one of create_ignition_from_latlongs, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, or farsite_output_fire_perimeter_files ignition types to run
+polygon_ignit_shape_files = 1
+/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/7a-cougarCreek-polygonIgnit.shp
+
+# GeoMAC_fire_perimeter_files consists of a list of GeoMAC fire perimeters to be used as input ignitions. New versions of these files are created that are in the necessary projection coordinates as the original files will not work in Farsite without preprocessing. Files are checked to make sure file extension is .shp and that files can be read by ogr/gdal. Need at least one of create_ignition_from_latlongs, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, or farsite_output_fire_perimeter_files ignition types to run
+GeoMAC_fire_perimeter_files = 2
+/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/day1-wa_cougar_creek_20150811_2300_dd83/wa_cougar_creek_20150811_2300_dd83.shp
+/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/day10-wa_cougar_creek_20150815_2300_dd83/wa_cougar_creek_20150815_2300_dd83.shp
+
+# farsite_output_fire_perimeter_files consists of a list of past farsite run output fire perimeter files to use as ignitions for a new farsite run. These cannot be read by the current version of farsite, so new versions of these files are created by grabbing all fires that occur at the last output fire perimeter date/time. The new date/time for these fire perimeters is assumed to be the burn_start_time value. Files are checked to make sure file extension is .shp and that files can be read by ogr/gdal. Need at least one of create_ignition_from_latlongs, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, or farsite_output_fire_perimeter_files ignition types to run
+farsite_output_fire_perimeter_files = 4
+/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/11a-cougarCreekFire_Perimeters.shp
+/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/13a-cougarCreek-pointIgnit-perimeters-firelaborg.shp
+/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/17a-cougarCreek-polygonIgnit-perimeters-firelaborg.shp
+/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/19a-cougarCreek-3polygonIgnit-perimeters-firelaborg.shp
+
+# fire_perimeter_widening_factor is an integer used to shrink or expand fire perimeters of all created ignition files by multiplying each point in the geometry by this integer. Defaults to a value of 1.0 unless specified. May need to make this specific to each ignition file if needed long term. Or can get rid of and if any perimeter is less than say 30 m, just stretch it to that size as that is the default farsite distance res
+fire_perimeter_widening_factor = 1.0
+
+
+### wrfGetWeather and WindNinja variables
+
+# extend_wrf_data is a boolean telling the application whether it should duplicate the wrf data acquired from the earliest and latest wrf files to extend wind and weather data to the required start and end times for the simulation. But only to a maximum of 24 hours each way. Hm, should this be a days worth of data instead of a single data to extend? Need more thought to do something like that
+extend_wrf_data = true
+
+# wrf_files consists of a list of paths to each of the WRF files used as wind and weather start points for the application. Internal WRF file times will be checked to make sure they are sorted by date and hour, where they begin 24 hrs before burn_start_time and end at burn_end_time. So if burn_start_time is 08 11 2015, 12:00 and burn_end_time is 08 13 2015, 12:00 then the first WRF file should be for 08 10 2015, 12:00 and the last WRF file should be for 08 13 2015, 12:00. This comes out to be 72 WRF files. Files are assumed to be of timezone UTZ so GMT. If extend_wrf_date is set to true, then the wrf data acquired from the earliest wrf file will be duplicated to fill to the needed start time and the same goes for the latest wrf file data duplicated to fill to the needed end time
+wrf_files = 2
+/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/firstRunCougarCreekFire-trimmed/wrfout_d3.2015081000.f12.0000-trimmed
+/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/firstRunCougarCreekFire-trimmed/wrfout_d3.2015081000.f13.0000-trimmed
+
+
+
+### WindNinja only variables
+
+# WindNinja_number_of_threads is the number of threads to use for WindNinja simulations. If you specify a greater number than exist, will use max. Default is 8
+WindNinja_number_of_threads = 8
+
+## use only one: WindNinja_mesh_choice, WindNinja_mesh_resolution.
+# WindNinja_mesh_choice is a string specifying the type of WindNinja mesh desired for all simulations. Choices are coarse, medium, fine, or custom. Default is fine if WindNinja_mesh_choice is not specified
+WindNinja_mesh_choice = fine
+
+# WindNinja_mesh_resolution is a positive double value specifying the exact desired mesh resolution. Only specify this is WindNinja_mesh_choice has a value of custom. Warning! If this is a lot smaller than what is selected by WindNinja_mesh_choice of fine, could make simulations take a TON longer
+#WindNinja_mesh_resolution = 90
+
+# WindNinja_mesh_res_units is a string specifying the units of WindNinja_mesh_resolution and has to be either ft or m. Default is m if WindNinja_mesh_resolution is specified but this is not
+#WindNinja_mesh_res_units = m
+
+# diurnal_winds is a boolean used to know whether WindNinja should be run with the diurnal wind thermal parameter. Default value is false
+diurnal_winds = true
+
+# non_neutral_stability is a boolean used to know whether WindNinja should be run with the stability thermal parameter. Default value is false
+non_neutral_stability = true
+
+
+### wrfGetWeather only variables
+
+## choose only one: use_weather_from_ignition_center, use_weather_from_full_ignition_area, use_weather_from_wrf_center
+# use_weather_from_ignition_center is a boolean to know whether weather data should be pulled from the WRF files by using the average of all ignition centers
+#weather_from_ignition_center = false
+
+# use_weather_from_full_ignition_area is a boolean to know whether weather data should be pulled from the WRF files by using the average of all points in the ignition perimeters
+use_weather_from_full_ignition_area = false
+
+# use_weather_from_wrf_center is a boolean to know whether weather data should be pulled from the WRF files by using the center of the WRF file and is the initially preferred method of the three options
+use_weather_from_wrf_center = true
+
+
+### farsiteAPI variables
+# cougar creek case was actually 08 11 2015, 01:00 gmt to 08 13 2015, 01:00 but I don't have those WRF files
+
+## funny thing with WindNinja, converts what looks to be 08/10/2015 00:00 hrs to 12:00 hrs! So going to do less time to make sure it still works
+# burn_start_time needs to be a single date of format (month day year hour:minute). hour:minute goes from 00:00 to 23:59
+burn_start_time = 08 11 2015 13:00
+
+# burn_end_time needs to be a single date of format (month day year hour:minute). hour:minute goes from 00:00 to 23:59. Will be checked to make sure it is after burn_start_time
+burn_end_time = 08 13 2015 12:00
+
+# farsite_barrier_shapefile is a path to a barrier file to use with each farsite run. Is an optional input. Checks to make sure file has .shp extension and is openable by ogr/gdal
+#farsite_barrier_shapefile = /home/atw09001/Documents/windninjaPanther/test1177973/currentInput/test1177973_NTFBBarrier.shp
+
+# farsite_distance_res and farsite_perimeter_res will be 60 meters and 30 meters for now with farsite_min_ignition_vertex_distance and farsite_spot_grid_resolution as half the farsite_perimeter_res with farsite_minimum_spot_distance the same value as farsite_perimeter_res
+
+# farsite_time_step will be 60 minutes for now, and is dependent on the wrf files
+
+# farsite_spot_probability is a percentage given with the % sign missing. The default value is 0.05 so 0.05%
+farsite_spot_probability = 0.05
+
+# farsite_spot_ignition_delay is a time in minutes to give a short time delay to when spotting calculations occur. Default value is 0
+farsite_spot_ignition_delay = 0
+
+# farsite_spotting_seed is a tally number for the assumed starting possible number of spotting embers to be generated at a given time. The default value is 1000
+farsite_spotting_seed = 1000
+
+# farsite_earliest_burn_time is a time used for setting the farsite_burn_periods, so the earliest time during a day that fires can burn. Format is (hour:minute) which can range from 00:00 to 23:59. The default value is 08:00
+farsite_earliest_burn_time = 08:00
+
+# farsite_latest_burn_time is a time used for setting the farsite_burn_periods, so the latest time during a day that fires can burn. This is usually set with the assumption that fires don't burn well at night. Format is (hour:minute) which can range from 00:00 to 23:59. The default value is 19:59
+farsite_latest_burn_time = 18:00
+
+# farsite_foliar_moisture_content is a percentage given with the % sign missing. The default value is 70 so 70%. Can play a large role in crown fire spread
+farsite_foliar_moisture_content = 70
+
+# farsite_crown_fire_method is a string specifying the crown fire method used in farsite. Options are Finney or Reinhart where Finney is the default if farsite_crown_fire_method is not specified
+farsite_crown_fire_method = Finney
+
+
+### debugging related variables
+
+# report_largest_ignition_bounds is a boolean that specifies whether to output the lat_long bounding box that contains the smallest and largest lat long coordinates that have ignitions in them. May not be used as an optional debugging statement, probably just output it as looking through the different ignition locations. Fun, have to do ignitions before and after the lcp download lol
+report_largest_ignition_bounds = true       
+
+# report_found_inputs is a boolean that specifies whether to output what the input file is seen to be by the code. Defaults to false if not specified
+report_found_inputs = true
+
+
+### optional WindNinja output settings, may not even add these options
+
+# additional_WindNinja_outputs_google is a list specifying all runs that want additional google output files written by using wrf_files. Format is (wrf_file_name write_wx_model_goog_output write_goog_output goog_out_resolution units_goog_out_resolution goog_out_color_scheme goog_out_vector_scaling) where you can see what each of these mean looking at WindNinja help. The default for any wrf_file_names not specified is everything needed to disallow these outputs, so can piecemeal choose to have these additional outputs for separate WindNinja runs. Checked to make sure each specified wrf_file exists in list of wrf_files. Warning! If even a few of these are to be outputted, will make simulations take a TON longer, especially the wx_file_outputs
+#additional_WindNinja_outputs_google = 1
+#wrfout_d3.2015080912.f12.0000 true true -1 m default false
+
+# additional_WindNinja_outputs_shapefile is a list specifying all runs that want additional shapefile output files written by using wrf_files. Format is (wrf_file_name write_wx_model_shapefile_output write_shapefile_output shape_out_resolution units_shape_out_resolution) where you can see what each of these mean looking at WindNinja help. The default for any wrf_file_names not specified is everything needed to disallow these outputs, so can piecemeal choose to have these additional outputs for separate WindNinja runs. Checked to make sure each specified wrf_file exists in list of wrf_files. Warning! If even a few of these are to be outputted, will make simulations take a TON longer, especially the wx_file_outputs
+#additional_WindNinja_outputs_shapefile = 1
+#wrfout_d3.2015080912.f12.0000 true true -1 m
+
+## all the ascii fire behavior files will be output as these are required output
+
+# additional_WindNinja_outputs_pdf is a list specifying all runs that want additional shapefile output files written by using wrf_files. Format is (wrf_file_name write_pdf_output pdf_out_resolution units_pdf_out_resolution pdf_linewidth pdf_basemap pdf_height pdf_width pdf_size) where you can see what each of these mean looking at WindNinja help. The default for any wrf_file_names not specified is everything needed to disallow these outputs, so can piecemeal choose to have these additional outputs for separate WindNinja runs. Checked to make sure each specified wrf_file exists in list of wrf_files. Warning! If even a few of these are to be outputted, will make simulations take a TON longer, especially the wx_file_outputs
+#additional_WindNinja_outputs_pdf = 2
+#wrfout_d3.2015080912.f12.0000 true -1 m 1 topofire 800 550 letter
+#wrfout_d3.2015080912.f13.0000 true -1 m 1 topofire 800 550 letter
+
+
+
+
