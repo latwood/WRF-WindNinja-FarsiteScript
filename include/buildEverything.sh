@@ -1,13 +1,8 @@
 #!/bin/bash
 
-### the basic idea of this script is that you set the versions and link names for downloading the dependencies, set the directory locations and other stuff as needed for other packages that need built, then you just run this script and it will download and build all 3rd library packages and extra applications used by this script. It will also create a config/cmake file with the paths so that at the end of this script, an attempt to build the program is made using all these extra applications and libraries. If there are any problems found in any of the process, errors will be given so you can pinpoint what paths or variables set at the beginning of the script need changed. Warnings are given if certain steps aren't built in case they already exist, in which case you can decide to keep what you have or delete and retry certain steps, so if the process is interrupted, you can avoid rebuilding everything each time.
+### the basic idea of this script is that you set the versions and link names for downloading the dependencies, set the directory locations and other stuff as needed for other packages that need built, then you just run this script and it will download and build all 3rd library packages and extra applications used by this script. It will also create a config/cmake file with the paths, and a .cpp file needed by the code with paths, so that at the end of this script, an attempt to build the program is made using all these extra applications and libraries. If there are any problems found in any of the process, errors will be given so you can pinpoint what paths or variables set at the beginning of the script need changed. Warnings are given if certain steps aren't built in case they already exist, in which case you can decide to keep what you have or delete and retry certain steps, so if the process is interrupted, you can avoid rebuilding everything each time.
 ### in order to get the paths correct for the final script build, it turns out you don't need to edit the .bashrc file to add exports to the LD_LIBRARY_PATH for each new path, or even export the paths in such a way in the middle of the process. Instead a config/cmake file is written from scratch with the new paths as found when building everything, so if you need to edit the way that file is made, that stuff isn't specified at the beginning of the script like all the other variables.
 
-echo "" # want a nice clean line
-echo "running build_depsh.sh script"
-echo "running sudo -v so all future sudo commands shouldn't pause the process to ask for a password. Unfortunately the script is sometimes time consuming enough that the section for building WindNinja still asks for a password."
-sudo -v
-echo "" # want a nice clean line
 
 # setup base directory variables
 baseDir=$(pwd)
@@ -155,7 +150,7 @@ farsiteSrcDir=$farsiteDir"/src"
 
 setupDownloadableLib()
 {
-
+  sudo -v
   if [ "$#" != 12 ]; then
     echo "" # want a nice clean line
     echo "!!!Incorrect Number of parameters for setupDownloadableLib!!!"
@@ -251,26 +246,57 @@ setupDownloadableLib()
 }
 
 
+
+
+
+echo "" # want a nice clean line
+echo "running buildEverything.sh script"
+echo "" # want a nice clean line
+
+
 # setup failing step bool
 success=0  # 1 if failing, 0 if successful
 
 
-### make sure extraLibs and extraApps directories exist, if not, make them
-if [ ! -d "${extraLibsDir}" ]; then
-  echo "creating missing extraLibsDir "$extraLibsDir
-  mkdir ${extraLibsDir}
-  if [ ! -d "${extraLibsDir}" ]; then
-    echo "!!!failed to create extraLibsDir!!!"
+### make sure the current working directory (baseDir) is the same location as the script executable so that everything gets placed in the right spots
+if [ $success == 0 ]; then
+  baseDirParent=$(dirname $baseDir)
+  baseDirName=$(echo "${baseDir}" | sed 's/.*\///')
+  baseDirParentName=$(echo "${baseDirParent}" | sed 's/.*\///')
+  if [ ${baseDirName} != "include" ] && [ ${baseDirParentName} != "WRF-WindNinja-FarsiteScript" ]; then
+    echo "!!!buildEverything.sh is not being run from the location of the executable!!!"
     success=1
   fi
 fi
 
-if [ ! -d "${extraAppsDir}" ]; then
-  echo "creating missing extraLibsDir "$extraAppsDir
-  mkdir ${extraAppsDir}
+
+if [ $success == 0 ]; then
+  echo "running sudo -v so all future sudo commands shouldn't pause the process to ask for a password. Will run sudo -v at different points in the code to try to avoid password tracking timeout in bash, so if the script pauses to ask for passwords again, it means sudo -v wasn't run frequently enough to get bash to keep the password. Unfortunately the script is sometimes time consuming enough that the section for building WindNinja still asks for a password."
+  sudo -v
+  echo "" # want a nice clean line
+fi
+
+
+### make sure extraLibs and extraApps directories exist, if not, make them
+if [ $success == 0 ]; then
+  if [ ! -d "${extraLibsDir}" ]; then
+    echo "creating missing extraLibsDir "$extraLibsDir
+    mkdir ${extraLibsDir}
+    if [ ! -d "${extraLibsDir}" ]; then
+      echo "!!!failed to create extraLibsDir!!!"
+      success=1
+    fi
+  fi
+fi
+
+if [ $success == 0 ]; then
   if [ ! -d "${extraAppsDir}" ]; then
-    echo "!!!failed to create extraAppsDir!!!"
-    success=1
+    echo "creating missing extraLibsDir "$extraAppsDir
+    mkdir ${extraAppsDir}
+    if [ ! -d "${extraAppsDir}" ]; then
+      echo "!!!failed to create extraAppsDir!!!"
+      success=1
+    fi
   fi
 fi
 
@@ -318,6 +344,7 @@ fi
 
 
 ## now check for WindNinja and download if needed
+sudo -v
 if [ $success == 0 ]; then
   echo "" # want a nice clean line
   echo "checking for WindNinja"
@@ -338,7 +365,9 @@ if [ $success == 0 ]; then
   if [ ! -d "${windninjaBuildDir}" ]; then
     echo "building WindNinja 3rd party libs"
     cd $windninjaScriptsDir
+    sudo -v
     ./build_deps.sh
+    sudo -v
     cd $windninjaDir
   else
     echo "!warning, "$windninjaBuildDir" already exists so build_deps.sh for WindNinja should already have been done. Not running build_deps.sh for WindNinja!"
@@ -380,6 +409,7 @@ fi
 
 
 ## now check for farsite and download if needed
+sudo -v
 if [ $success == 0 ]; then
   echo "" # want a nice clean line
   echo "checking for farsite"
