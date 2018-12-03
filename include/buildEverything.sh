@@ -6,11 +6,16 @@
 
 # setup base directory variables
 baseDir=$(pwd)
+utilitiesDir=$baseDir"/../utility_scripts"
 finalScriptDir=$baseDir"/.."   # this should be the case
 finalBuildDir=$finalScriptDir"/build"
 configCmakeFile=$finalScriptDir"/config/default.cmake"
 extraLibsDir=$baseDir"/extraLibs"
 extraAppsDir=$baseDir"/extraApps"
+getWindNinjaPathFile=$baseDir"/../src/getWindNinjaPath.cpp"
+WindNinjaPathLine=6   # this is the line in the file to be replaced with the new path
+getFarsitePathFile=$baseDir"/../src/getFarsitePath.cpp"
+farsitePathLine=6   # this is the line in the file to be replaced with the new path
 
 # setup zlib variables
 zlibVersion="1.2.11"
@@ -407,6 +412,26 @@ if [ $success == 0 ]; then
   fi
 fi
 
+## now edit getWindNinjaPath.cpp file to update the path to the WindNinja directory
+if [ $success == 0 ]; then
+  echo "" # want a nice clean line
+  echo "editing getWindNinjaPath.cpp file to update the path to the WindNinja application"
+  if [ ! -f "${getWindNinjaPathFile}" ]; then
+    echo "!!!getWindNinjaPath.cpp "${getWindNinjaPathFile}" file does not exist!!!"
+    success=1
+  else
+    newLine="\tstd::string WindNinjaPath = \""${windninjaBuildDir}"/src/cli/WindNinja_cli\";"
+    replacement=$(sed 's/\//\\\//g' <<<"$newLine")
+    sed -i "${WindNinjaPathLine}s/.*/${replacement}/" $getWindNinjaPathFile
+    success=$?
+  fi
+  if [ $success == 0 ]; then
+    echo "finished editing getWindNinjaPath.cpp file"
+  else
+    echo "!!!failed to edit getWindNinjaPath.cpp file!!!"
+  fi
+fi
+
 
 ## now check for farsite and download if needed
 sudo -v
@@ -440,6 +465,26 @@ if [ $success == 0 ]; then
     fi
   else
     echo "!warning, farsite executable "${farsiteSrcDir}"/TestFARSITE already exits. Not running make on farsite!"
+  fi
+fi
+
+## now edit getFarsitePath.cpp file to update the path to the farsite directory
+if [ $success == 0 ]; then
+  echo "" # want a nice clean line
+  echo "editing getFarsitePath.cpp file to update the path to the Farsite application"
+  if [ ! -f "${getFarsitePathFile}" ]; then
+    echo "!!!getFarsitePath.cpp "${getFarsitePathFile}" file does not exist!!!"
+    success=1
+  else
+    newLine="\tstd::string farsitePath = \""${farsiteSrcDir}"/TestFARSITE\";"
+    replacement=$(sed 's/\//\\\//g' <<<"$newLine")
+    sed -i "${farsitePathLine}s/.*/${replacement}/" $getFarsitePathFile
+    success=$?
+  fi
+  if [ $success == 0 ]; then
+    echo "finished editing getFarsitePath.cpp file"
+  else
+    echo "!!!failed to edit getFarsitePath.cpp file!!!"
   fi
 fi
 

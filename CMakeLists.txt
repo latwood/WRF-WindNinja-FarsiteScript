@@ -49,6 +49,8 @@ endif()
 #file(GLOB_RECURSE SOURCES "src/*")
 set(SOURCES "src/main.cpp" "src/lcpDownloader.cpp" "src/createIgnitions.cpp" "src/WindNinjaAPI.cpp" "src/wrfGetWeather.cpp" "src/farsiteAPI.cpp"
 
+        "src/getWindNinjaPath.cpp" "src/getFarsitePath.cpp"
+
 	"src/inputClasses/inputVariablesHandler.cpp" "src/inputClasses/inputVariable_info.cpp" "src/inputClasses/inputVariables_infoStorage.cpp"
 	"src/inputClasses/inputVariables_valueStorage.cpp" "src/inputClasses/inputParser.cpp" 
 

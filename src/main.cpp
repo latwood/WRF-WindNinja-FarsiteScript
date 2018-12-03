@@ -8,6 +8,9 @@
 #include "wrfGetWeather.h"
 #include "farsiteAPI.h"
 
+#include "getWindNinjaPath.h"
+#include "getFarsitePath.h"
+
 #include <chrono>
 
 using namespace std;
@@ -55,6 +58,19 @@ bool doesFolderExist(std::string pathName)
     return exists;
 }
 
+bool isValidExecutable(std::string executablePath)  // this is just a temporary fix. Almost need to try the script with simple inputs as a test run to see for sure if it is a valid application executable
+{
+    bool isValid = false;
+
+    struct stat info;
+    if( stat(executablePath.c_str(), &info) == 0 && info.st_mode & S_IXUSR)
+    {
+        isValid = true;
+    }
+
+    return isValid;
+}
+
 int main(int argc, char* argv[])
 {
     printf("\n\nbeginning WRF-WindNinja-FarsiteScript\n\n");
@@ -74,6 +90,22 @@ int main(int argc, char* argv[])
     {
         inputFilePath = argv[1];
         printf("using inputFilePath %s\n",inputFilePath.c_str());
+    }
+
+    printf("\nchecking WindNinja path\n");
+    std::string WindNinjaPath = getWindNinjaPath();
+    if(isValidExecutable(WindNinjaPath) == false)
+    {
+        printf("Invalid WindNinja path %s! buildEverything.sh should have set this up at compile time! Exiting Program!\n",WindNinjaPath.c_str());
+        exit(1);
+    }
+
+    printf("\nchecking farsite path\n");
+    std::string farsitePath = getFarsitePath();
+    if(isValidExecutable(farsitePath) == false)
+    {
+        printf("Invalid farsite path %s! buildEverything.sh should have set this up at compile time! Exiting Program!\n",farsitePath.c_str());
+        exit(1);
     }
 
     printf("\nloading WRF-WinNinja-FarsiteScript inputs into input class\n");
