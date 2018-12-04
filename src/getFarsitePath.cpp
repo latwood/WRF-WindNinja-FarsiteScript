@@ -3,6 +3,6 @@
 
 std::string getFarsitePath()
 {
-    std::string farsitePath = "/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/include/extraApps/farsite/src/TestFARSITE";
+    std::string farsitePath = "$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraApps/farsite/src/TestFARSITE";
     return farsitePath;
 }

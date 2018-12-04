@@ -18,7 +18,7 @@ public:
     WindNinjaAPI();
 
     // reconstructor like functions
-    bool load_required_inputs(inputVariablesHandler *inputs);
+    bool load_required_inputs(inputVariablesHandler *inputs, std::string WindNinjaPath);
 
     // functions
     bool create_WindNinja_cfg_files();
@@ -92,6 +92,8 @@ private:
     std::string WindNinja_diurnal_winds_string;
     std::string WindNinja_non_neutral_stability_string;
     std::string WindNinja_units_ascii_out_resolution;
+
+    std::string WindNinjaApplicationPath;
 
     // desired output values
     // don't need to check for prj files with this version of everything

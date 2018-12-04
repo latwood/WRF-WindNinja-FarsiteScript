@@ -184,7 +184,7 @@ int main(int argc, char* argv[])
 
     printf("\nloading inputs into WindNinjaAPI\n");
     // load inputs into WindNinjaApi class
-    if(windAPI.load_required_inputs(&inputs) == false)
+    if(windAPI.load_required_inputs(&inputs, WindNinjaPath) == false)
     {
         printf("failed to load inputs into WindNinjaAPI class!\n");
         exit(1);
@@ -237,7 +237,7 @@ int main(int argc, char* argv[])
     }
 
     printf("\nloading inputs into farsiteAPI class\n");
-    if(fireAPI.load_required_inputs(&inputs,&ignitions,&windAPI,&weatherAPI) == false)
+    if(fireAPI.load_required_inputs(&inputs,&ignitions,&windAPI,&weatherAPI, farsitePath) == false)
     {
         printf("Error creating farsite inputs! Exiting program!\n");
         exit(1);

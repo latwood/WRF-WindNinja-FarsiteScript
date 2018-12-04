@@ -6,7 +6,6 @@
 
 # setup base directory variables
 baseDir=$(pwd)
-utilitiesDir=$baseDir"/../utility_scripts"
 finalScriptDir=$baseDir"/.."   # this should be the case
 finalBuildDir=$finalScriptDir"/build"
 configCmakeFile=$finalScriptDir"/config/default.cmake"
@@ -152,14 +151,17 @@ farsiteSource="https://github.com/firelab/farsite"
 farsiteLink="https://github.com/firelab/farsite.git"
 farsiteSrcDir=$farsiteDir"/src"
 
+# replacing paths in files variables
+varToReplace="\$scriptRoot"
+#varToReplace="/home/atw09001/src/combinationScript-cmake"
+
 
 setupDownloadableLib()
 {
-  sudo -v
-  if [ "$#" != 12 ]; then
+  if [ "$#" != 13 ]; then
     echo "" # want a nice clean line
     echo "!!!Incorrect Number of parameters for setupDownloadableLib!!!"
-    echo "need 12 parameters: \"extraLibsDir\" \"libDirName\" \"libTarDir\" \"libTarName\" \"libSource\" \"libLink\" \"libDir\" \"libTarDirName\" \"libBuildDir\" \"libCPPFLAGS\" \"libLDFLAGS\" \"libConfigure\""
+    echo "need 13 parameters: \"extraLibsDir\" \"libDirName\" \"libTarDir\" \"libTarName\" \"libSource\" \"libLink\" \"libDir\" \"libTarDirName\" \"libBuildDir\" \"libCPPFLAGS\" \"libLDFLAGS\" \"libConfigure\" \"tryPasswordInjection\""
     echo "" # want a nice clean line
     return 1
   fi
@@ -176,6 +178,11 @@ setupDownloadableLib()
   local libCPPFLAGS="${10}"
   local libLDFLAGS="${11}"
   local libConfigure="${12}"
+  local tryPasswordInjection="${13}"
+
+  if [ $tryPasswordInjection == 1 ]; then
+    sudo -v
+  fi
 
   ## uncomment out if need to debug
 #  echo "" # want a nice clean line
@@ -254,13 +261,28 @@ setupDownloadableLib()
 
 
 
-echo "" # want a nice clean line
-echo "running buildEverything.sh script"
-echo "" # want a nice clean line
-
-
 # setup failing step bool
 success=0  # 1 if failing, 0 if successful
+
+
+# see if inputs are good
+if [ $success == 0 ]; then
+  if [ "$#" != 1 ]; then
+    echo "not enough inputs! Inputs must be \"tryPasswordInjection\""
+    echo "  \"tryPasswordInjection\" is a boolean value of \"0\" or \"1\" where \"0\" means the script will not attempt to use sudo -v periodically to avoid password timeout (which can fail which means lots of excess password input), and \"1\" means the script will attempt to use sudo -v periodically to avoid password timeout, meaning if successful, should only need password once at the beginning of the script"
+    success=1
+  fi
+fi
+
+# set inputs to variables
+tryPasswordInjection="${1}"
+
+
+if [ $success == 0 ]; then
+  echo "" # want a nice clean line
+  echo "running buildEverything.sh script"
+  echo "" # want a nice clean line
+fi
 
 
 ### make sure the current working directory (baseDir) is the same location as the script executable so that everything gets placed in the right spots
@@ -276,9 +298,11 @@ fi
 
 
 if [ $success == 0 ]; then
-  echo "running sudo -v so all future sudo commands shouldn't pause the process to ask for a password. Will run sudo -v at different points in the code to try to avoid password tracking timeout in bash, so if the script pauses to ask for passwords again, it means sudo -v wasn't run frequently enough to get bash to keep the password. Unfortunately the script is sometimes time consuming enough that the section for building WindNinja still asks for a password."
-  sudo -v
-  echo "" # want a nice clean line
+  if [ $tryPasswordInjection == 1 ]; then
+    echo "running sudo -v so all future sudo commands shouldn't pause the process to ask for a password. Will run sudo -v at different points in the code to try to avoid password tracking timeout in bash, so if the script pauses to ask for passwords again, it means sudo -v wasn't run frequently enough to get bash to keep the password. Unfortunately the script is sometimes time consuming enough that the section for building WindNinja still asks for a password."
+    sudo -v
+    echo "" # want a nice clean line
+  fi
 fi
 
 
@@ -308,49 +332,51 @@ fi
 
 ## now check installation and download all the needed libraries
 if [ $success == 0 ]; then
-  setupDownloadableLib "${extraLibsDir}" "${zlibDirName}" "${zlibTarDir}" "${zlibTarDirName}" "${zlibSource}" "${zlibLink}" "${zlibDir}" "${zlibTarDirName}" "${zlibBuildDir}" "${zlibCPPFLAGS}" "${zlibLDFLAGS}" "${zlibConfigure}"
+  setupDownloadableLib "${extraLibsDir}" "${zlibDirName}" "${zlibTarDir}" "${zlibTarDirName}" "${zlibSource}" "${zlibLink}" "${zlibDir}" "${zlibTarDirName}" "${zlibBuildDir}" "${zlibCPPFLAGS}" "${zlibLDFLAGS}" "${zlibConfigure}" "{$tryPasswordInjection}"
   success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-  setupDownloadableLib "${extraLibsDir}" "${szlibDirName}" "${szlibTarDir}" "${szlibTarDirName}" "${szlibSource}" "${szlibLink}" "${szlibDir}" "${szlibTarDirName}" "${szlibBuildDir}" "${szlibCPPFLAGS}" "${szlibLDFLAGS}" "${szlibConfigure}"
+  setupDownloadableLib "${extraLibsDir}" "${szlibDirName}" "${szlibTarDir}" "${szlibTarDirName}" "${szlibSource}" "${szlibLink}" "${szlibDir}" "${szlibTarDirName}" "${szlibBuildDir}" "${szlibCPPFLAGS}" "${szlibLDFLAGS}" "${szlibConfigure}" "{$tryPasswordInjection}"
   success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-  setupDownloadableLib "${extraLibsDir}" "${curlDirName}" "${curlTarDir}" "${curlTarDirName}" "${curlSource}" "${curlLink}" "${curlDir}" "${curlTarDirName}" "${curlBuildDir}" "${curlCPPFLAGS}" "${curlLDFLAGS}" "${curlConfigure}"
+  setupDownloadableLib "${extraLibsDir}" "${curlDirName}" "${curlTarDir}" "${curlTarDirName}" "${curlSource}" "${curlLink}" "${curlDir}" "${curlTarDirName}" "${curlBuildDir}" "${curlCPPFLAGS}" "${curlLDFLAGS}" "${curlConfigure}" "{$tryPasswordInjection}"
   success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-  setupDownloadableLib "${extraLibsDir}" "${hdf5DirName}" "${hdf5TarDir}" "${hdf5TarDirName}" "${hdf5Source}" "${hdf5Link}" "${hdf5Dir}" "${hdf5TarDirName}" "${hdf5BuildDir}" "${hdf5CPPFLAGS}" "${hdf5LDFLAGS}" "${hdf5Configure}"
+  setupDownloadableLib "${extraLibsDir}" "${hdf5DirName}" "${hdf5TarDir}" "${hdf5TarDirName}" "${hdf5Source}" "${hdf5Link}" "${hdf5Dir}" "${hdf5TarDirName}" "${hdf5BuildDir}" "${hdf5CPPFLAGS}" "${hdf5LDFLAGS}" "${hdf5Configure}" "{$tryPasswordInjection}"
   success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-  setupDownloadableLib "${extraLibsDir}" "${netcdf_cDirName}" "${netcdf_cTarDir}" "${netcdf_cTarDirName}" "${netcdf_cSource}" "${netcdf_cLink}" "${netcdf_cDir}" "${netcdf_cTarDirName}" "${netcdf_cBuildDir}" "${netcdf_cCPPFLAGS}" "${netcdf_cLDFLAGS}" "${netcdf_cConfigure}"
+  setupDownloadableLib "${extraLibsDir}" "${netcdf_cDirName}" "${netcdf_cTarDir}" "${netcdf_cTarDirName}" "${netcdf_cSource}" "${netcdf_cLink}" "${netcdf_cDir}" "${netcdf_cTarDirName}" "${netcdf_cBuildDir}" "${netcdf_cCPPFLAGS}" "${netcdf_cLDFLAGS}" "${netcdf_cConfigure}" "{$tryPasswordInjection}"
   success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-  setupDownloadableLib "${extraLibsDir}" "${netcdf_cxxDirName}" "${netcdf_cxxTarDir}" "${netcdf_cxxTarDirName}" "${netcdf_cxxSource}" "${netcdf_cxxLink}" "${netcdf_cxxDir}" "${netcdf_cxxTarDirName}" "${netcdf_cxxBuildDir}" "${netcdf_cxxCPPFLAGS}" "${netcdf_cxxLDFLAGS}" "${netcdf_cxxConfigure}"
+  setupDownloadableLib "${extraLibsDir}" "${netcdf_cxxDirName}" "${netcdf_cxxTarDir}" "${netcdf_cxxTarDirName}" "${netcdf_cxxSource}" "${netcdf_cxxLink}" "${netcdf_cxxDir}" "${netcdf_cxxTarDirName}" "${netcdf_cxxBuildDir}" "${netcdf_cxxCPPFLAGS}" "${netcdf_cxxLDFLAGS}" "${netcdf_cxxConfigure}" "{$tryPasswordInjection}"
   success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-  setupDownloadableLib "${extraLibsDir}" "${jasperDirName}" "${jasperTarDir}" "${jasperTarDirName}" "${jasperSource}" "${jasperLink}" "${jasperDir}" "${jasperTarDirName}" "${jasperBuildDir}" "${jasperCPPFLAGS}" "${jasperLDFLAGS}" "${jasperConfigure}"
+  setupDownloadableLib "${extraLibsDir}" "${jasperDirName}" "${jasperTarDir}" "${jasperTarDirName}" "${jasperSource}" "${jasperLink}" "${jasperDir}" "${jasperTarDirName}" "${jasperBuildDir}" "${jasperCPPFLAGS}" "${jasperLDFLAGS}" "${jasperConfigure}" "{$tryPasswordInjection}"
   success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-  setupDownloadableLib "${extraLibsDir}" "${gdalDirName}" "${gdalTarDir}" "${gdalTarDirName}" "${gdalSource}" "${gdalLink}" "${gdalDir}" "${gdalTarDirName}" "${gdalBuildDir}" "${gdalCPPFLAGS}" "${gdalLDFLAGS}" "${gdalConfigure}"
+  setupDownloadableLib "${extraLibsDir}" "${gdalDirName}" "${gdalTarDir}" "${gdalTarDirName}" "${gdalSource}" "${gdalLink}" "${gdalDir}" "${gdalTarDirName}" "${gdalBuildDir}" "${gdalCPPFLAGS}" "${gdalLDFLAGS}" "${gdalConfigure}" "{$tryPasswordInjection}"
   success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 
 ## now check for WindNinja and download if needed
-sudo -v
 if [ $success == 0 ]; then
+  if [ $tryPasswordInjection == 1 ]; then
+    sudo -v
+  fi
   echo "" # want a nice clean line
   echo "checking for WindNinja"
   if [ ! -d "${windninjaDir}" ]; then
@@ -370,9 +396,13 @@ if [ $success == 0 ]; then
   if [ ! -d "${windninjaBuildDir}" ]; then
     echo "building WindNinja 3rd party libs"
     cd $windninjaScriptsDir
-    sudo -v
+    if [ $tryPasswordInjection == 1 ]; then
+      sudo -v
+    fi
     ./build_deps.sh
-    sudo -v
+    if [ $tryPasswordInjection == 1 ]; then
+      sudo -v
+    fi
     cd $windninjaDir
   else
     echo "!warning, "$windninjaBuildDir" already exists so build_deps.sh for WindNinja should already have been done. Not running build_deps.sh for WindNinja!"
@@ -412,30 +442,12 @@ if [ $success == 0 ]; then
   fi
 fi
 
-## now edit getWindNinjaPath.cpp file to update the path to the WindNinja directory
-if [ $success == 0 ]; then
-  echo "" # want a nice clean line
-  echo "editing getWindNinjaPath.cpp file to update the path to the WindNinja application"
-  if [ ! -f "${getWindNinjaPathFile}" ]; then
-    echo "!!!getWindNinjaPath.cpp "${getWindNinjaPathFile}" file does not exist!!!"
-    success=1
-  else
-    newLine="\tstd::string WindNinjaPath = \""${windninjaBuildDir}"/src/cli/WindNinja_cli\";"
-    replacement=$(sed 's/\//\\\//g' <<<"$newLine")
-    sed -i "${WindNinjaPathLine}s/.*/${replacement}/" $getWindNinjaPathFile
-    success=$?
-  fi
-  if [ $success == 0 ]; then
-    echo "finished editing getWindNinjaPath.cpp file"
-  else
-    echo "!!!failed to edit getWindNinjaPath.cpp file!!!"
-  fi
-fi
-
 
 ## now check for farsite and download if needed
-sudo -v
 if [ $success == 0 ]; then
+  if [ $tryPasswordInjection == 1 ]; then
+    sudo -v
+  fi
   echo "" # want a nice clean line
   echo "checking for farsite"
   if [ ! -d "${farsiteDir}" ]; then
@@ -468,85 +480,27 @@ if [ $success == 0 ]; then
   fi
 fi
 
-## now edit getFarsitePath.cpp file to update the path to the farsite directory
-if [ $success == 0 ]; then
-  echo "" # want a nice clean line
-  echo "editing getFarsitePath.cpp file to update the path to the Farsite application"
-  if [ ! -f "${getFarsitePathFile}" ]; then
-    echo "!!!getFarsitePath.cpp "${getFarsitePathFile}" file does not exist!!!"
-    success=1
-  else
-    newLine="\tstd::string farsitePath = \""${farsiteSrcDir}"/TestFARSITE\";"
-    replacement=$(sed 's/\//\\\//g' <<<"$newLine")
-    sed -i "${farsitePathLine}s/.*/${replacement}/" $getFarsitePathFile
-    success=$?
-  fi
-  if [ $success == 0 ]; then
-    echo "finished editing getFarsitePath.cpp file"
-  else
-    echo "!!!failed to edit getFarsitePath.cpp file!!!"
-  fi
-fi
 
-
-## now write default-cmake file for script to grab the right libraries
+## now find and update all paths in the repo that to match the current base directory
 if [ $success == 0 ]; then
+  aboveBaseDir=$(dirname $baseDirParent)
   echo "" # want a nice clean line
-  echo "checking for config cmake file"
-  if [ ! -f "${configCmakeFile}" ]; then
-    echo "writing config cmake file "$configCmakeFile
-    
-    echo "" > $configCmakeFile # first one needs to start a new file, the rest are for appending
-    echo "set(ENV{CC} cc)" >> $configCmakeFile
-    echo "set(ENV{CXX} g++)" >> $configCmakeFile
-    
-    echo "" >> $configCmakeFile
-    
-    echo "set(USER_CXX_FLAGS \"-std=c++11\")" >> $configCmakeFile
-    echo "set(USER_CXX_FLAGS_RELEASE \"-O3\")" >> $configCmakeFile
-    echo "set(USER_CXX_FLAGS_DEBUG \"-debug -g -check=conversions,stack,uninit -fp-stack-check -fp-trap=common -fp-trap-all=common \")" >> $configCmakeFile
-    
-    echo "" >> $configCmakeFile
-    
-    echo "set(NETCDF_C_INCLUDE_DIR \""$netcdf_cBuildDir"/include/\")" >> $configCmakeFile
-    echo "set(NETCDF_CXX_INCLUDE_DIR \""$netcdf_cxxBuildDir"/include/\")" >> $configCmakeFile
-    echo "set(HDF5_INCLUDE_DIR \""$hdf5BuildDir"/include/\")" >> $configCmakeFile
-    echo "set(SZIP_INCLUDE_DIR \""$szlibBuildDir"/include/\")" >> $configCmakeFile
-    echo "set(ZLIB_INCLUDE_DIR \""$zlibBuildDir"/include/\")" >> $configCmakeFile
-    echo "set(CURL_INCLUDE_DIR \""$curlBuildDir"/include/\")" >> $configCmakeFile
-    echo "set(JASPER_INCLUDE_DIR \""$jasperBuildDir"/include/\")" >> $configCmakeFile
-    echo "set(GDAL_INCLUDE_DIR \""$gdalBuildDir"/include/\")" >> $configCmakeFile
-    
-    echo "" >> $configCmakeFile
-    
-    echo "set(NETCDF_LIB_C \""$netcdf_cBuildDir"/lib/libnetcdf.a\")" >> $configCmakeFile
-    echo "set(NETCDF_LIB_CXX \""$netcdf_cxxBuildDir"/lib/libnetcdf_c++4.so\")" >> $configCmakeFile
-    echo "set(HDF5_LIB_1 \""$hdf5BuildDir"/lib/libhdf5.so\")" >> $configCmakeFile
-    echo "set(HDF5_LIB_2 \""$hdf5BuildDir"/lib/libhdf5_hl.so\")" >> $configCmakeFile
-    echo "set(SZIP_LIB \""$szlibBuildDir"/lib/libsz.a\")" >> $configCmakeFile
-    echo "set(ZLIB_LIB \""$zlibBuildDir"/lib/libz.a\")" >> $configCmakeFile
-    echo "set(CURL_LIB \""$curlBuildDir"/lib/libcurl.so\")" >> $configCmakeFile
-    echo "set(JASPER_LIB \""$jasperBuildDir"/lib/libjasper.so\")" >> $configCmakeFile
-    echo "set(GDAL_LIB \""$gdalBuildDir"/lib/libgdal.so\")" >> $configCmakeFile
-    
-    echo "" >> $configCmakeFile
-    
-    echo "set(LIBS \${NETCDF_LIB_CXX} \${NETCDF_LIB_C} \${HDF5_LIB_2} \${HDF5_LIB_1} \${SZIP_LIB} \${ZLIB_LIB} \${CURL_LIB} \${JASPER_LIB} \${GDAL_LIB} m z)" >> $configCmakeFile
-    echo "set(INCLUDE_DIRS \${NETCDF_C_INCLUDE_DIR} \${NETCDF_CXX_INCLUDE_DIR} \${HDF5_INCLUDE_DIR} \${SZIP_INCLUDE_DIR} \${ZLIB_INCLUDE_DIR} \${CURL_INCLUDE_DIR} \${JASPER_INCLUDE_DIR} \${GDAL_INCLUDE_DIR})" >> $configCmakeFile
-    
-    echo "" >> $configCmakeFile
-    
-    echo "add_definitions(-DRESTRICTKEYWORD=restrict)" >> $configCmakeFile
-    
-    echo "" >> $configCmakeFile
-    echo "" >> $configCmakeFile
-    
-    if [ ! -f "${configCmakeFile}" ]; then
-      echo "!!!failed to write config cmake file "$configCmakeFile"!!!"
+  echo "finding all files with \""$varToReplace"\" in them to replace with the above current base directory \""$aboveBaseDir"\""
+  preppedVarToReplace=$(sed 's/\//\\\//g' <<<"$varToReplace")
+  preppedAboveBaseDir=$(sed 's/\//\\\//g' <<<"$aboveBaseDir")
+  #preppedAboveBaseDir="\$scriptRoot"
+  grep -rl $preppedVarToReplace $finalScriptDir --exclude-dir=.git --exclude-dir=include | xargs sed -i 's/'$preppedVarToReplace'/'$preppedAboveBaseDir'/g'
+  success=$?
+  if [ $success != 0 ]; then
+    if [ $success == 123 ]; then
+      echo "!warning, no stuff to replace!"
+      success=0
+    else
+      echo "!!!failed during replace path text process!!!"
       success=1
     fi
   else
-    echo "!warning, config cmake file "$configCmakeFile" already exists, so not writing a new one!"
+    echo "finished replacing text"
   fi
 fi
 

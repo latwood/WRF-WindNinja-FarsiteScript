@@ -10,7 +10,7 @@ farsiteAPI::farsiteAPI()
 /*** end constructor functions ***/
 
 /*** reconstructor like functions ***/
-bool farsiteAPI::load_required_inputs(inputVariablesHandler *inputs, createIgnitions *ignitions, WindNinjaAPI *windAPI, wrfGetWeather *weatherAPI)
+bool farsiteAPI::load_required_inputs(inputVariablesHandler *inputs, createIgnitions *ignitions, WindNinjaAPI *windAPI, wrfGetWeather *weatherAPI, std::string farsitePath)
 {
     // first reset all values to default values with reconstructor
     reset();
@@ -162,7 +162,8 @@ bool farsiteAPI::load_required_inputs(inputVariablesHandler *inputs, createIgnit
         farsiteCldFiles.push_back(farsiteCldFileNameVector);
 
     }
-    farsiteApplicationPath = "/home/atw09001/src/farsite/src/TestFARSITE";
+    //farsiteApplicationPath = "/home/atw09001/src/farsite/src/TestFARSITE";
+    farsiteApplicationPath = farsitePath;
 
     // for farsite burn period stuff
     // this can run now cause wrf file times has been found

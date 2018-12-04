@@ -10,7 +10,7 @@ WindNinjaAPI::WindNinjaAPI()
 /*** end constructor functions ***/
 
 /*** reconstructor like functions ***/
-bool WindNinjaAPI::load_required_inputs(inputVariablesHandler *inputs)
+bool WindNinjaAPI::load_required_inputs(inputVariablesHandler *inputs, std::string WindNinjaPath)
 {
     // first reset all values to default values with reconstructor
     reset();
@@ -91,6 +91,8 @@ bool WindNinjaAPI::load_required_inputs(inputVariablesHandler *inputs)
     {
         WindNinja_non_neutral_stability_string = "false";
     }
+
+    WindNinjaApplicationPath = WindNinjaPath;
 
     // if it gets here, everything went well
     return true;

@@ -17,7 +17,7 @@ public:
     farsiteAPI();
 
     // reconstructor like functions
-    bool load_required_inputs(inputVariablesHandler *inputs, createIgnitions *ignitions, WindNinjaAPI *windAPI, wrfGetWeather *weatherAPI);
+    bool load_required_inputs(inputVariablesHandler *inputs, createIgnitions *ignitions, WindNinjaAPI *windAPI, wrfGetWeather *weatherAPI, std::string farsitePath);
 
     // functions
     bool createAllFarsiteInputs();

@@ -1,4 +1,4 @@
-### /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/template-runCougarCreek-fire.txt
+### $scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/template-runCougarCreek-fire.txt
 ######################
 ######## basic idea here is I need to figure out what inputs are necessary and what format they need to have
 ####  So list out all the required and optional inputs and figure out their format and dependencies or if optional, what would need to be checked against
@@ -11,10 +11,10 @@
 #run_base_name = cougarCreek
 
 # createInputs_path is the path where files created by createIgnitions, WindNinja, wrfGetWeather, and createFarsiteInputs go. createInputs folder Will contain separate folders for each of these outputs
-createInputs_path = /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire
+createInputs_path = $scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire
 
 # finalOutput_path is the path where farsite run outputs will be generated
-finalOutput_path = /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire
+finalOutput_path = $scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire
 
 # overwrite_past_outputs is a boolean specifying whether the output files found in createdInputs and finalOutputs folders should be overwritten. If these output folders exist in createInputs_path or finalOutputs_path and overwrite_past_outputs is true, folders aren't deleted, just if names are the same they will be overwritten. If overwrite_past_outputs is false and these folders exist, a search for either createInputs-# or finalOutputs-# will determine the highest # value, add one to it, and use that as the new output. Default value is false
 overwrite_past_outputs = true
@@ -48,7 +48,7 @@ automate_lcp_download = false
 use_past_lcp = true
 
 # lcp_file_path is a path to a predownloaded lcp file to use instead of downloading a new one. Use if use_past_lcp set to true. File name extension is verified to be .lcp and file is verified to be openable by gdal. Second file with same path and name but .prj extension is also verified to exist. Specify only if use_past_lcp is set to true
-lcp_file_path = /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/cougarCreekFire.lcp
+lcp_file_path = $scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/cougarCreekFire.lcp
 
 # specify_lcp_download is for doing a WindNinja style lat/long point and buffer zone or lat/long box lcp download. If this is true, need to specify all the following: lcp_download_lat_long_point, lcp_download_northsouth_buffer, lcp_download_westeast_buffer, lcp_download_buffer_units OR lcp_download_north_lat_bound, lcp_download_south_lat_bound, lcp_download_east_long_bound, lcp_download_west_long_bound. Only one of automate_lcp_download, use_past_lcp, and specify_lcp_download can be true and the default to be true if none are specified is automate_lcp_download
 specify_lcp_download = false
@@ -87,21 +87,21 @@ create_ignition_from_latlongs = 1
 
 # polygon_ignit_shape_files consists of a list of precreated ignition shape files (so can be past ones created of any other type). Format of ignition shape files are still checked. Checked to make sure file extension is .shp and that file can be read by ogr/gdal. Need at least one of create_ignition_from_latlongs, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, or farsite_output_fire_perimeter_files ignition types to run
 polygon_ignit_shape_files = 3
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/5a-cougarCreek-pointIgnit.shp
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/7a-cougarCreek-polygonIgnit.shp
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/8a-cougarCreek-3polygonIgnit.shp
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/5a-cougarCreek-pointIgnit.shp
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/7a-cougarCreek-polygonIgnit.shp
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/8a-cougarCreek-3polygonIgnit.shp
 
 # GeoMAC_fire_perimeter_files consists of a list of GeoMAC fire perimeters to be used as input ignitions. New versions of these files are created that are in the necessary projection coordinates as the original files will not work in Farsite without preprocessing. Files are checked to make sure file extension is .shp and that files can be read by ogr/gdal. Need at least one of create_ignition_from_latlongs, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, or farsite_output_fire_perimeter_files ignition types to run
 GeoMAC_fire_perimeter_files = 2
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/day1-wa_cougar_creek_20150811_2300_dd83/wa_cougar_creek_20150811_2300_dd83.shp
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/day10-wa_cougar_creek_20150815_2300_dd83/wa_cougar_creek_20150815_2300_dd83.shp
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/day1-wa_cougar_creek_20150811_2300_dd83/wa_cougar_creek_20150811_2300_dd83.shp
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/day10-wa_cougar_creek_20150815_2300_dd83/wa_cougar_creek_20150815_2300_dd83.shp
 
 # farsite_output_fire_perimeter_files consists of a list of past farsite run output fire perimeter files to use as ignitions for a new farsite run. These cannot be read by the current version of farsite, so new versions of these files are created by grabbing all fires that occur at the last output fire perimeter date/time. The new date/time for these fire perimeters is assumed to be the burn_start_time value. Files are checked to make sure file extension is .shp and that files can be read by ogr/gdal. Need at least one of create_ignition_from_latlongs, polygon_ignit_shape_files, GeoMAC_fire_perimeter_files, or farsite_output_fire_perimeter_files ignition types to run
 farsite_output_fire_perimeter_files = 4
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/11a-cougarCreekFire_Perimeters.shp
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/13a-cougarCreek-pointIgnit-perimeters-firelaborg.shp
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/17a-cougarCreek-polygonIgnit-perimeters-firelaborg.shp
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/19a-cougarCreek-3polygonIgnit-perimeters-firelaborg.shp
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/11a-cougarCreekFire_Perimeters.shp
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/13a-cougarCreek-pointIgnit-perimeters-firelaborg.shp
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/17a-cougarCreek-polygonIgnit-perimeters-firelaborg.shp
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/ignitions/19a-cougarCreek-3polygonIgnit-perimeters-firelaborg.shp
 
 # fire_perimeter_widening_factor is an integer used to shrink or expand fire perimeters of all created ignition files by multiplying each point in the geometry by this integer. Defaults to a value of 1.0 unless specified. May need to make this specific to each ignition file if needed long term. Or can get rid of and if any perimeter is less than say 30 m, just stretch it to that size as that is the default farsite distance res
 fire_perimeter_widening_factor = 1.0
@@ -114,31 +114,31 @@ extend_wrf_data = true
 
 # wrf_files consists of a list of paths to each of the WRF files used as wind and weather start points for the application. Internal WRF file times will be checked to make sure they are sorted by date and hour, where they begin 24 hrs before burn_start_time and end at burn_end_time. So if burn_start_time is 08 11 2015, 12:00 and burn_end_time is 08 13 2015, 12:00 then the first WRF file should be for 08 10 2015, 12:00 and the last WRF file should be for 08 13 2015, 12:00. This comes out to be 72 WRF files. Files are assumed to be of timezone UTZ so GMT. If extend_wrf_date is set to true, then the wrf data acquired from the earliest wrf file will be duplicated to fill to the needed start time and the same goes for the latest wrf file data duplicated to fill to the needed end time
 wrf_files = 25
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f12.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f13.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f14.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f15.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f16.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f17.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f18.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f19.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f20.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f21.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f22.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f23.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f12.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f13.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f14.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f15.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f16.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f17.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f18.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f19.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f20.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f21.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f22.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f23.0000
-/home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f24.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f12.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f13.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f14.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f15.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f16.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f17.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f18.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f19.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f20.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f21.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f22.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015080912.f23.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f12.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f13.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f14.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f15.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f16.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f17.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f18.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f19.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f20.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f21.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f22.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f23.0000
+$scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/a-originalInputs/wrf/templateN-runCougarCreek-fire-trimmed/wrfout_d3.2015081000.f24.0000
 
 
 ### WindNinja only variables
