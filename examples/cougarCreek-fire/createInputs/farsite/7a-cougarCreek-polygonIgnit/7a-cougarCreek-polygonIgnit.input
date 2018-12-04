@@ -16,9 +16,9 @@ SPOTTING_SEED: 1000
 FUEL_MOISTURES_DATA: 1
 0 3 4 6 70 100
 
-RAWS_FILE: /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/createInputs/farsite/7a-cougarCreek-polygonIgnit/7a-cougarCreek-polygonIgnit.raws
+RAWS_FILE: $scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/createInputs/farsite/7a-cougarCreek-polygonIgnit/7a-cougarCreek-polygonIgnit.raws
 
-FARSITE_ATM_FILE: /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/createInputs/farsite/7a-cougarCreek-polygonIgnit/7a-cougarCreek-polygonIgnit.atm
+FARSITE_ATM_FILE: $scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/createInputs/farsite/7a-cougarCreek-polygonIgnit/7a-cougarCreek-polygonIgnit.atm
 
 FOLIAR_MOISTURE_CONTENT: 70.00
 CROWN_FIRE_METHOD: Finney

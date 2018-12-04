@@ -2,14 +2,14 @@ Farsite BenchMark Results
 
 
 Simulation Info:
-	Landscape File: /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/createInputs/farsite/7a-cougarCreek-polygonIgnit/cougarCreekFire.lcp
+	Landscape File: $scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/createInputs/farsite/7a-cougarCreek-polygonIgnit/cougarCreekFire.lcp
 	Landscape Resolution: 30.0
 	Landscape Size: 1040 x 1000
-	Inputs File: /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/createInputs/farsite/7a-cougarCreek-polygonIgnit/7a-cougarCreek-polygonIgnit.input
+	Inputs File: $scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/createInputs/farsite/7a-cougarCreek-polygonIgnit/7a-cougarCreek-polygonIgnit.input
 	Farsite Start Time: 08 11 1300
 	Farsite End Time:   08 13 1200
 	Total Sim Time:     2820.000000
-	Ignition File:      /home/atw09001/src/combinationScript-cmake/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/createInputs/farsite/7a-cougarCreek-polygonIgnit/7a-cougarCreek-polygonIgnit.shp
+	Ignition File:      $scriptRoot/WRF-WindNinja-FarsiteScript/examples/cougarCreek-fire/createInputs/farsite/7a-cougarCreek-polygonIgnit/7a-cougarCreek-polygonIgnit.shp
 	Barriers File:      None
 	Time Step:                  60.000000
 	Distance Resolution:        30.000000
@@ -113,4 +113,4 @@ Simulation Info:
 8 13 1200 150 180 0
 8 13 1800 150 180 0
 
-	Total Farsite Run Time: 45.015 Seconds
+	Total Farsite Run Time: 46.900 Seconds
