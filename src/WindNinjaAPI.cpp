@@ -137,19 +137,21 @@ bool WindNinjaAPI::create_WindNinja_cfg_files()
     std::vector<stringValue> pdf_size_values = stored_additional_WindNinja_Outputs_pdf.get_stored_pdf_size_values();
 
     // all paths up to this point should end without a "/" character
-    if(doesFolderExist(WindNinjaOutputFolderPath) == false)
+
+    // make WindNinja directory
+    if(createFolder(WindNinjaOutputFolderPath) == false)
     {
-            // now make the directory
-        VSIMkdir( WindNinjaOutputFolderPath.c_str(), 0777 );
+        printf("failed to create WindNinjaOutputFolderPath %s! Exiting program!\n",WindNinjaOutputFolderPath.c_str());
+        exit(1);
     }
 
     for(size_t wrfCount = 0; wrfCount < wrf_files.size(); wrfCount++)
     {
         // make folder for the run if it doesn't yet exist
-        if(doesFolderExist(WindNinjaRunFolderPaths[wrfCount]) == false)
+        if(createFolder(WindNinjaRunFolderPaths[wrfCount]) == false)
         {
-                // now make the directory
-            VSIMkdir( WindNinjaRunFolderPaths[wrfCount].c_str(), 0777 );
+            printf("failed to create WindNinjaRunFolderPath %s! Exiting program!\n",WindNinjaRunFolderPaths[wrfCount].c_str());
+            exit(1);
         }
 
         // next write the cfg files, will always overwrite these if not exist as the actualCreateInputs path takes care of overwriting when not supposed to
@@ -234,7 +236,7 @@ bool WindNinjaAPI::run_WindNinja()
 
         std::string logFileName = WindNinjaRunFolderPaths[wrfCount] + "/log.WindNinjaRun";
         std::ifstream fzInput;
-        if(doesFilenameExist(logFileName) == false)
+        if(doesFileExist(logFileName) == false)
         {
             printf("failed to open WindNinja log file \"%s\"!\n",logFileName.c_str());
             return false;
@@ -264,7 +266,7 @@ bool WindNinjaAPI::findFinalRunFiles()
     for(size_t runCount = 0; runCount < WindNinjaRunFolderPaths.size(); runCount++)
     {
         std::string currentFolder = WindNinjaRunFolderPaths[runCount];
-        if(doesFolderExist(currentFolder) == false)
+        if(doesDirExist(currentFolder) == false)
         {
             printf("folder \"%s\" does not exist!\n",currentFolder.c_str());
             return false;
@@ -356,7 +358,7 @@ bool WindNinjaAPI::findWrfTimes()
     {
         std::string logFileName = WindNinjaRunFolderPaths[wrfCount] + "/log.WindNinjaRun";
         std::ifstream fzInput;
-        if(doesFilenameExist(logFileName) == false)
+        if(doesFileExist(logFileName) == false)
         {
             printf("failed to open WindNinja log file \"%s\"!\n",logFileName.c_str());
             return false;
@@ -623,36 +625,6 @@ void WindNinjaAPI::reset()
 /*** end reconstructor like functions ***/
 
 /*** utility functions ***/
-bool WindNinjaAPI::doesFolderExist(std::string pathName)
-{
-    bool exists = true;
-
-    struct stat info;
-    if( stat( pathName.c_str(), &info ) != 0 )
-    {
-        //printf( "cannot access %s\n", inputString.c_str() );
-        exists = false;
-    } else if( info.st_mode & S_IFDIR )  // S_ISDIR() doesn't exist on my windows
-    {
-        //printf( "%s is a directory\n", inputString.c_str() );
-        exists = true;
-    } else
-    {
-        //printf( "%s is no directory\n", inputString.c_str() );
-        exists = false;
-    }
-
-    return exists;
-}
-
-bool WindNinjaAPI::doesFilenameExist(std::string fileName)
-{
-    // found this here: https://stackoverflow.com/questions/12774207/fastest-way-to-check-if-a-file-exist-using-standard-c-c11-c
-    // hopefully it works for files as well as directories as this is the same thing used to check a file path. More interesting hopefully this works for .prj files!
-    struct stat buffer;
-    return (stat (fileName.c_str(), &buffer) == 0);
-}
-
 bool WindNinjaAPI::doesNetCDFFileExist(std::string pathName)
 {
     GDALDatasetH  hDataset;
@@ -686,7 +658,7 @@ bool WindNinjaAPI::doOutputFilesExist(size_t runNumber)
     bool exists = true;
 
     std::string currentFolder = WindNinjaRunFolderPaths[runNumber];
-    if(doesFolderExist(currentFolder) == false)
+    if(doesDirExist(currentFolder) == false)
     {
         exists = false;
     }

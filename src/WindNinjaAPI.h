@@ -9,6 +9,10 @@
 #include "cpl_spawn.h"
 #include <glob.h>
 
+#include "utilityClasses/doesFolderExist.h"
+#include "utilityClasses/createFolder.h"
+#include "utilityClasses/doesFilenameExist.h"
+
 class WindNinjaAPI
 {
 
@@ -46,8 +50,6 @@ private:
     void reset();
 
     // useful utility functions
-    bool doesFolderExist(std::string pathName);
-    bool doesFilenameExist(std::string fileName);
     bool doesNetCDFFileExist(std::string pathName);
     std::vector<std::string> globVector(const std::string& pattern);
     bool doOutputFilesExist(size_t runNumber);

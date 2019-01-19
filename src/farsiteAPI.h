@@ -7,6 +7,13 @@
 #include "WindNinjaAPI.h"
 #include "wrfGetWeather.h"
 
+#include "utilityClasses/doesFolderExist.h"
+#include "utilityClasses/createFolder.h"
+#include "utilityClasses/doesFilenameExist.h"
+#include "utilityClasses/isValidExecFile.h"
+#include "utilityClasses/copySingleFile.h"
+#include "utilityClasses/findFileBaseNameStuff.h"
+
 
 class farsiteAPI
 {
@@ -50,13 +57,6 @@ private:
     std::string exec_cmd(const char* cmd);
 
     // useful utility functions
-    bool doesFilenameExist(std::string fileName);
-    bool doesFolderExist(std::string pathName);
-    bool isExecutable(const char *file);
-    std::string findFileBaseNameAndExtension(std::string filePath);
-    std::string findBaseName(std::string filePath);
-    std::string findBaseNameWithPath(std::string filePath);
-    bool copyFile(std::string inputFilename, std::string outputFilename);
     std::string monthTextToNumber(std::string inputMonthText);
     std::string monthDayHourMinSecAddZero(int time);
 

@@ -178,25 +178,25 @@ bool farsiteAPI::load_required_inputs(inputVariablesHandler *inputs, createIgnit
 bool farsiteAPI::createAllFarsiteInputs()
 {
     // first make needed overall directory
-    if(doesFolderExist(farsiteMainCreateInputsFolderPath) == false)
+    if(createFolder(farsiteMainCreateInputsFolderPath) == false)
     {
-            // now make the directory
-        VSIMkdir( farsiteMainCreateInputsFolderPath.c_str(), 0777 );
+        printf("failed to create folder %s! exiting program!\n", farsiteMainCreateInputsFolderPath.c_str());
+        exit(1);
     }
 
     // now for each run, make all the necessary files and folders
     for(size_t runIdx = 0; runIdx < farsiteCreateInputRunFolderPaths.size(); runIdx++)
     {
         // first make the input and output directories for the farsite run
-        if(doesFolderExist(farsiteCreateInputRunFolderPaths[runIdx]) == false)
+        if(createFolder(farsiteCreateInputRunFolderPaths[runIdx]) == false)
         {
-                // now make the directory
-            VSIMkdir( farsiteCreateInputRunFolderPaths[runIdx].c_str(), 0777 );
+            printf("failed to create folder %s! exiting program!\n", farsiteCreateInputRunFolderPaths[runIdx].c_str());
+            exit(1);
         }
-        if(doesFolderExist(farsiteFinalOutputRunFolderPaths[runIdx]) == false)
+        if(createFolder(farsiteFinalOutputRunFolderPaths[runIdx]) == false)
         {
-                // now make the directory
-            VSIMkdir( farsiteFinalOutputRunFolderPaths[runIdx].c_str(), 0777 );
+            printf("failed to create folder %s! exiting program!\n", farsiteFinalOutputRunFolderPaths[runIdx].c_str());
+            exit(1);
         }
 
        // now copy files
@@ -280,7 +280,7 @@ bool farsiteAPI::createAllFarsiteInputs()
             }
             std::string barrierPrjFileInput = inputBarrierBaseNameAndPath + ".prj";
             std::string barrierPrjFileOutput = farsiteBarrierFiles[runIdx] + ".prj";    // this one might be optional
-            if(doesFilenameExist(barrierPrjFileInput) == true)
+            if(doesFileExist(barrierPrjFileInput) == true)
             {
                 if(copyFile(barrierPrjFileInput,barrierPrjFileOutput) == false)
                 {
@@ -314,7 +314,7 @@ bool farsiteAPI::createAllFarsiteInputs()
         }
         std::string ignitionPrjFileInput = inputIgnitionBaseNameAndPath + ".prj";
         std::string ignitionPrjFileOutput = farsiteIgnitionFiles[runIdx] + ".prj";    // this one might be optional
-        if(doesFilenameExist(ignitionPrjFileInput) == true)
+        if(doesFileExist(ignitionPrjFileInput) == true)
         {
             if(copyFile(ignitionPrjFileInput,ignitionPrjFileOutput) == false)
             {
@@ -374,7 +374,7 @@ bool farsiteAPI::createAllFarsiteInputs()
 
 bool farsiteAPI::runFarsite()
 {
-    if(isExecutable(farsiteApplicationPath.c_str()) == false)
+    if(isValidExecutable(farsiteApplicationPath.c_str()) == false)
     {
         printf("farsiteApplicationPath \"%s\" is not a valid executable program!\n",farsiteApplicationPath.c_str());
         return false;
@@ -382,7 +382,7 @@ bool farsiteAPI::runFarsite()
 
     for(size_t runIdx = 0; runIdx < farsiteCommandFiles.size(); runIdx++)
     {
-        if(doesFilenameExist(farsiteCommandFiles[runIdx]) == false)
+        if(doesFileExist(farsiteCommandFiles[runIdx]) == false)
         {
             printf("farsite command file \"%s\" does not exist!\n",farsiteCommandFiles[runIdx].c_str());
             return false;
@@ -764,123 +764,6 @@ std::string farsiteAPI::exec_cmd(const char* cmd)
 /*** end special execute external script commands ***/
 
 /*** useful utility functions ***/
-bool farsiteAPI::doesFilenameExist(std::string fileName)
-{
-    // found this here: https://stackoverflow.com/questions/12774207/fastest-way-to-check-if-a-file-exist-using-standard-c-c11-c
-    // hopefully it works for files as well as directories as this is the same thing used to check a file path. More interesting hopefully this works for .prj files!
-    struct stat buffer;
-    return (stat (fileName.c_str(), &buffer) == 0);
-}
-
-bool farsiteAPI::doesFolderExist(std::string pathName)
-{
-    bool exists = true;
-
-    struct stat info;
-    if( stat( pathName.c_str(), &info ) != 0 )
-    {
-        //printf( "cannot access %s\n", inputString.c_str() );
-        exists = false;
-    } else if( info.st_mode & S_IFDIR )  // S_ISDIR() doesn't exist on my windows
-    {
-        //printf( "%s is a directory\n", inputString.c_str() );
-        exists = true;
-    } else
-    {
-        //printf( "%s is no directory\n", inputString.c_str() );
-        exists = false;
-    }
-
-    return exists;
-}
-
-// found this function here: https://stackoverflow.com/questions/5719694/having-a-path-to-file-how-to-check-if-it-is-executable
-// so it could use some extra stuff to test the owner and group and if you have Secure Linux then the security settings which stat does not give you
-bool farsiteAPI::isExecutable(const char *file)
-{
-    struct stat  st;
-
-        if (stat(file, &st) < 0)
-            return false;
-        if ((st.st_mode & S_IEXEC) != 0)
-            return true;
-        return false;
-}
-
-std::string farsiteAPI::findFileBaseNameAndExtension(std::string filePath)
-{
-    std::string fileName = "";
-
-    for(size_t charIdx = filePath.length()-1; charIdx > 0; charIdx--)
-    {
-        std::string currentChr = filePath.substr(charIdx,1);
-        if(currentChr == "/")
-        {
-            fileName = filePath.substr(charIdx+1,filePath.length());
-            break;
-        }
-        if(charIdx == 1)    // was no extra path on it
-        {
-            fileName = filePath;
-        }
-    }
-
-    return fileName;
-}
-
-std::string farsiteAPI::findBaseName(std::string filePath)
-{
-    // first pull off the path part
-    std::string fileBaseName = findFileBaseNameAndExtension(filePath);
-
-    // now pull of the extension
-    for(size_t charIdx = fileBaseName.length()-1; charIdx > 0; charIdx--)
-    {
-        std::string currentChr = fileBaseName.substr(charIdx,1);
-        if(currentChr == ".")
-        {
-            fileBaseName = fileBaseName.substr(0,charIdx);
-            break;
-        }
-    }
-
-    return fileBaseName;
-}
-
-std::string farsiteAPI::findBaseNameWithPath(std::string filePath)
-{
-    // first pull off the path part
-    std::string fileBaseName = "";
-
-    // now pull of the extension
-    for(size_t charIdx = filePath.length()-1; charIdx > 0; charIdx--)
-    {
-        std::string currentChr = filePath.substr(charIdx,1);
-        if(currentChr == ".")
-        {
-            fileBaseName = filePath.substr(0,charIdx);
-            break;
-        }
-        if(charIdx == 1)    // was no extension on it
-        {
-            fileBaseName = filePath;
-        }
-    }
-
-    return fileBaseName;
-}
-
-// found this function from: https://stackoverflow.com/questions/10195343/copy-a-file-in-a-sane-safe-and-efficient-way
-bool farsiteAPI::copyFile(std::string inputFilename, std::string outputFilename)
-{
-    std::ifstream  src(inputFilename.c_str(), std::ios::binary);
-    std::ofstream  dst(outputFilename.c_str(),   std::ios::binary);
-    dst << src.rdbuf();
-
-    // if it gets here, everything went well
-    return true;
-}
-
 std::string farsiteAPI::monthTextToNumber(std::string inputMonthText)
 {
     std::string outputMonthNumber = "";
