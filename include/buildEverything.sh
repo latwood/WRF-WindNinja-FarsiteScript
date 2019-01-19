@@ -142,7 +142,7 @@ windninjaDir=$extraAppsDir"/windninja"
 windninjaSource="https://github.com/firelab/windninja"
 windninjaLink="https://github.com/firelab/windninja.git"
 windninjaScriptsDir=$windninjaDir"/scripts"
-windninjaBuildDir=$windninjaDir"/build-windninja"
+windninjaBuildDir=$windninjaDir"/build_windninja"
 windninjaConfigure=""
 
 # setup farsite variables

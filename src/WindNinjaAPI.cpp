@@ -215,8 +215,10 @@ bool WindNinjaAPI::run_WindNinja()
 
     for(size_t wrfCount = 0; wrfCount < wrf_files.size(); wrfCount++)
     {
-
+        printf("running %s config file\n",WindNinjaCfgFileNames[wrfCount].c_str());
         int nRet = -1;
+        char data[4096 + 1];
+        std::string s;
 
         const char *const papszArgv[] = { "WindNinja_cli",
                                           WindNinjaCfgFileNames[wrfCount].c_str(),
@@ -230,11 +232,28 @@ bool WindNinjaAPI::run_WindNinja()
 
         VSIFCloseL(fout);
 
+        std::string logFileName = WindNinjaRunFolderPaths[wrfCount] + "/log.WindNinjaRun";
+        std::ifstream fzInput;
+        if(doesFilenameExist(logFileName) == false)
+        {
+            printf("failed to open WindNinja log file \"%s\"!\n",logFileName.c_str());
+            return false;
+        }
+        fzInput.open(logFileName.c_str());
+        std::string currentLine;
+        while(std::getline(fzInput,currentLine))
+        {
+            printf("%s\n",currentLine.c_str());
+        }
+        printf("finished running %s config file\n\n",WindNinjaCfgFileNames[wrfCount].c_str());
+
+
         if(nRet == -1)
         {
             success = false;
             break;
         }
+
     }
 
     return success;
