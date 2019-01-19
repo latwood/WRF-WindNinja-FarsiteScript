@@ -12,6 +12,9 @@ public:
     // constructors
     inputParser();
 
+    // reinit functions (like constructors)
+    void reset();     //kind of a reusable constructor/destructor
+
     // variable class getter functions
     void loadVariableInfo(inputVariables_valueStorage* newInputVariables);
 

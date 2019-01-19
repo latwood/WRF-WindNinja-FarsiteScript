@@ -11,7 +11,7 @@
 #include "getWindNinjaPath.h"
 #include "getFarsitePath.h"
 
-#include <chrono>
+#include "utilityClasses/calcTime.h"
 
 using namespace std;
 
@@ -74,7 +74,8 @@ bool isValidExecutable(std::string executablePath)  // this is just a temporary 
 int main(int argc, char* argv[])
 {
     printf("\n\nbeginning WRF-WindNinja-FarsiteScript\n\n");
-    auto start = std::chrono::high_resolution_clock::now(); // start recording execution time
+    calcTime timers;
+    timers.startNewTime("initialize WRF-WindNinja-FarsiteScript"); // start recording execution time
 
     inputVariablesHandler inputs;
     lcpDownloader createLcp;
@@ -267,9 +268,7 @@ int main(int argc, char* argv[])
 
     printf("\n\nfinished WRF-WindNinja-FarsiteScript\n");
 
-    auto finish = std::chrono::high_resolution_clock::now();  // finish recording execution time
-    std::chrono::duration<double> elapsed = finish - start;
-    printf("Elapsed time: %f seconds\n\n\n",elapsed.count());   // print out elapsed execution time
+    timers.getAndPrint_time("initialize WRF-WindNinja-FarsiteScript");   // print out elapsed execution time
 
     return 0;
 }

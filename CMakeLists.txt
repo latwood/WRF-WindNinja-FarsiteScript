@@ -51,6 +51,8 @@ set(SOURCES "src/main.cpp" "src/lcpDownloader.cpp" "src/createIgnitions.cpp" "sr
 
         "src/getWindNinjaPath.cpp" "src/getFarsitePath.cpp"
 
+        "src/utilityClasses/calcTime.cpp"
+
 	"src/inputClasses/inputVariablesHandler.cpp" "src/inputClasses/inputVariable_info.cpp" "src/inputClasses/inputVariables_infoStorage.cpp"
 	"src/inputClasses/inputVariables_valueStorage.cpp" "src/inputClasses/inputParser.cpp" 
 

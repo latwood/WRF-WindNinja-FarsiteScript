@@ -9,6 +9,32 @@ inputParser::inputParser()
 }
 /*** end constructor functions ***/
 
+/*** reinit functions ***/
+void inputParser::reset()
+{
+    while(!foundInputLines.empty())
+    {
+        foundInputLines.pop_back();
+    }
+    while(!foundLineTypes.empty())
+    {
+        foundLineTypes.pop_back();
+    }
+    while(!foundVarNames.empty())
+    {
+        foundVarNames.pop_back();
+    }
+    while(!foundVarNames_inputVariableInfoIndices.empty())
+    {
+        foundVarNames_inputVariableInfoIndices.pop_back();
+    }
+    while(!foundVarCountStrings.empty())
+    {
+        foundVarCountStrings.pop_back();
+    }
+}
+/*** end reinit functions ***/
+
 /*** variable class getter functions ***/
 void inputParser::loadVariableInfo(inputVariables_valueStorage* newInputVariables)
 {
@@ -28,6 +54,8 @@ std::vector<inputVariable_info> inputParser::transferVariableInfo()
 bool inputParser::readInputFile(std::string inputFileName)
 {
     bool success = true;
+
+    reset();
 
     std::ifstream fzInput;   // input file stream, using pointer to a FILE was not accepted by std::getline
     success = openIsStream(inputFileName,fzInput);
