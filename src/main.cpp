@@ -12,6 +12,8 @@
 #include "getFarsitePath.h"
 
 #include "utilityClasses/calcTime.h"
+#include "utilityClasses/createFolder.h"
+#include "utilityClasses/isValidExecFile.h"
 
 using namespace std;
 
@@ -34,41 +36,6 @@ bool checkCommandLineInput(int argc, char*argv[], inputVariablesHandler *inputs)
     }
     fclose(cmd);
     return true;    // only other way to return is by exiting
-}
-
-bool doesFolderExist(std::string pathName)
-{
-    bool exists = true;
-
-    struct stat info;
-    if( stat( pathName.c_str(), &info ) != 0 )
-    {
-        //printf( "cannot access %s\n", inputString.c_str() );
-        exists = false;
-    } else if( info.st_mode & S_IFDIR )  // S_ISDIR() doesn't exist on my windows
-    {
-        //printf( "%s is a directory\n", inputString.c_str() );
-        exists = true;
-    } else
-    {
-        //printf( "%s is no directory\n", inputString.c_str() );
-        exists = false;
-    }
-
-    return exists;
-}
-
-bool isValidExecutable(std::string executablePath)  // this is just a temporary fix. Almost need to try the script with simple inputs as a test run to see for sure if it is a valid application executable
-{
-    bool isValid = false;
-
-    struct stat info;
-    if( stat(executablePath.c_str(), &info) == 0 && info.st_mode & S_IXUSR)
-    {
-        isValid = true;
-    }
-
-    return isValid;
 }
 
 int main(int argc, char* argv[])
@@ -120,23 +87,15 @@ int main(int argc, char* argv[])
 
     printf("\ncreating main output folders\n");
     // create main output folders if needed. overwrite outputs will already be checked to get the right paths
-    if(doesFolderExist(inputs.get_actualCreateInputs_path()) == false)
+    if(createFolder(inputs.get_actualCreateInputs_path()) == false)
     {
-            //force temp dir to DEM location (is this even necessary?)
-        CPLSetConfigOption("CPL_TMPDIR", CPLGetDirname(inputs.get_actualCreateInputs_path().c_str()));
-        CPLSetConfigOption("CPLTMPDIR", CPLGetDirname(inputs.get_actualCreateInputs_path().c_str()));
-        CPLSetConfigOption("TEMP", CPLGetDirname(inputs.get_actualCreateInputs_path().c_str()));
-            // now make the directory
-        VSIMkdir( inputs.get_actualCreateInputs_path().c_str(), 0777 );
+        printf("failed to create createInputs folder!\n");
+        exit(1);
     }
-    if(doesFolderExist(inputs.get_actualFinalOutput_path()) == false)
+    if(createFolder(inputs.get_actualFinalOutput_path()) == false)
     {
-            //force temp dir to DEM location (is this even necessary?)
-        CPLSetConfigOption("CPL_TMPDIR", CPLGetDirname(inputs.get_actualFinalOutput_path().c_str()));
-        CPLSetConfigOption("CPLTMPDIR", CPLGetDirname(inputs.get_actualFinalOutput_path().c_str()));
-        CPLSetConfigOption("TEMP", CPLGetDirname(inputs.get_actualFinalOutput_path().c_str()));
-            // now make the directory
-        VSIMkdir( inputs.get_actualFinalOutput_path().c_str(), 0777 );
+        printf("failed to create finalOutput folder!\n");
+        exit(1);
     }
 
     printf("\nloading inputs into createIgnition class\n");
