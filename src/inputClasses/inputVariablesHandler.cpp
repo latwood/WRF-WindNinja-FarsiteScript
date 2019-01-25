@@ -118,7 +118,7 @@ bool inputVariablesHandler::loadScriptInputs(std::string inputFileName)
         // transfer final data back before doing any printing or whatever
         transferVariableInfo(); // don't be caught off gaurd, runs theInputParser.loadAllInputs if success is true, if that succeeds runs transferVariableInfo
         // comment this out unless debugging
-        printFoundInput();
+        //printFoundInput();
     }
 
     // now get the actual output paths for use by everything
@@ -477,28 +477,6 @@ bool inputVariablesHandler::verifyFoundInputCombinations()
     return success;
 }
 
-bool inputVariablesHandler::doesFolderExist(std::string pathName)
-{
-    bool exists = true;
-
-    struct stat info;
-    if( stat( pathName.c_str(), &info ) != 0 )
-    {
-        //printf( "cannot access %s\n", inputString.c_str() );
-        exists = false;
-    } else if( info.st_mode & S_IFDIR )  // S_ISDIR() doesn't exist on my windows
-    {
-        //printf( "%s is a directory\n", inputString.c_str() );
-        exists = true;
-    } else
-    {
-        //printf( "%s is no directory\n", inputString.c_str() );
-        exists = false;
-    }
-
-    return exists;
-}
-
 bool inputVariablesHandler::findActualCreateInputsAndFinalOutputsPaths()
 {
     bool success = true;
@@ -528,14 +506,14 @@ bool inputVariablesHandler::findActualCreateInputsAndFinalOutputsPaths()
         std::string currentCreateInputsPath = foundCreateInputs_path;
         std::string currentFinalOutputPath = foundFinalOutput_path;
 
-        if(doesFolderExist(currentCreateInputsPath) == false && doesFolderExist(currentFinalOutputPath) == false)
+        if(doesDirExist(currentCreateInputsPath) == false && doesDirExist(currentFinalOutputPath) == false)
         {
             actualCreateInputs_path = foundCreateInputs_path;
             actualFinalOutput_path = foundFinalOutput_path;
         } else
         {
             size_t fileIdxCount = 0;
-            while(doesFolderExist(currentCreateInputsPath) == true || doesFolderExist(currentFinalOutputPath) == true)
+            while(doesDirExist(currentCreateInputsPath) == true || doesDirExist(currentFinalOutputPath) == true)
             {
                 fileIdxCount = fileIdxCount + 1;
                 currentCreateInputsPath = foundCreateInputs_path + "-" + std::to_string(fileIdxCount);

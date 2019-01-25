@@ -6,6 +6,8 @@
 
 #include "gdal.h"
 
+#include "../../utilityClasses/doesFilenameExist.h"
+
 class lcpFileValue
 {
 
@@ -30,7 +32,6 @@ private:
     bool isValidLcpFilename(std::string inputString, bool suppressWarnings);
 
     // utility functions
-    bool doesFilenameExist(std::string fileName);
 
     // data members
     std::string variableName;

@@ -515,31 +515,20 @@ bool inputParser::loadLoaderFunctionData()
 
 
 /*** parsing utility functions ***/
-bool inputParser::doesRegularFileExist(std::string fileName)
+bool inputParser::openIsStream(std::string fileName,std::ifstream &fzStream)
 {
     bool success = true;
 
     FILE *fzTemp = fopen(fileName.c_str(),"r");    // use "w" for write
     if( fzTemp == NULL)
     {
-        printf("file \"%s\" could not be opened!\n",fileName.c_str());
+        printf("File \"%s\" could not be opened! Failed to open input file!\n",fileName.c_str());
         success = false;
     }
     fclose(fzTemp);
 
-    return success;
-}
-
-bool inputParser::openIsStream(std::string fileName,std::ifstream &fzStream)
-{
-    bool success = true;
-
-    // run does file exist function on inputFileName. If so, open this input file as the file to pass around to all the loader functions
-    if(doesRegularFileExist(fileName) == false)
-    {
-        printf("failed to open input file!\n");
-        success = false;
-    } else
+    // figure out if file exists. If so, open this input file as the file to pass around to all the loader functions
+    if(success == true)
     {
         fzStream.open(fileName.c_str());
     }

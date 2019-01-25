@@ -32,7 +32,6 @@ public:
 private:
 
     // parsing utility functions
-    bool doesRegularFileExist(std::string fileName);
     bool openIsStream(std::string fileName,std::ifstream &fzStream);
     void removeLeadingWhitespace(std::string &inputString);
     void removeEndingWhitespace(std::string &inputString);

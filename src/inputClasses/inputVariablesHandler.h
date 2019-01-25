@@ -6,6 +6,8 @@
 
 #include "inputParser.h"
 
+#include "../utilityClasses/doesFolderExist.h"
+
 
 class inputVariablesHandler
 {
@@ -58,7 +60,6 @@ private:
     // functions
     bool reset();
     bool verifyFoundInputCombinations();
-    bool doesFolderExist(std::string pathName);
     bool findActualCreateInputsAndFinalOutputsPaths();
     bool findActualLcpPathAndBaseName();
 

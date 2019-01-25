@@ -163,7 +163,7 @@ bool lcpFileValue::isValidLcpFilename(std::string inputString, bool suppressWarn
     {
         std::string lcpBasePath = inputString.substr(0,inputString.length()-4);
         std::string prjFileName = lcpBasePath + ".prj";
-        if(doesFilenameExist(prjFileName) == false)    // not sure if this one will be allowed, maybe do a function that takes in lcp filename that checks for prj specifically
+        if(doesFileExist(prjFileName) == false)    // not sure if this one will be allowed, maybe do a function that takes in lcp filename that checks for prj specifically
         {
             if(suppressWarnings == false)
             {
@@ -178,11 +178,4 @@ bool lcpFileValue::isValidLcpFilename(std::string inputString, bool suppressWarn
 /*** end typechecker functions ***/
 
 /*** utility functions ***/
-bool lcpFileValue::doesFilenameExist(std::string fileName)
-{
-    // found this here: https://stackoverflow.com/questions/12774207/fastest-way-to-check-if-a-file-exist-using-standard-c-c11-c
-    // hopefully it works for files as well as directories as this is the same thing used to check a file path. More interesting hopefully this works for .prj files!
-    struct stat buffer;
-    return (stat (fileName.c_str(), &buffer) == 0);
-}
 /*** end utility functions ***/
