@@ -88,8 +88,8 @@ netcdf_cTarDir=$extraLibsDir"/"$netcdf_cTarName
 netcdf_cTarDirName=$extraLibsDir"/"$netcdf_cDirName
 netcdf_cDir=$extraLibsDir"/"$netcdf_cDirName
 netcdf_cBuildDir=$netcdf_cDir"/"$netcdf_cBuildDirName
-netcdf_cCPPFLAGS="-I"$hdf5BuildDir"/include"
-netcdf_cLDFLAGS="-L"$hdf5BuildDir"/lib"
+netcdf_cCPPFLAGS="-I"$zlibBuildDir"/include -I"$curlBuildDir"/include -I"$hdf5BuildDir"/include"
+netcdf_cLDFLAGS="-L"$zlibBuildDir"/lib -L"$curlBuildDir"/lib -L"$hdf5BuildDir"/lib"
 netcdf_cConfigure="./configure --prefix="$netcdf_cBuildDir
 
 # setup netcdf-cxx variables
@@ -103,8 +103,8 @@ netcdf_cxxTarDir=$extraLibsDir"/"$netcdf_cxxTarName
 netcdf_cxxTarDirName=$extraLibsDir"/netcdf-cxx4-"$netcdf_cxxVersion
 netcdf_cxxDir=$extraLibsDir"/"$netcdf_cxxDirName
 netcdf_cxxBuildDir=$netcdf_cxxDir"/"$netcdf_cxxBuildDirName
-netcdf_cxxCPPFLAGS="-I"$hdf5BuildDir"/include"
-netcdf_cxxLDFLAGS="-L"$hdf5BuildDir"/lib"
+netcdf_cxxCPPFLAGS="-I"$hdf5BuildDir"/include -I"$netcdf_cBuildDir"/include"
+netcdf_cxxLDFLAGS="-L"$hdf5BuildDir"/lib -L"$netcdf_cBuildDir"/lib"
 netcdf_cxxConfigure="./configure --prefix="$netcdf_cxxBuildDir
 
 # setup jasper variables
