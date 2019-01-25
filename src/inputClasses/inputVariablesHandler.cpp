@@ -462,19 +462,70 @@ bool inputVariablesHandler::reset()
     return success;
 }
 
+size_t inputVariablesHandler::findVarInfoIdx(std::string varName)
+{
+    bool foundVar = false;
+    size_t infoIdx = 0;
+
+    for(size_t varIdx = 0; varIdx < inputVariableInfo.size(); varIdx++)
+    {
+        std::string currentVarName = inputVariableInfo[varIdx].get_variableName();
+        if(currentVarName == varName)
+        {
+            infoIdx = varIdx;
+            foundVar = true;
+            break;
+        }
+    }
+
+    if(foundVar == false)
+    {
+        printf("Couldn't find %s varName in stored var info! Exiting program!\n");
+        exit(1);
+    }
+
+    return infoIdx;
+}
+
+void inputVariablesHandler::checkUsage_defaultValue(std::string varName)
+{
+    size_t infoIdx = findVarInfoIdx(varName);
+    if(inputVariableInfo[infoIdx].get_isFoundInInputFile() == false)
+    {
+        inputVariableInfo[infoIdx].set_wantDefaultValue(true);  // means user doesn't need to specify this, default value was used
+        //printf("%s variable not input, was set to default value\n",varName.c_str());
+    }
+}
+
+void inputVariablesHandler::checkUsage_requiredValue(std::string varName, bool &InputCombinationSuccess)
+{
+    size_t infoIdx = findVarInfoIdx(varName);
+    if(inputVariableInfo[infoIdx].get_isFoundInInputFile() == false)
+    {
+        printf("%s variable is required but is not set in the input file!\n",varName.c_str());
+        InputCombinationSuccess = false;    // only thing it can become is false, never turned back to true
+    }
+}
+
+void inputVariablesHandler::checkUsage_conflictingOptions(std::vector<std::string> varNames, bool &InputCombinationSuccess)
+{
+
+}
+
 // I think super slow cause have to go through every single variable multiple times
 bool inputVariablesHandler::verifyFoundInputCombinations()
 {
-    bool success = true;
+    bool InputCombinationSuccess = true;
 
     // setup whatever you need to set if input variables are optional or not, or how they are optional or required
     // set_wantDefaultValue
     // I would keep the order of these checkers as close to the input variable list order as possible to keep it hopefully less confusing
 
+    checkUsage_defaultValue("run_base_name");
+    checkUsage_requiredValue("createInputs_path",InputCombinationSuccess);
+    checkUsage_requiredValue("finalOutput_path",InputCombinationSuccess);
 
-
-
-    return success;
+    return InputCombinationSuccess;
 }
 
 bool inputVariablesHandler::findActualCreateInputsAndFinalOutputsPaths()

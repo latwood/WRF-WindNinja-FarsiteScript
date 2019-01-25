@@ -59,6 +59,10 @@ private:
 
     // functions
     bool reset();
+    size_t findVarInfoIdx(std::string varName);
+    void checkUsage_defaultValue(std::string varName);
+    void checkUsage_requiredValue(std::string varName, bool &InputCombinationSuccess);
+    void checkUsage_conflictingOptions(std::vector<std::string> varNames, bool &InputCombinationSuccess);
     bool verifyFoundInputCombinations();
     bool findActualCreateInputsAndFinalOutputsPaths();
     bool findActualLcpPathAndBaseName();
