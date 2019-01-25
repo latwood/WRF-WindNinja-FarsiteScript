@@ -217,6 +217,7 @@ setupDownloadableLib()
 
   if [ ! -d "${libDir}" ]; then
     echo "unpacking "$libTarDir
+    cd $extraLibsDir
     tar -xzf $libTarDir
     if [ ! -d "${libTarDirName}" ]; then
       echo "!!!failed to unpack "$libDir"!!!"
