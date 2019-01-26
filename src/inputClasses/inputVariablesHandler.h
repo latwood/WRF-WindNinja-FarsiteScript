@@ -59,13 +59,20 @@ private:
 
     // functions
     bool reset();
-    size_t findVarInfoIdx(std::string varName);
-    void checkUsage_defaultValue(std::string varName);
-    void checkUsage_requiredValue(std::string varName, bool &InputCombinationSuccess);
-    void checkUsage_conflictingOptions(std::vector<std::string> varNames, bool &InputCombinationSuccess);
     bool verifyFoundInputCombinations();
     bool findActualCreateInputsAndFinalOutputsPaths();
     bool findActualLcpPathAndBaseName();
+
+    // input combination checking functions
+    size_t findVarInfoIdx(std::string varName);
+    void checkUsage_optionalValue(std::string varName);
+    void checkUsage_defaultValue(std::string varName);
+    void checkUsage_requiredValue(std::string varName, bool &InputCombinationSuccess);
+    void checkUsage_chooseOnlyOneValue(std::vector<std::string> varNames, bool &InputCombinationSuccess);
+    void checkUsage_chooseAtLeastOneValue(std::vector<std::string> varNames, bool &InputCombinationSuccess);
+    void checkUsage_chooseOnlyOneValueOrDefaultValue(std::string defaultVarName, std::vector<std::string> otherVarNames, bool &InputCombinationSuccess);
+    void checkUsage_requiredIfCertainValueSet(std::string ifSetVarName, std::vector<std::string> checkVarNames, bool &InputCombinationSuccess);
+    void checkUsage_chooseOnlyOneIfCertainValueSet(std::string ifSetVarName, std::vector<std::string> checkVarNames, bool &InputCombinationSuccess);
 
     // class data members
     std::vector<inputVariable_info> inputVariableInfo;

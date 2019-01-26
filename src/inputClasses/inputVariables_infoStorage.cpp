@@ -198,37 +198,46 @@ void inputVariables_infoStorage::setupAvailableVariables()
                 "File name extension is verified to be .lcp and file is verified to be openable by gdal. Second file with same path and name "
                 "but .prj extension is also verified to exist. Specify only if use_past_lcp is set to true");
     addVariable("specify_lcp_download","lcpDownloader","bool",
-                "For doing a WindNinja style lat/long point and buffer zone or lat/long box lcp download. "
-                "If this is true, need to specify all the following: lcp_download_lat_long_point, lcp_download_northsouth_buffer, "
-                "lcp_download_westeast_buffer, lcp_download_buffer_units OR lcp_download_north_lat_bound, lcp_download_south_lat_bound, "
-                "lcp_download_east_long_bound, lcp_download_west_long_bound. Only one of automate_lcp_download, use_past_lcp, "
-                "and specify_lcp_download can be true and the default to be true if none are specified is automate_lcp_download");
+                "For doing a WindNinja style lat/long point and buffer zone or lat/long bounding box lcp download. "
+                "If this is true, need to specify either use_point_lcp_download or use_bounds_lcp_download. "
+                "If use_point_lcp_download is specified, all the following need specified: lcp_download_lat_long_point, "
+                "lcp_download_northsouth_buffer, lcp_download_westeast_buffer, lcp_download_buffer_units. "
+                "If use_bounds_lcp_download is specified, all the following need specified: lcp_download_north_lat_bound, "
+                "lcp_download_south_lat_bound, lcp_download_east_long_bound, lcp_download_west_long_bound. "
+                "Only one of automate_lcp_download, use_past_lcp, and specify_lcp_download can be true and the default "
+                "to be true if none are specified is automate_lcp_download");
+    addVariable("use_point_lcp_download","lcpDownloader","bool",
+                "A boolean specifying which WindNinja download type to use. Specify only if specify_lcp_download is set to true, "
+                "with conditions as explained for that variable");
     addVariable("lcp_download_lat_long_point","lcpDownloader","lat_long_point",
                 "A lat long point of format (lat long) and is the center point of a box used for lcp downloading in WindNinja. "
-                "Specify only if use_past_lcp is set to true, with conditions as explained for that variable");
+                "Specify only if specify_lcp_download and use_point_lcp_download are set to true");
     addVariable("lcp_download_northsouth_buffer","lcpDownloader","positive double",
                 "Half the height of the box with lcp_download_lat_long_point as the center of the box. "
-                "Specify only if use_past_lcp is set to true, with conditions as explained for that variable");
+                "Specify only if specify_lcp_download and use_point_lcp_download are set to true");
     addVariable("lcp_download_westeast_buffer","lcpDownloader","positive double",
                 "Half the width of the box with lcp_download_lat_long_point as the center of the box. "
-                "Specify only if use_past_lcp is set to true, with conditions as explained for that variable");
+                "Specify only if specify_lcp_download and use_point_lcp_download are set to true");
     addVariable("lcp_download_buffer_units","lcpDownloader","string",
                 "The units of the buffer box width and height. Can be kilometers or miles. "
-                "Specify only if use_past_lcp is set to true, with conditions as explained for that variable");
+                "Specify only if specify_lcp_download and use_point_lcp_download are set to true");
+    addVariable("use_bounds_lcp_download","lcpDownloader","bool",
+                "A boolean specifying which WindNinja download type to use. Specify only if specify_lcp_download is set to true, "
+                "with conditions as explained for that variable");
     addVariable("lcp_download_north_lat_bound","lcpDownloader","lat_coord",
-                "The north latitude coordinate for an lcp download of a box with no center. "
-                "Is a decimal point value. Specify only if use_past_lcp is set to true, with conditions as explained for that variable");
+                "The north latitude coordinate for an lcp download of a box with no center. Is a decimal point value. "
+                "Specify only if specify_lcp_download and use_bounds_lcp_download are set to true");
     addVariable("lcp_download_south_lat_bound","lcpDownloader","lat_coord",
-                "The south latitude coordinate for an lcp download of a box with no center. "
-                "Is a decimal point value. Specify only if use_past_lcp is set to true, with conditions as explained for that variable. "
+                "The south latitude coordinate for an lcp download of a box with no center. Is a decimal point value. "
+                "Specify only if specify_lcp_download and use_bounds_lcp_download are set to true. "
                 "Checks to make sure is less than lcp_download_north_lat_bound");
     addVariable("lcp_download_east_long_bound","lcpDownloader","long_coord",
                 "The east latitude coordinate for an lcp download of a box with no center. Is a decimal point value. "
-                "Specify only if use_past_lcp is set to true, with conditions as explained for that variable. "
+                "Specify only if specify_lcp_download and use_bounds_lcp_download are set to true. "
                 "Checks to make sure is less than lcp_download_west_long_bound");
     addVariable("lcp_download_west_long_bound","lcpDownloader","long_coord",
                 "The west latitude coordinate for an lcp download of a box with no center. Is a decimal point value. "
-                "Specify only if use_past_lcp is set to true, with conditions as explained for that variable");
+                "Specify only if specify_lcp_download and use_bounds_lcp_download are set to true");
 
         // createIgnition variables
     addVariable("create_ignition_from_latlongs","createIgnition","count",

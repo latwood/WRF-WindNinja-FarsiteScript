@@ -462,56 +462,6 @@ bool inputVariablesHandler::reset()
     return success;
 }
 
-size_t inputVariablesHandler::findVarInfoIdx(std::string varName)
-{
-    bool foundVar = false;
-    size_t infoIdx = 0;
-
-    for(size_t varIdx = 0; varIdx < inputVariableInfo.size(); varIdx++)
-    {
-        std::string currentVarName = inputVariableInfo[varIdx].get_variableName();
-        if(currentVarName == varName)
-        {
-            infoIdx = varIdx;
-            foundVar = true;
-            break;
-        }
-    }
-
-    if(foundVar == false)
-    {
-        printf("Couldn't find %s varName in stored var info! Exiting program!\n");
-        exit(1);
-    }
-
-    return infoIdx;
-}
-
-void inputVariablesHandler::checkUsage_defaultValue(std::string varName)
-{
-    size_t infoIdx = findVarInfoIdx(varName);
-    if(inputVariableInfo[infoIdx].get_isFoundInInputFile() == false)
-    {
-        inputVariableInfo[infoIdx].set_wantDefaultValue(true);  // means user doesn't need to specify this, default value was used
-        //printf("%s variable not input, was set to default value\n",varName.c_str());
-    }
-}
-
-void inputVariablesHandler::checkUsage_requiredValue(std::string varName, bool &InputCombinationSuccess)
-{
-    size_t infoIdx = findVarInfoIdx(varName);
-    if(inputVariableInfo[infoIdx].get_isFoundInInputFile() == false)
-    {
-        printf("%s variable is required but is not set in the input file!\n",varName.c_str());
-        InputCombinationSuccess = false;    // only thing it can become is false, never turned back to true
-    }
-}
-
-void inputVariablesHandler::checkUsage_conflictingOptions(std::vector<std::string> varNames, bool &InputCombinationSuccess)
-{
-
-}
-
 // I think super slow cause have to go through every single variable multiple times
 bool inputVariablesHandler::verifyFoundInputCombinations()
 {
@@ -521,9 +471,67 @@ bool inputVariablesHandler::verifyFoundInputCombinations()
     // set_wantDefaultValue
     // I would keep the order of these checkers as close to the input variable list order as possible to keep it hopefully less confusing
 
-    checkUsage_defaultValue("run_base_name");
+        // application specific variables
+    checkUsage_optionalValue("run_base_name");
     checkUsage_requiredValue("createInputs_path",InputCombinationSuccess);
     checkUsage_requiredValue("finalOutput_path",InputCombinationSuccess);
+    checkUsage_defaultValue("overwrite_past_outputs");
+    checkUsage_defaultValue("createIgnition_output_units");
+    checkUsage_defaultValue("WindNinja_required_output_units");
+    checkUsage_defaultValue("wrfGetWeather_output_units");
+    checkUsage_defaultValue("farsite_output_units");
+    checkUsage_defaultValue("use_native_timezone");
+
+        // lcp download variables (WindNinja related)
+    checkUsage_chooseOnlyOneValueOrDefaultValue("automate_lcp_download",{"use_past_lcp","specify_lcp_download"},InputCombinationSuccess);
+    checkUsage_defaultValue("fireperim_to_lcp_scalefactor");
+    checkUsage_requiredIfCertainValueSet("use_past_lcp",{"lcp_file_path"},InputCombinationSuccess);
+    checkUsage_chooseOnlyOneIfCertainValueSet("specify_lcp_download",{"use_point_lcp_download","use_bounds_lcp_download"},InputCombinationSuccess);
+    checkUsage_requiredIfCertainValueSet("use_point_lcp_download",{"lcp_download_lat_long_point","lcp_download_northsouth_buffer",
+                                                                   "lcp_download_westeast_buffer","lcp_download_buffer_units"},InputCombinationSuccess);
+    checkUsage_requiredIfCertainValueSet("use_bounds_lcp_download",{"lcp_download_north_lat_bound","lcp_download_south_lat_bound",
+                                                                    "lcp_download_east_long_bound","lcp_download_west_long_bound"},InputCombinationSuccess);
+
+        // createIgnition variables
+    checkUsage_chooseAtLeastOneValue({"create_ignition_from_latlongs","polygon_ignit_shape_files","GeoMAC_fire_perimeter_files","farsite_output_fire_perimeter_files"},InputCombinationSuccess);
+    checkUsage_defaultValue("fire_perimeter_widening_factor");
+
+        // wrfGetWeather and WindNinja variables
+    checkUsage_defaultValue("extend_wrf_data");
+    checkUsage_requiredValue("wrf_files",InputCombinationSuccess);
+
+        // WindNinja only variables
+    checkUsage_defaultValue("WindNinja_number_of_threads");
+    checkUsage_chooseOnlyOneValueOrDefaultValue("WindNinja_mesh_choice",{"WindNinja_mesh_resolution"},InputCombinationSuccess);
+    checkUsage_requiredIfCertainValueSet("WindNinja_mesh_resolution",{"WindNinja_mesh_res_units"},InputCombinationSuccess);
+    checkUsage_defaultValue("diurnal_winds");
+    checkUsage_defaultValue("non_neutral_stability");
+
+        // wrfGetWeather only variables
+    checkUsage_chooseOnlyOneValue({"use_weather_from_ignition_center","use_weather_from_full_ignition_area","use_weather_from_wrf_center"},InputCombinationSuccess);
+
+        // farsiteAPI variables
+    checkUsage_requiredValue("burn_start_time",InputCombinationSuccess);
+    checkUsage_requiredValue("burn_end_time",InputCombinationSuccess);
+    checkUsage_defaultValue("farsite_barrier_shapefile");
+    checkUsage_defaultValue("farsite_spot_probability");
+    checkUsage_defaultValue("farsite_spot_ignition_delay");
+    checkUsage_defaultValue("farsite_spotting_seed");
+    checkUsage_defaultValue("farsite_earliest_burn_time");
+    checkUsage_defaultValue("farsite_latest_burn_time");
+    checkUsage_defaultValue("farsite_foliar_moisture_content");
+    checkUsage_defaultValue("farsite_crown_fire_method");
+    checkUsage_defaultValue("farsite_spotting_seed");
+
+        // debugging related variables
+    // may be taking these out soon
+    checkUsage_optionalValue("report_largest_ignition_bounds");
+    checkUsage_optionalValue("report_found_inputs");
+
+        // optional WindNinja output settings, may not even add these options
+    checkUsage_optionalValue("additional_WindNinja_outputs_google");
+    checkUsage_optionalValue("additional_WindNinja_outputs_shapefile");
+    checkUsage_optionalValue("additional_WindNinja_outputs_pdf");
 
     return InputCombinationSuccess;
 }
@@ -596,3 +604,310 @@ bool inputVariablesHandler::findActualLcpPathAndBaseName()
     return success;
 }
 /*** end other functions ***/
+
+/*** input combination checking functions ***/
+size_t inputVariablesHandler::findVarInfoIdx(std::string varName)
+{
+    bool foundVar = false;
+    size_t infoIdx = 0;
+
+    for(size_t varIdx = 0; varIdx < inputVariableInfo.size(); varIdx++)
+    {
+        std::string currentVarName = inputVariableInfo[varIdx].get_variableName();
+        if(currentVarName == varName)
+        {
+            infoIdx = varIdx;
+            foundVar = true;
+            break;
+        }
+    }
+
+    if(foundVar == false)
+    {
+        printf("Couldn't find \"%s\" varName in stored var info! Exiting program!\n",varName.c_str());
+        exit(1);
+    }
+
+    return infoIdx;
+}
+
+void inputVariablesHandler::checkUsage_optionalValue(std::string varName)
+{
+    // is an optional value, so don't want to do anything, but makes for a nice place holder so everything has a nice format
+}
+
+void inputVariablesHandler::checkUsage_defaultValue(std::string varName)
+{
+    size_t infoIdx = findVarInfoIdx(varName);
+    if(inputVariableInfo[infoIdx].get_isFoundInInputFile() == false)
+    {
+        inputVariableInfo[infoIdx].set_wantDefaultValue(true);  // means user doesn't need to specify this, default value was used
+        //printf("\"%s\" variable not input, was set to default value\n",varName.c_str());
+    }
+}
+
+void inputVariablesHandler::checkUsage_requiredValue(std::string varName, bool &InputCombinationSuccess)
+{
+    size_t infoIdx = findVarInfoIdx(varName);
+    if(inputVariableInfo[infoIdx].get_isFoundInInputFile() == false)
+    {
+        printf("\"%s\" variable is required but is not set in the input file!\n",varName.c_str());
+        InputCombinationSuccess = false;    // only thing it can become is false, never turned back to true
+    }
+    // don't want a default value for this
+}
+
+void inputVariablesHandler::checkUsage_chooseOnlyOneValue(std::vector<std::string> varNames, bool &InputCombinationSuccess)
+{
+    size_t nVars = varNames.size();
+    if(nVars == 0)
+    {
+        printf("error checking variable input usage! varNames has no values! Exiting program!\n");
+        exit(1);
+    }
+    std::vector<bool> isSet(nVars,false);
+    std::vector<size_t> infoIdx(nVars,0);
+    size_t isSetCounter = 0;
+    for(size_t varIdx = 0; varIdx < nVars; varIdx++)
+    {
+        infoIdx[varIdx] = findVarInfoIdx(varNames[varIdx]);
+        if(inputVariableInfo[infoIdx[varIdx]].get_isFoundInInputFile() == true)
+        {
+            isSet[varIdx] = true;
+            isSetCounter = isSetCounter + 1;
+        }
+    }
+
+    if(isSetCounter == 0)
+    {
+        printf("Need exactly one of the variables ");
+        for(size_t varIdx = 0; varIdx < nVars; varIdx++)
+        {
+            printf("\"%s\" ",varNames[varIdx].c_str());
+        }
+        printf("specified in the input file, but none of these variables are specified!\n");
+        InputCombinationSuccess = false;    // only thing it can become is false, never turned back to true
+    } else if(isSetCounter > 1)
+    {
+        printf("Need exactly one of the variables ");
+        for(size_t varIdx = 0; varIdx < nVars; varIdx++)
+        {
+            printf("\"%s\" ",varNames[varIdx].c_str());
+        }
+        printf("specified in the input file, but ");
+        for(size_t varIdx = 0; varIdx < nVars; varIdx++)
+        {
+            if(isSet[varIdx] == true)
+            {
+                printf("\"%s\" ",varNames[varIdx].c_str());
+            }
+        }
+        printf("are each set!\n");
+        InputCombinationSuccess = false;    // only thing it can become is false, never turned back to true
+    }
+    // don't want a default value for any of these
+}
+
+void inputVariablesHandler::checkUsage_chooseAtLeastOneValue(std::vector<std::string> varNames, bool &InputCombinationSuccess)
+{
+    size_t nVars = varNames.size();
+    if(nVars == 0)
+    {
+        printf("error checking variable input usage! varNames has no values! Exiting program!\n");
+        exit(1);
+    }
+    size_t isSetCounter = 0;
+    for(size_t varIdx = 0; varIdx < nVars; varIdx++)
+    {
+        size_t infoIdx = findVarInfoIdx(varNames[varIdx]);
+        if(inputVariableInfo[infoIdx].get_isFoundInInputFile() == true)
+        {
+            isSetCounter = isSetCounter + 1;
+        }
+    }
+
+    if(isSetCounter == 0)
+    {
+        printf("Need at least one of the variables ");
+        for(size_t varIdx = 0; varIdx < nVars; varIdx++)
+        {
+            printf("\"%s\" ",varNames[varIdx].c_str());
+        }
+        printf("specified in the input file, but none of these variables are specified!\n");
+        InputCombinationSuccess = false;    // only thing it can become is false, never turned back to true
+    }
+    // don't want a default value for any of these
+}
+
+void inputVariablesHandler::checkUsage_chooseOnlyOneValueOrDefaultValue(std::string defaultVarName, std::vector<std::string> otherVarNames, bool &InputCombinationSuccess)
+{
+    size_t defaultVarIdx = findVarInfoIdx(defaultVarName);
+    size_t nOtherVars = otherVarNames.size();
+    if(nOtherVars == 0)
+    {
+        printf("error checking variable input usage! otherVarNames has no values! Exiting program!\n");
+        exit(1);
+    } else
+    {
+        for(size_t varIdx = 0; varIdx < nOtherVars; varIdx++)
+        {
+            if(defaultVarName == otherVarNames[varIdx])
+            {
+                printf("error checking variable input usage! defaultVarName should not be in otherVarName values! Exiting program!\n");
+                exit(1);
+            }
+        }
+    }
+
+    std::vector<bool> isSet(nOtherVars,false);
+    std::vector<size_t> otherVarIdx(nOtherVars,0);
+    size_t isSetCounter = 0;
+    if(inputVariableInfo[defaultVarIdx].get_isFoundInInputFile() == true)
+    {
+        isSetCounter = isSetCounter + 1;
+    }
+    for(size_t varIdx = 0; varIdx < nOtherVars; varIdx++)
+    {
+        otherVarIdx[varIdx] = findVarInfoIdx(otherVarNames[varIdx]);
+        if(inputVariableInfo[otherVarIdx[varIdx]].get_isFoundInInputFile() == true)
+        {
+            isSet[varIdx] = true;
+            isSetCounter = isSetCounter + 1;
+        }
+    }
+
+    if(isSetCounter == 0)
+    {
+        inputVariableInfo[defaultVarIdx].set_wantDefaultValue(true);  // means user doesn't need to specify this, default value was used
+    } else if(isSetCounter > 1)
+    {
+        printf("Need exactly one of the variables \"%s\" ",defaultVarName.c_str());
+        for(size_t varIdx = 0; varIdx < nOtherVars; varIdx++)
+        {
+            printf("\"%s\" ",otherVarNames[varIdx].c_str());
+        }
+        printf("specified in the input file or none of them, but ");
+        for(size_t varIdx = 0; varIdx < nOtherVars; varIdx++)
+        {
+            if(isSet[varIdx] == true)
+            {
+                printf("\"%s\" ",otherVarNames[varIdx].c_str());
+            }
+        }
+        if(inputVariableInfo[defaultVarIdx].get_isFoundInInputFile() == true)
+        {
+            printf("\"%s\" ",defaultVarName.c_str());
+        }
+        printf("are each set!\n");
+        InputCombinationSuccess = false;    // only thing it can become is false, never turned back to true
+    }
+    // don't want a default value for any of these
+}
+
+void inputVariablesHandler::checkUsage_requiredIfCertainValueSet(std::string ifSetVarName, std::vector<std::string> checkVarNames, bool &InputCombinationSuccess)
+{
+    size_t ifSetVarNameIdx = findVarInfoIdx(ifSetVarName);
+    size_t nCheckVars = checkVarNames.size();
+    if(nCheckVars == 0)
+    {
+        printf("error checking variable input usage! varNames has no values! Exiting program!\n");
+        exit(1);
+    }
+
+    if(inputVariableInfo[ifSetVarNameIdx].get_isFoundInInputFile() == false)
+    {
+        // expects want default value to be set by something else for isSetVarName
+        for(size_t varIdx = 0; varIdx < nCheckVars; varIdx++)
+        {
+            size_t checkVarIdx = findVarInfoIdx(checkVarNames[varIdx]);
+            inputVariableInfo[checkVarIdx].set_wantDefaultValue(true);  // means user doesn't need to specify this, default value was used
+            if(inputVariableInfo[checkVarIdx].get_isFoundInInputFile() == true)
+            {
+                printf("\"%s\" not set so \"%s\" should not be set, but \"%s\" is set!\n",ifSetVarName.c_str(),checkVarNames[varIdx].c_str(),checkVarNames[varIdx].c_str());
+                InputCombinationSuccess = false;    // only thing it can become is false, never turned back to true
+            }
+        }
+    } else
+    {
+        for(size_t varIdx = 0; varIdx < nCheckVars; varIdx++)
+        {
+            size_t checkVarIdx = findVarInfoIdx(checkVarNames[varIdx]);
+            if(inputVariableInfo[checkVarIdx].get_isFoundInInputFile() == false)
+            {
+                printf("\"%s\" set so \"%s\" should be set, but \"%s\" is not set!\n",ifSetVarName.c_str(),checkVarNames[varIdx].c_str(),checkVarNames[varIdx].c_str());
+                InputCombinationSuccess = false;    // only thing it can become is false, never turned back to true
+            }
+            // don't want a default value for this
+        }
+    }
+}
+
+void inputVariablesHandler::checkUsage_chooseOnlyOneIfCertainValueSet(std::string ifSetVarName, std::vector<std::string> checkVarNames, bool &InputCombinationSuccess)
+{
+    size_t ifSetVarNameIdx = findVarInfoIdx(ifSetVarName);
+    size_t nCheckVars = checkVarNames.size();
+    if(nCheckVars == 0)
+    {
+        printf("error checking variable input usage! varNames has no values! Exiting program!\n");
+        exit(1);
+    }
+
+    if(inputVariableInfo[ifSetVarNameIdx].get_isFoundInInputFile() == false)
+    {
+        // expects want default value to be set by something else for isSetVarName
+        for(size_t varIdx = 0; varIdx < nCheckVars; varIdx++)
+        {
+            size_t checkVarIdx = findVarInfoIdx(checkVarNames[varIdx]);
+            inputVariableInfo[checkVarIdx].set_wantDefaultValue(true);  // means user doesn't need to specify this, default value was used
+            if(inputVariableInfo[checkVarIdx].get_isFoundInInputFile() == true)
+            {
+                printf("\"%s\" not set so \"%s\" should not be set, but \"%s\" is set!\n",ifSetVarName.c_str(),checkVarNames[varIdx].c_str(),checkVarNames[varIdx].c_str());
+                InputCombinationSuccess = false;    // only thing it can become is false, never turned back to true
+            }
+        }
+    } else
+    {
+        std::vector<bool> isSet(nCheckVars,false);
+        std::vector<size_t> checkVarIdx(nCheckVars,0);
+        size_t isSetCounter = 0;
+        for(size_t varIdx = 0; varIdx < nCheckVars; varIdx++)
+        {
+            checkVarIdx[varIdx] = findVarInfoIdx(checkVarNames[varIdx]);
+            if(inputVariableInfo[checkVarIdx[varIdx]].get_isFoundInInputFile() == true)
+            {
+                isSet[varIdx] = true;
+                isSetCounter = isSetCounter + 1;
+            }
+        }
+
+        if(isSetCounter == 0)
+        {
+            printf("\"%s\" set so need exactly one of the variables ",ifSetVarName.c_str());
+            for(size_t varIdx = 0; varIdx < nCheckVars; varIdx++)
+            {
+                printf("\"%s\" ",checkVarNames[varIdx].c_str());
+            }
+            printf("specified in the input file, but none of these are specified!\n");
+            InputCombinationSuccess = false;    // only thing it can become is false, never turned back to true
+        } else if(isSetCounter > 1)
+        {
+            printf("\"%s\" set so need exactly one of the variables ",ifSetVarName.c_str());
+            for(size_t varIdx = 0; varIdx < nCheckVars; varIdx++)
+            {
+                printf("\"%s\" ",checkVarNames[varIdx].c_str());
+            }
+            printf("specified in the input file, but ");
+            for(size_t varIdx = 0; varIdx < nCheckVars; varIdx++)
+            {
+                if(isSet[varIdx] == true)
+                {
+                    printf("\"%s\" ",checkVarNames[varIdx].c_str());
+                }
+            }
+            printf("are each set!\n");
+            InputCombinationSuccess = false;    // only thing it can become is false, never turned back to true
+        }
+        // don't want a default value for any of these
+    }
+}
+/*** end input combination checking functions ***/
