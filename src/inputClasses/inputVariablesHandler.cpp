@@ -24,7 +24,7 @@ void inputVariablesHandler::explainInputReqs()
 {
     printf("WRF-WindNinja-FarsiteScript Usage:\n"
            "WRF-WindNinja-FarsiteScript [inputfile]\n"
-           "Where:\t[commandfile] is the path to the input file.\n\n");
+           "Where:\t[inputfile] is the path to the input file.\n\n");
     printf("The input file can contain the following variables:\n");
     printf("\n%s input variables\n",inputVariableInfo[0].get_applicationUseName().c_str());
     for(size_t varIdx = 0; varIdx < inputVariableInfo.size(); varIdx++)
@@ -522,11 +522,6 @@ bool inputVariablesHandler::verifyFoundInputCombinations()
     checkUsage_defaultValue("farsite_foliar_moisture_content");
     checkUsage_defaultValue("farsite_crown_fire_method");
     checkUsage_defaultValue("farsite_spotting_seed");
-
-        // debugging related variables
-    // may be taking these out soon
-    checkUsage_optionalValue("report_largest_ignition_bounds");
-    checkUsage_optionalValue("report_found_inputs");
 
         // optional WindNinja output settings, may not even add these options
     checkUsage_optionalValue("additional_WindNinja_outputs_google");

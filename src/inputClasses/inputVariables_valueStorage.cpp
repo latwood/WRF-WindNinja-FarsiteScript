@@ -26,7 +26,7 @@ inputVariables_valueStorage::inputVariables_valueStorage()
 /*** reinit functions (like constructors) ***/
 bool inputVariables_valueStorage::resetVariables()
 {
-    printf("\nreseting all variable values storage to default values\n\n");
+    //printf("\nreseting all variable values storage to default values\n\n");
     bool success = true;
 
     // reset values for all single count types to default values (keep the stuff with string names from setup)
@@ -96,7 +96,7 @@ bool inputVariables_valueStorage::resetVariables()
         printf("problem setting up specialized default values!\n");
         success = false;
     }
-    printf("\nfinished reseting all variable values storage to default values\n\n");
+    //printf("\nfinished reseting all variable values storage to default values\n\n");
 
     return success;
 }
@@ -124,7 +124,7 @@ bool inputVariables_valueStorage::set_boolValue(std::string varName, bool newBoo
     {
         if(boolValues[varIdx].get_variableName() == varName)
         {
-            printf("setting bool value \"%d\" to variable \"%s\"\n",newBoolValue,varName.c_str());
+            //printf("setting bool value \"%d\" to variable \"%s\"\n",newBoolValue,varName.c_str());
             boolValues[varIdx].set_storedBoolValue(newBoolValue);
             foundVarName = true;
             break;
@@ -149,7 +149,7 @@ bool inputVariables_valueStorage::set_boolValue_string(std::string varName, std:
     {
         if(boolValues[varIdx].get_variableName() == varName)
         {
-            printf("setting bool value \"%s\" to variable \"%s\"\n",newStringBoolValue.c_str(),varName.c_str());
+            //printf("setting bool value \"%s\" to variable \"%s\"\n",newStringBoolValue.c_str(),varName.c_str());
             boolValues[varIdx].set_storedBoolValue_string(newStringBoolValue);
             foundVarName = true;
             break;
@@ -174,7 +174,7 @@ bool inputVariables_valueStorage::set_size_tValue(std::string varName, size_t ne
     {
         if(size_tValues[varIdx].get_variableName() == varName)
         {
-            printf("setting size_t value \"%zu\" to variable \"%s\"\n",newSize_tValue,varName.c_str());
+            //printf("setting size_t value \"%zu\" to variable \"%s\"\n",newSize_tValue,varName.c_str());
             size_tValues[varIdx].set_storedSize_tValue(newSize_tValue);
             foundVarName = true;
             break;
@@ -199,7 +199,7 @@ bool inputVariables_valueStorage::set_size_tValue_string(std::string varName, st
     {
         if(size_tValues[varIdx].get_variableName() == varName)
         {
-            printf("setting size_t value \"%s\" to variable \"%s\"\n",newStringSize_tValue.c_str(),varName.c_str());
+            //printf("setting size_t value \"%s\" to variable \"%s\"\n",newStringSize_tValue.c_str(),varName.c_str());
             size_tValues[varIdx].set_storedSize_tValue_string(newStringSize_tValue);
             foundVarName = true;
             break;
@@ -224,7 +224,7 @@ bool inputVariables_valueStorage::set_intValue(std::string varName, int newIntVa
     {
         if(intValues[varIdx].get_variableName() == varName)
         {
-            printf("setting int value \"%d\" to variable \"%s\"\n",newIntValue,varName.c_str());
+            //printf("setting int value \"%d\" to variable \"%s\"\n",newIntValue,varName.c_str());
             intValues[varIdx].set_storedIntValue(newIntValue);
             foundVarName = true;
             break;
@@ -249,7 +249,7 @@ bool inputVariables_valueStorage::set_intValue_string(std::string varName, std::
     {
         if(intValues[varIdx].get_variableName() == varName)
         {
-            printf("setting int value \"%s\" to variable \"%s\"\n",newStringIntValue.c_str(),varName.c_str());
+            //printf("setting int value \"%s\" to variable \"%s\"\n",newStringIntValue.c_str(),varName.c_str());
             intValues[varIdx].set_storedIntValue_string(newStringIntValue);
             foundVarName = true;
             break;
@@ -274,7 +274,7 @@ bool inputVariables_valueStorage::set_doubleValue(std::string varName, double ne
     {
         if(doubleValues[varIdx].get_variableName() == varName)
         {
-            printf("setting double value \"%f\" to variable \"%s\"\n",newDoubleValue,varName.c_str());
+            //printf("setting double value \"%f\" to variable \"%s\"\n",newDoubleValue,varName.c_str());
             doubleValues[varIdx].set_storedDoubleValue(newDoubleValue,doubleType);
             foundVarName = true;
             break;
@@ -299,7 +299,7 @@ bool inputVariables_valueStorage::set_doubleValue_string(std::string varName, st
     {
         if(doubleValues[varIdx].get_variableName() == varName)
         {
-            printf("setting double value \"%s\" to variable \"%s\"\n",newStringDoubleValue.c_str(),varName.c_str());
+            //printf("setting double value \"%s\" to variable \"%s\"\n",newStringDoubleValue.c_str(),varName.c_str());
             doubleValues[varIdx].set_storedDoubleValue_string(newStringDoubleValue,doubleType);
             foundVarName = true;
             break;
@@ -324,7 +324,7 @@ bool inputVariables_valueStorage::set_stringValue(std::string varName, std::stri
     {
         if(stringValues[varIdx].get_variableName() == varName)
         {
-            printf("setting string value \"%s\" to variable \"%s\"\n",newStringValue.c_str(),varName.c_str());
+            //printf("setting string value \"%s\" to variable \"%s\"\n",newStringValue.c_str(),varName.c_str());
             stringValues[varIdx].set_storedStringValue(newStringValue,varName);
             foundVarName = true;
             break;
@@ -349,7 +349,7 @@ bool inputVariables_valueStorage::set_pathNameValue(std::string varName, std::st
     {
         if(pathNameValues[varIdx].get_variableName() == varName)
         {
-            printf("setting pathName value \"%s\" to variable \"%s\"\n",newPathNameValue.c_str(),varName.c_str());
+            //printf("setting pathName value \"%s\" to variable \"%s\"\n",newPathNameValue.c_str(),varName.c_str());
             pathNameValues[varIdx].set_storedPathNameValue(newPathNameValue);
             foundVarName = true;
             break;
@@ -374,7 +374,7 @@ bool inputVariables_valueStorage::set_lcpFileValue(std::string varName, std::str
     {
         if(lcpFileValues[varIdx].get_variableName() == varName)
         {
-            printf("setting lcpFile value \"%s\" to variable \"%s\"\n",newLcpFileValue.c_str(),varName.c_str());
+            //printf("setting lcpFile value \"%s\" to variable \"%s\"\n",newLcpFileValue.c_str(),varName.c_str());
             lcpFileValues[varIdx].set_storedLcpFileValue(newLcpFileValue);
             foundVarName = true;
             break;
@@ -399,7 +399,7 @@ bool inputVariables_valueStorage::set_shapeFileValue(std::string varName, std::s
     {
         if(shapeFileValues[varIdx].get_variableName() == varName)
         {
-            printf("setting shapeFile value \"%s\" to variable \"%s\"\n",newShapeFileValue.c_str(),varName.c_str());
+            //printf("setting shapeFile value \"%s\" to variable \"%s\"\n",newShapeFileValue.c_str(),varName.c_str());
             shapeFileValues[varIdx].set_storedShapeFileValue(newShapeFileValue);
             foundVarName = true;
             break;
@@ -424,7 +424,7 @@ bool inputVariables_valueStorage::set_wrfFileValue(std::string varName, std::str
     {
         if(wrfFileValues[varIdx].get_variableName() == varName)
         {
-            printf("setting wrfFile value \"%s\" to variable \"%s\"\n",newWrfFileValue.c_str(),varName.c_str());
+            //printf("setting wrfFile value \"%s\" to variable \"%s\"\n",newWrfFileValue.c_str(),varName.c_str());
             wrfFileValues[varIdx].set_storedWrfFileName(newWrfFileValue);
             foundVarName = true;
             break;
@@ -449,7 +449,7 @@ bool inputVariables_valueStorage::set_lat_longValue(std::string varName, double 
     {
         if(lat_longValues[varIdx].get_variableName() == varName)
         {
-            printf("setting lat_long value \"%f\" \"%f\" (\"lat\" \"long\") to variable \"%s\"\n",newLatValue,newLongValue,varName.c_str());
+            //printf("setting lat_long value \"%f\" \"%f\" (\"lat\" \"long\") to variable \"%s\"\n",newLatValue,newLongValue,varName.c_str());
             lat_longValues[varIdx].set_storedLatLongValue(newLatValue,newLongValue);
             foundVarName = true;
             break;
@@ -474,7 +474,7 @@ bool inputVariables_valueStorage::set_lat_longValue(std::string varName, double 
     {
         if(lat_longValues[varIdx].get_variableName() == varName)
         {
-            printf("setting lat_long value \"%s\" \"%s\" (\"lat\" \"long\") to variable \"%s\"\n",newStringLatValue.c_str(),newStringLongValue.c_str(),varName.c_str());
+            //printf("setting lat_long value \"%s\" \"%s\" (\"lat\" \"long\") to variable \"%s\"\n",newStringLatValue.c_str(),newStringLongValue.c_str(),varName.c_str());
             lat_longValues[varIdx].set_storedLatLongValue_string(newStringLatValue,newStringLongValue);
             foundVarName = true;
             break;
@@ -499,7 +499,7 @@ bool inputVariables_valueStorage::set_lat_longValue_string(std::string varName, 
     {
         if(lat_longValues[varIdx].get_variableName() == varName)
         {
-            printf("setting lat_long value \"%s\" (\"lat\" \"long\") to variable \"%s\"\n",newLatLongValueString.c_str(),varName.c_str());
+            //printf("setting lat_long value \"%s\" (\"lat\" \"long\") to variable \"%s\"\n",newLatLongValueString.c_str(),varName.c_str());
             lat_longValues[varIdx].set_storedLatLongValue_string(newLatLongValueString);
             foundVarName = true;
             break;
@@ -524,7 +524,7 @@ bool inputVariables_valueStorage::set_dateValue(std::string varName, int newYear
     {
         if(dateValues[varIdx].get_variableName() == varName)
         {
-            printf("setting date value \"%d %d %d %d:%d\" (month day year hour:min) to variable \"%s\"\n",newMonthValue,newDayValue,newYearValue,newHourValue,newMinuteValue,varName.c_str());
+            //printf("setting date value \"%d %d %d %d:%d\" (month day year hour:min) to variable \"%s\"\n",newMonthValue,newDayValue,newYearValue,newHourValue,newMinuteValue,varName.c_str());
             dateValues[varIdx].set_storedDateValue(newYearValue,newMonthValue,newDayValue,newHourValue,newMinuteValue);
             foundVarName = true;
             break;
@@ -549,7 +549,7 @@ bool inputVariables_valueStorage::set_dateValue(std::string varName, int newYear
     {
         if(dateValues[varIdx].get_variableName() == varName)
         {
-            printf("setting date value \"%s %s %s %s:%s\" (month day year hour:min) to variable \"%s\"\n",newStringMonthValue.c_str(),newStringDayValue.c_str(),newStringYearValue.c_str(),newStringHourValue.c_str(),newStringMinuteValue.c_str(),varName.c_str());
+            //printf("setting date value \"%s %s %s %s:%s\" (month day year hour:min) to variable \"%s\"\n",newStringMonthValue.c_str(),newStringDayValue.c_str(),newStringYearValue.c_str(),newStringHourValue.c_str(),newStringMinuteValue.c_str(),varName.c_str());
             dateValues[varIdx].set_storedDateValue_string(newStringYearValue,newStringMonthValue,newStringDayValue,newStringHourValue,newStringMinuteValue);
             foundVarName = true;
             break;
@@ -574,7 +574,7 @@ bool inputVariables_valueStorage::set_dateValue_string(std::string varName, std:
     {
         if(dateValues[varIdx].get_variableName() == varName)
         {
-            printf("setting date value \"%s\" (month day year hour:min) to variable \"%s\"\n",newDateValueString.c_str(),varName.c_str());
+            //printf("setting date value \"%s\" (month day year hour:min) to variable \"%s\"\n",newDateValueString.c_str(),varName.c_str());
             dateValues[varIdx].set_storedDateValue_string(newDateValueString);
             foundVarName = true;
             break;
@@ -599,7 +599,7 @@ bool inputVariables_valueStorage::set_hour_minValue(std::string varName, int new
     {
         if(hour_minValues[varIdx].get_variableName() == varName)
         {
-            printf("setting hour_min value \"%d:%d\" (hour:minute) to variable \"%s\"\n",newHourValue,newMinuteValue,varName.c_str());
+            //printf("setting hour_min value \"%d:%d\" (hour:minute) to variable \"%s\"\n",newHourValue,newMinuteValue,varName.c_str());
             hour_minValues[varIdx].set_storedHour_MinValue(newHourValue,newMinuteValue);
             foundVarName = true;
             break;
@@ -624,7 +624,7 @@ bool inputVariables_valueStorage::set_hour_minValue(std::string varName, int new
     {
         if(hour_minValues[varIdx].get_variableName() == varName)
         {
-            printf("setting hour_min value \"%s:%s\" (hour:minute) to variable \"%s\"\n",newStringHourValue.c_str(),newStringMinuteValue.c_str(),varName.c_str());
+            //printf("setting hour_min value \"%s:%s\" (hour:minute) to variable \"%s\"\n",newStringHourValue.c_str(),newStringMinuteValue.c_str(),varName.c_str());
             hour_minValues[varIdx].set_storedHour_MinValue_string(newStringHourValue,newStringMinuteValue);
             foundVarName = true;
             break;
@@ -649,7 +649,7 @@ bool inputVariables_valueStorage::set_hour_minValue_string(std::string varName, 
     {
         if(hour_minValues[varIdx].get_variableName() == varName)
         {
-            printf("setting hour_min value \"%s\" (hour:minute) to variable \"%s\"\n",newHourMinValue.c_str(),varName.c_str());
+            //printf("setting hour_min value \"%s\" (hour:minute) to variable \"%s\"\n",newHourMinValue.c_str(),varName.c_str());
             hour_minValues[varIdx].set_storedHour_MinValue_string(newHourMinValue);
             foundVarName = true;
             break;
@@ -1179,16 +1179,6 @@ bool inputVariables_valueStorage::setSpecializedDefaults()
         success = false;
     }
     if(set_stringValue("farsite_crown_fire_method","Finney") == false)   // need to be careful that it is a legit signless percent
-    {
-        success = false;
-    }
-
-        // debugging related variables
-    if(set_boolValue("report_largest_ignition_bounds",false) == false)
-    {
-        success = false;
-    }
-    if(set_boolValue("report_found_inputs",false) == false)
     {
         success = false;
     }

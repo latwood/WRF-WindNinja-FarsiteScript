@@ -203,7 +203,7 @@ bool createIgnitions::createIgnitionFromPastFarsiteOutputs()
 bool createIgnitions::checkIgnitionFile(std::string ignitionFile)
 {
     // should at a minimum make sure all the required side files are there to go with the ignition file, probably during the inputs handling
-    printf("checkIgnitionFile ignition file \"%s\"\n",ignitionFile.c_str());
+    //printf("checkIgnitionFile ignition file \"%s\"\n",ignitionFile.c_str());
     // if it gets here, everything went well
     return true;
 }

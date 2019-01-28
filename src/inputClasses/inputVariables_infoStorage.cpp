@@ -92,7 +92,6 @@ void inputVariables_infoStorage::setupAvailableApplicationUseNames()
     allowedApplicationUseNames.push_back("WindNinja only");
     allowedApplicationUseNames.push_back("wrfGetWeather only");
     allowedApplicationUseNames.push_back("farsiteAPI");
-    allowedApplicationUseNames.push_back("debugging related");
     allowedApplicationUseNames.push_back("optional WindNinja output settings");
 }
 
@@ -333,14 +332,6 @@ void inputVariables_infoStorage::setupAvailableVariables()
     addVariable("farsite_crown_fire_method","farsiteAPI","string",
                 "A string specifying the crown fire method used in farsite. "
                 "Options are Finney or Reinhart where Finney is the default if farsite_crown_fire_method is not specified");
-
-        // debugging related variables
-    addVariable("report_largest_ignition_bounds","debugging related","bool",
-                "A boolean that specifies whether to output the lat_long bounding box that contains the smallest and largest lat long coordinates that have ignitions in them. "
-                "May not be used as an optional debugging statement, probably just output it as looking through the different ignition locations. "
-                "Fun, have to do ignitions before and after the lcp download lol");
-    addVariable("report_found_inputs","debugging related","bool",
-                "A boolean that specifies whether to output what the input file is seen to be by the code. Defaults to false if not specified");
 
         // optional WindNinja output settings, may not even add these options
     addVariable("additional_WindNinja_outputs_google","optional WindNinja output settings","count",

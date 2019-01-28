@@ -93,53 +93,53 @@ bool farsiteAPI::load_required_inputs(inputVariablesHandler *inputs, createIgnit
     {
         // probably should do the naming check during the inputs checking stuff to make sure no duplications by this point or something
         std::string ignitionFileBaseName = findBaseName(ignitionShapefilesForSimulations[ignitCount].c_str());
-        printf("ignitionFileBaseName[%zu] = \"%s\"\n",ignitCount,ignitionFileBaseName.c_str());
+        //printf("ignitionFileBaseName[%zu] = \"%s\"\n",ignitCount,ignitionFileBaseName.c_str());
 
         std::string farsiteCreateInputsFolderPath = farsiteMainCreateInputsFolderPath + "/" + ignitionFileBaseName;
         farsiteCreateInputRunFolderPaths.push_back(farsiteCreateInputsFolderPath);
-        printf("farsiteCreateInputsFolderPath[%zu] = \"%s\"\n",ignitCount,farsiteCreateInputsFolderPath.c_str());
+        //printf("farsiteCreateInputsFolderPath[%zu] = \"%s\"\n",ignitCount,farsiteCreateInputsFolderPath.c_str());
 
         std::string farsiteFinalOutputFolderPath = actualFinalOutput_path + "/" + ignitionFileBaseName;
         farsiteFinalOutputRunFolderPaths.push_back(farsiteFinalOutputFolderPath);
-        printf("farsiteFinalOutputFolderPath[%zu] = \"%s\"\n",ignitCount,farsiteFinalOutputFolderPath.c_str());
+        //printf("farsiteFinalOutputFolderPath[%zu] = \"%s\"\n",ignitCount,farsiteFinalOutputFolderPath.c_str());
 
         std::string farsiteCommandFileName = farsiteCreateInputsFolderPath + "/run_" + ignitionFileBaseName + ".txt";
         farsiteCommandFiles.push_back(farsiteCommandFileName);
-        printf("farsiteCommandFileName[%zu] = \"%s\"\n",ignitCount,farsiteCommandFileName.c_str());
+        //printf("farsiteCommandFileName[%zu] = \"%s\"\n",ignitCount,farsiteCommandFileName.c_str());
 
         std::string farsiteLcpFileName = farsiteCreateInputsFolderPath + "/" + findBaseName(actualLcpPath);
         farsiteLcpFiles.push_back(farsiteLcpFileName);
-        printf("farsiteLcpFileName[%zu] = \"%s\"\n",ignitCount,farsiteLcpFileName.c_str());
+        //printf("farsiteLcpFileName[%zu] = \"%s\"\n",ignitCount,farsiteLcpFileName.c_str());
 
         std::string farsiteInputFileName = farsiteCreateInputsFolderPath + "/" + ignitionFileBaseName + ".input";
         farsiteInputFiles.push_back(farsiteInputFileName);
-        printf("farsiteInputFileName[%zu] = \"%s\"\n",ignitCount,farsiteInputFileName.c_str());
+        //printf("farsiteInputFileName[%zu] = \"%s\"\n",ignitCount,farsiteInputFileName.c_str());
 
         std::string farsiteIgnitionFileName = farsiteCreateInputsFolderPath + "/" + findBaseName(ignitionShapefilesForSimulations[ignitCount]);
         farsiteIgnitionFiles.push_back(farsiteIgnitionFileName);
-        printf("farsiteIgnitionFileName[%zu] = \"%s\"\n",ignitCount,farsiteIgnitionFileName.c_str());
+        //printf("farsiteIgnitionFileName[%zu] = \"%s\"\n",ignitCount,farsiteIgnitionFileName.c_str());
 
         if(farsite_barrier_shapefile != "") // is optional, should be this value if it was never filled
         {
             std::string farsiteBarrierFileName = farsiteCreateInputsFolderPath + "/" + findBaseName(farsite_barrier_shapefile);
             farsiteBarrierFiles.push_back(farsiteBarrierFileName);
-            printf("farsiteBarrierFileName[%zu] = \"%s\"\n",ignitCount,farsiteBarrierFileName.c_str());
+            //printf("farsiteBarrierFileName[%zu] = \"%s\"\n",ignitCount,farsiteBarrierFileName.c_str());
         }
 
         std::string farsiteRawsFileName = farsiteCreateInputsFolderPath + "/" + ignitionFileBaseName + ".raws";
         farsiteRawsFiles.push_back(farsiteRawsFileName);
-        printf("farsiteRawsFileName[%zu] = \"%s\"\n",ignitCount,farsiteRawsFileName.c_str());
+        //printf("farsiteRawsFileName[%zu] = \"%s\"\n",ignitCount,farsiteRawsFileName.c_str());
 
         std::string farsiteAtmFileName = farsiteCreateInputsFolderPath + "/" + ignitionFileBaseName + ".atm";
         farsiteAtmFiles.push_back(farsiteAtmFileName);
-        printf("farsiteAtmFileName[%zu] = \"%s\"\n",ignitCount,farsiteAtmFileName.c_str());
+        //printf("farsiteAtmFileName[%zu] = \"%s\"\n",ignitCount,farsiteAtmFileName.c_str());
 
         std::vector<std::string> farsiteVelFileNameVector;
         for(size_t fileIdx = 0; fileIdx < velFiles.size(); fileIdx++)
         {
             std::string farsiteVelFileName = farsiteCreateInputsFolderPath + "/" + findBaseName(velFiles[fileIdx]);
             farsiteVelFileNameVector.push_back(farsiteVelFileName);
-            printf("farsiteVelFileName[%zu] = \"%s\"\n",ignitCount,farsiteVelFileName.c_str());
+            //printf("farsiteVelFileName[%zu] = \"%s\"\n",fileIdx,farsiteVelFileName.c_str());
         }
         farsiteVelFiles.push_back(farsiteVelFileNameVector);
 
@@ -148,7 +148,7 @@ bool farsiteAPI::load_required_inputs(inputVariablesHandler *inputs, createIgnit
         {
             std::string farsiteAngFileName = farsiteCreateInputsFolderPath + "/" + findBaseName(angFiles[fileIdx]);
             farsiteAngFileNameVector.push_back(farsiteAngFileName);
-            printf("farsiteAngFileName[%zu] = \"%s\"\n",ignitCount,farsiteAngFileName.c_str());
+            //printf("farsiteAngFileName[%zu] = \"%s\"\n",fileIdx,farsiteAngFileName.c_str());
         }
         farsiteAngFiles.push_back(farsiteAngFileNameVector);
 
@@ -157,12 +157,12 @@ bool farsiteAPI::load_required_inputs(inputVariablesHandler *inputs, createIgnit
         {
             std::string farsiteCldFileName = farsiteCreateInputsFolderPath + "/" + findBaseName(cldFiles[fileIdx]);
             farsiteCldFileNameVector.push_back(farsiteCldFileName);
-            printf("farsiteCldFileName[%zu] = \"%s\"\n",ignitCount,farsiteCldFileName.c_str());
+            //printf("farsiteCldFileName[%zu] = \"%s\"\n",fileIdx,farsiteCldFileName.c_str());
         }
         farsiteCldFiles.push_back(farsiteCldFileNameVector);
 
     }
-    //farsiteApplicationPath = "/home/atw09001/src/farsite/src/TestFARSITE";
+
     farsiteApplicationPath = farsitePath;
 
     // for farsite burn period stuff

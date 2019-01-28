@@ -30,7 +30,7 @@ bool checkCommandLineInput(int argc, char*argv[], inputVariablesHandler *inputs)
     FILE *cmd = fopen(argv[1], "rt");
     if(!cmd)
     {
-        printf("Error, cannot open %s\n\n", argv[1]);
+        printf("Error, cannot open \"%s\"\n\n", argv[1]);
         inputs->explainInputReqs();
         exit(1);
     }
