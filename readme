@@ -52,7 +52,7 @@ Description of buildEverything.sh
 --Runs "make -j$nCores && make install" to build the 3rd party library
 ** 3rd party libraries are built in this order: zlib, szlib, curl, hdf5, netcdf_c, netcdf_cxx, jasper, gdal. See the parameteres specified at the start of the script for version numbers and downloadable link locations. A lot of the extra variables are just trying to manipulate the folder and filenames in a manageable way that is slightly specific to each package so the process works without messing with the process, just some variables at the start of the script. Note might not need all these packages, was what I always started with originally as stuff I thought normally went with gdal.
 --Downloads WindNinja using "git clone"
---Builds WindNinja's 3rd party libraries by running "windninja/scripts/buildDepsh.sh" which uses "sudo apt install" for installing a bunch of stuff, "wget, tar, ./configure, make and sudo make instal" for installing some other 3rd party libs from source. Since this script is managed by the WindNinja people, can't easily edit the number of cores used for this process, unfortunately. Note the gdal is the same as what was downloaded before, but build with different dependencies, and can diverge from the gdal needed by this overall script, so need both downloads.
+--Builds WindNinja's 3rd party libraries by running "windninja/scripts/buildDepsh.sh" which uses "sudo apt install" for installing a bunch of stuff, "wget, tar, ./configure, make and sudo make instal" for installing some other 3rd party libs from source. Since this script is managed by the WindNinja people, can't easily edit the number of cores used for this process, unfortunately. Note the gdal is the same as what was downloaded before, but builds with different dependencies, and can diverge from the gdal needed by this overall script, so need both downloads.
 --Configures WindNinja using "cmake"
 --Builds WindNinja by just doing "make -j4". Note that you have to manually do the "sudo make install" since I didn't want to override anyone's current version of WindNinja on accident.
 --Runs "sudo ldconfig" to make sure WindNinja can find the paths to some of it's libraries correctly.
@@ -61,8 +61,14 @@ Description of buildEverything.sh
 --Runs "make -j$nCores" to build farsite
 ** find and replace text in examples, cmake.default, getFarsitePath.cpp, and getWindNinjaPath.cpp files
 --uses "sed" to process input strings so they will work correctly in other utilities for this process
---uses "grep" to get the files needed, excluding the include and .git directories, uses pipeline "|", "xargs", and "sed" to modify the files with the newly updated paths
+--uses "grep" to get the files needed, excluding the include and .git directories and the readme file, uses pipeline "|", "xargs", and "sed" to modify the files with the newly updated paths
+** update local git ignore stuff so that files with paths changed by the script that still need tracked (like the example files) can still be ignored, so it is less easy to accidentally make changes to them
+--uses "git update-index --assume-unchanged" on src/getFarsitePath.cpp, src/getWindNinjaPath.cpp, and config/default.cmake to avoid modifications of these files by buildEverything.sh causing unnecessary "git status" showing all these files modified
+--uses "git ls-files -- $examplesDir | xargs -l git update-index --assume-unchanged" to also ignore all files found in the examples directory that are modified by buildEverything.sh
 ** final script is build using "cmake" and "make -j$nCores".
+
+Note that if you want to modify files that have been setup to be ignored during "git status", you need to run the command "git update-index --no-assume-unchanged <file>" for each file. This should make it easier to ignore changes to these files but still track them, so less accidental modifications of these files happen when pushing to the repo.
+
 
 Description of utility_scripts/wrfTrimmer.sh
 --Makes sure the input directory does not match the output directory

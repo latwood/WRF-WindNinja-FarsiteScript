@@ -492,7 +492,7 @@ if [ $success == 0 ]; then
   preppedVarToReplace=$(sed 's/\//\\\//g' <<<"$varToReplace")
   preppedAboveBaseDir=$(sed 's/\//\\\//g' <<<"$aboveBaseDir")
   #preppedAboveBaseDir="\$scriptRoot"
-  grep -rl $preppedVarToReplace $finalScriptDir --exclude-dir=.git --exclude-dir=include | xargs sed -i 's/'$preppedVarToReplace'/'$preppedAboveBaseDir'/g'
+  grep -rl $preppedVarToReplace $finalScriptDir --exclude-dir=.git --exclude-dir=include --exclude=readme | xargs sed -i 's/'$preppedVarToReplace'/'$preppedAboveBaseDir'/g'
   success=$?
   if [ $success != 0 ]; then
     if [ $success == 123 ]; then
@@ -504,6 +504,31 @@ if [ $success == 0 ]; then
     fi
   else
     echo "finished replacing text"
+  fi
+fi
+
+## now update local git ignore stuff so that example files that are tracked can still be ignored, so it is less easy to accidentally make changes to them
+if [ $success == 0 ]; then
+  echo "" # want a nice clean line
+  echo "running \"git update-index --assume-unchanged\" on files changed by replacing \""$varToReplace\"
+  cd $finalScriptDir
+  git update-index --assume-unchanged src/getFarsitePath.cpp src/getWindNinjaPath.cpp config/default.cmake
+  success=$?
+  if [ $success != 0 ]; then
+    echo "!!!failed to update local git ignore stuff!!!"
+    success=1
+  fi
+  if [ $success == 0 ]; then
+    examplesDir=$finalScriptDir"/examples"
+    git ls-files -- $examplesDir | xargs -l git update-index --assume-unchanged
+    success=$?
+    if [ $success != 0 ]; then
+      echo "!!!failed to update local git ignore directory stuff!!!"
+      success=1
+    fi
+  fi
+  if [ $success == 0 ]; then
+    echo "successfully updated local git ignore stuff. If you need to git add a specific ignored file, run the command \"git update-index --no-assume-unchanged\" on the file you want to add"
   fi
 fi
 

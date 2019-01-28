@@ -2,14 +2,5 @@
 /include/extraLibs
 /build
 /bin/WRF-WindNinja-FarsiteScript
-
-# to locally ignore the other files changed by running buildEverything.sh, but that are already tracked by git because they need transferred, but not changed, do the following:
-# git update-index --assume-unchanged <file>
-#
-# to get it back, do the following:
-# git update-index --no-assume-unchanged <file>
-#
-# stuff to copy and paste :)
-
-# git update-index --assume-unchanged src/getFarsitePath.cpp src/getWindNinjaPath.cpp config/default.cmake
+CMakeLists.txt.user
 
