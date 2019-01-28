@@ -2,9 +2,9 @@ The basic idea of this script is that running /include/buildEverything.sh downlo
 
 If there is anything wrong with the inputs, the input parser should catch the problem and warn if input data is off or more is required. The script also has error checking to stop at any point that it runs into trouble, so if you have problems without getting understandable errors, somehow you've caused an edge case where the programmers need to add some more error checking.
 
-If there is anything wrong with running buildEverything.sh, it should stop and warn where in the process an error has occured so you can go into the file and edit the download source links or any other required unpacked filenames that might have changed. Running buildEverything.sh multiple times should warn if different files are already found so it avoids redoing steps in the process unless you delete files.
+If there is anything wrong with running buildEverything.sh, it should stop and warn where in the process an error has occured so you can go into the file and edit the download source links or any other required unpacked filenames that might have changed. Running buildEverything.sh multiple times should warn if different files are already found so it avoids redoing steps in the process unless you delete files. You should delete the last file or folder that was being worked on before resuming the script if the script is interrupted in the process.
 
-The example input files should now run simply by modifying the base paths in each variable to the location of the main WRF-WindNinja-FarsiteScript directory. At some point, a utility script will be written that can be called by buildEverything.sh that will modify all these base paths for the user so examples can be immediately run without any changes to variables, but the WRF-WindNinja-FarsiteScript code itself will need a lot of cleanup of the required input variables and input variable explanations before this can be done. This means that the current examples should work as expected simply by modifying pathnames to some of the variables, but care should be taken when trying to completely change these variables or change what variable combinations are used as the WRF-WindNinja-FarsiteScript still needs some work on how it handles some stuff with these variables.
+The example input files should now run after buildEverything.sh runs properly, as this script also takes the keyword "$scriptRoot" and replaces it with the correct to home path for the user. Note that only one of the example config files is meant to run to completion because only one of these files uses enough wrf files and the correct start and end farsite simulation times to get farsite to process anything.
 
 Of the current examples, the expected behavior for firstRunCougarCreekFire.txt is as follows: firstRunCougarCreekFire.txt will run all the way to completion, and you can use the resulting a-originalInputs/cougarCreekFire.lcp with its corresponding projection file and a-originalInputs/colorInput.CLR files in farsite4 from firelab.org to view the lcp of the example. You can then take info from the finalOutputs folder to view the resulting fire stuff in said farsite4. Eventually will move on to use flammap6 instead of farsite4 for viewing.
 
@@ -12,4 +12,68 @@ For other current examples, the code will stop at farsite, as there are not enou
 
 
 If you have any trouble using this script or have any suggestions, email the original developer, Loren Atwood, at pianotocador@gmail.com
+
+
+
+
+
+IMPORTANT: DO NOT RUN "sudo make install" step if you have multiple versions of WindNinja as this will overwrite your current installation. At least some version of WindNinja needs this step done to it for the pipeline call to WindNinja to function properly.
+
+The following worked on fresh installations of Ubuntu 16.04 and 18.04:
+sudo apt update
+sudo apt upgrade
+sudo apt install build-essential cmake git m4
+git clone https://github.com/latwood/WRF-WindNinja-FarsiteScript.git
+cd WRF-WindNinja-FarsiteScript/include
+./buildEverything.sh 1
+cd ./extraApps/windninja/build_windninja
+sudo make install
+cd bin
+./WRF-WindNinja-FarsiteScript ../examples/cougarCreek-fire/firstRunCougarCreekFire.txt
+
+IMPORTANT: DO NOT RUN "sudo make install" step if you have multiple versions of WindNinja as this will overwrite your current installation. At least some version of WindNinja needs this step done to it for the pipeline call to WindNinja to function properly.
+
+Note that buildEverything takes completely different times depending on the computer, I've seen it take 2 hours on my relatively fast computer, to 4 hours with the Windows Subsystem of Ubuntu. If you are on a slow enough computer, change the 1 to a 0 for the line with ./buildEverything or you will find yourself constantly in pause waiting for a password cause the password injection fails. Note that the example run in this case is the one that goes to completion, which takes about 14.5 minutes on my relatively fast computer. It might be helpful to try out one of the other examples that take less time just to see if the installation succeeded or not. If things don't at least get to the farsite step, there's a problem.
+
+Step by step method to view results on a Windows machine. If you don't want to install farsite, your on your own, just need some kind of GIS software:
+go to https://www.firelab.org/, on this webpage look for "apps and products/fire behavior/farsite". On this farsite page, look for "farsite software". This leads you to a farsite for windows installer.
+After installing farsite, run farsite, and in the menu search for "view/view landscape file (.LCP)/2D window". Use the "cougarCreekFire.lcp" file.
+After the file loads, right click the section of the box labeled "Visible Theme" in the section with the numbers and colors. This should pop up a menu "Choose Color Ramp". Select "Load Color File (.CLR)" and use the "colorInput.CLR" file. Note you need to make your own if doing a different .lcp file than this example, I randomly changed colors till it looked good, then saved this color scheme.
+In the menu search for "view/View Vector File". Change the extensions it is looking for to ".shp", then you can view the "cougarCreekFire_Perimeters.shp" fire perimeters and "cougarCreekFire_Spots.shp" probabilistic spot location files. Need to select the boxes labeled "2D" to get the files to actually show the pictures, left click the lines or dots to choose colors, right click to choose the sizes.
+Note that you can see other files as well, but might need to hunt down their specific types using either "vector" or "raster" input from the "view" menu.
+
+
+
+
+Description of buildEverything.sh
+--Downloads 3rd party libs using "wget" with a link specified in all the variables at the start of the script
+--Unzips downloaded compressed folder with "tar -xzf"
+--Runs "./configure" on the 3rd party lib package, using CPP and LD flags and other parameters as specified in all the variables at the start of the script
+--Runs "make -j$nCores && make install" to build the 3rd party library
+** 3rd party libraries are built in this order: zlib, szlib, curl, hdf5, netcdf_c, netcdf_cxx, jasper, gdal. See the parameteres specified at the start of the script for version numbers and downloadable link locations. A lot of the extra variables are just trying to manipulate the folder and filenames in a manageable way that is slightly specific to each package so the process works without messing with the process, just some variables at the start of the script. Note might not need all these packages, was what I always started with originally as stuff I thought normally went with gdal.
+--Downloads WindNinja using "git clone"
+--Builds WindNinja's 3rd party libraries by running "windninja/scripts/buildDepsh.sh" which uses "sudo apt install" for installing a bunch of stuff, "wget, tar, ./configure, make and sudo make instal" for installing some other 3rd party libs from source. Since this script is managed by the WindNinja people, can't easily edit the number of cores used for this process, unfortunately. Note the gdal is the same as what was downloaded before, but build with different dependencies, and can diverge from the gdal needed by this overall script, so need both downloads.
+--Configures WindNinja using "cmake"
+--Builds WindNinja by just doing "make -j4". Note that you have to manually do the "sudo make install" since I didn't want to override anyone's current version of WindNinja on accident.
+--Runs "sudo ldconfig" to make sure WindNinja can find the paths to some of it's libraries correctly.
+** farsite
+--Downloads farsite using "git clone" (note this is not the most up to date version, even the firelab.org version is not the most up to date version)
+--Runs "make -j$nCores" to build farsite
+** find and replace text in examples, cmake.default, getFarsitePath.cpp, and getWindNinjaPath.cpp files
+--uses "sed" to process input strings so they will work correctly in other utilities for this process
+--uses "grep" to get the files needed, excluding the include and .git directories, uses pipeline "|", "xargs", and "sed" to modify the files with the newly updated paths
+** final script is build using "cmake" and "make -j$nCores".
+
+Description of utility_scripts/wrfTrimmer.sh
+--Makes sure the input directory does not match the output directory
+--Uses "/*" on input folder to grab all files in folder
+--Sets up a counter for nFilesLookedAt and nWrfFiles processed
+--Uses "ncdump -h" on each and every file to see which are valid netcdf files. Sends output away in a suppressed manner using ">" to "/dev/null 2>&1" since valid netcdf files are those for which "ncdump" works without error
+--If a file is found to be a valid netcdf files, "ncks -v" with the required data information for the overall script is used to trim the files
+--If a file is found to be a valid netcdf file, but "ncks" fails when trimming it, the process is stopped with an error
+Note that if the newly trimmed file location would be overwriting a file with the same name, "ncks" is nice and warns and gives the option to overwrite or skip before doing continuing.
+
+
+
+
 
