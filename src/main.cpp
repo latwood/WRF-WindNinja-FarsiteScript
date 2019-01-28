@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 {
     printf("\n\nbeginning WRF-WindNinja-FarsiteScript\n\n");
     calcTime timers;
-    timers.startNewTime("initialize WRF-WindNinja-FarsiteScript"); // start recording execution time
+    timers.startNewTime("WRF-WindNinja-FarsiteScript total runTime"); // start recording execution time
 
     inputVariablesHandler inputs;
     lcpDownloader createLcp;
@@ -76,12 +76,14 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
+    timers.startNewTime("loadScriptInputs total runTime");
     printf("\nloading WRF-WinNinja-FarsiteScript inputs into input class\n");
     if(inputs.loadScriptInputs(inputFilePath) == false)
     {
         printf("Error loading script inputs! Exiting program!\n");
         exit(1);
     }
+    timers.getAndPrint_time("loadScriptInputs total runTime");   // print out elapsed execution time
 
     // okay now create the necessary overall folders to be used by all the other classes, as they add more folders to these folders
 
@@ -98,6 +100,7 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
+    timers.startNewTime("createIgnitions and lcpDownload runTime");
     printf("\nloading inputs into createIgnition class\n");
     // okay do what is needed for lcp downloading stuff, which possibly includes some ignition stuff, so load inputs first
     if(ignitions.load_required_inputs(&inputs) == false)
@@ -141,7 +144,9 @@ int main(int argc, char* argv[])
         printf("Error creating ignitions! Exiting program!\n");
         exit(1);
     }
+    timers.getAndPrint_time("createIgnitions and lcpDownload runTime");
 
+    timers.startNewTime("WindNinja total runTime");
     printf("\nloading inputs into WindNinjaAPI\n");
     // load inputs into WindNinjaApi class
     if(windAPI.load_required_inputs(&inputs, WindNinjaPath) == false)
@@ -179,7 +184,9 @@ int main(int argc, char* argv[])
         printf("problems finding wrf file times from WindNinja logs!\n");
         exit(1);
     }
+    timers.getAndPrint_time("WindNinja total runTime");
 
+    timers.startNewTime("wrfGetWeather runTime");
     printf("\nloading inputs into wrfGetWeather class\n");
     // first load in the inputs
     if(weatherAPI.load_required_inputs(&inputs) == false)
@@ -195,7 +202,9 @@ int main(int argc, char* argv[])
         printf("problems running wrfGetWeather!\n");
         exit(1);
     }
+    timers.getAndPrint_time("wrfGetWeather runTime");
 
+    timers.startNewTime("farsite total runTime");
     printf("\nloading inputs into farsiteAPI class\n");
     if(fireAPI.load_required_inputs(&inputs,&ignitions,&windAPI,&weatherAPI, farsitePath) == false)
     {
@@ -217,17 +226,20 @@ int main(int argc, char* argv[])
         printf("Error running Farsite! Exiting program!\n");
         exit(1);
     }
+    timers.getAndPrint_time("farsite total runTime");
 
+    timers.startNewTime("processFarsiteResults runTime");
     printf("\nprocessing output farsite files for additional results\n");
     if(fireAPI.createAdditionalFarsiteResults() == false)
     {
         printf("Error generating extra farsite inputs! Exiting program!\n");
         exit(1);
     }
+    timers.getAndPrint_time("processFarsiteResults runTime");
 
     printf("\n\nfinished WRF-WindNinja-FarsiteScript\n");
 
-    timers.getAndPrint_time("initialize WRF-WindNinja-FarsiteScript");   // print out elapsed execution time
+    timers.getAndPrint_time("WRF-WindNinja-FarsiteScript total runTime");   // print out elapsed execution time
 
     return 0;
 }

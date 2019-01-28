@@ -27,8 +27,8 @@ private:
     // utility functions
     bool doesTimeExist(std::string newTImeName);
     size_t findTimeIdx(std::string storedTimeName);
-    void calcTimeDistribution(double totalSeconds, int &seconds, int &minutes, int &hours, int &days);
-    void printTimes(int seconds, int minutes, int hours, int days);
+    void calcTimeDistribution(double totalSeconds, int &milliseconds, int &seconds, int &minutes, int &hours, int &days);
+    void printTimes(int milliseconds, int seconds, int minutes, int hours, int days, std::string timerName);
 
     // data members
     std::vector<std::string> storedTimeNames;

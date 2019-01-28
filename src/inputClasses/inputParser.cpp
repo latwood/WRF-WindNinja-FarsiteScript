@@ -440,6 +440,7 @@ bool inputParser::loadLoaderFunctionData()
                     }
                 } else if(currentVarName == "wrf_files")
                 {
+                    debugTimers.startNewTime("load_wrf_files timing during input loading");
                     for(size_t dataIdx = 0; dataIdx < currentVarCount; dataIdx++)
                     {
                         lineIdx = lineIdx + 1;  // already read one line, need to move to the data line
@@ -450,6 +451,7 @@ bool inputParser::loadLoaderFunctionData()
                             break;
                         }
                     }
+                    debugTimers.getAndPrint_time("load_wrf_files timing during input loading");
                 } else if(currentVarName == "additional_WindNinja_outputs_google")
                 {
                     for(size_t dataIdx = 0; dataIdx < currentVarCount; dataIdx++)

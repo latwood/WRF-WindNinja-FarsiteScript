@@ -46,14 +46,15 @@ void calcTime::getAndPrint_time(std::string storedTimeName)
     std::chrono::duration<double> elapsed = nowTime - foundStartTime;
 
     // now figure out how to convert total seconds into different time period amounts
+    int passedMilliseconds;
     int passedSeconds = 0;
     int passedMinutes = 0;
     int passedHours = 0;
     int passedDays = 0;
-    calcTimeDistribution(elapsed.count(), passedSeconds, passedMinutes, passedHours, passedDays);
+    calcTimeDistribution(elapsed.count(), passedMilliseconds, passedSeconds, passedMinutes, passedHours, passedDays);
 
     // now print off whatever times are needed, depending on what is zero or not
-    printTimes(passedSeconds, passedMinutes, passedHours, passedDays);
+    printTimes(passedMilliseconds, passedSeconds, passedMinutes, passedHours, passedDays,storedTimeName);
 
 }
 /*** end get value functions ***/
@@ -103,7 +104,7 @@ size_t calcTime::findTimeIdx(std::string storedTimeName)
     return foundTimeIdx;
 }
 
-void calcTime::calcTimeDistribution(double totalSeconds, int &seconds, int &minutes, int &hours, int &days)
+void calcTime::calcTimeDistribution(double totalSeconds, int &milliseconds, int &seconds, int &minutes, int &hours, int &days)
 {
     days = totalSeconds/(24*3600);
     totalSeconds = totalSeconds - (24*3600*days);
@@ -112,11 +113,12 @@ void calcTime::calcTimeDistribution(double totalSeconds, int &seconds, int &minu
     minutes = totalSeconds/60;
     totalSeconds = totalSeconds - (60*minutes);
     seconds  = totalSeconds;
+    milliseconds = (totalSeconds - (seconds))*1000;
 }
 
-void calcTime::printTimes(int seconds, int minutes, int hours, int days)
+void calcTime::printTimes(int milliseconds, int seconds, int minutes, int hours, int days, std::string timerName)
 {
-    printf("Elapsed time: ");
+    printf("\nElapsed time for \"%s\" timer: ",timerName.c_str());
     if(days != 0)
     {
         printf("%d days, ", days);
@@ -129,6 +131,7 @@ void calcTime::printTimes(int seconds, int minutes, int hours, int days)
     {
         printf("%d minutes, ", minutes);
     }
-    printf("%d seconds\n\n", seconds);
+    printf("%d seconds, %d milliseconds\n\n", seconds, milliseconds);
+
 }
 /*** end utility functions ***/

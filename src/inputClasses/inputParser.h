@@ -5,6 +5,8 @@
 
 #include <fstream>
 
+#include "../utilityClasses/calcTime.h"
+
 class inputParser
 {
 public:
@@ -49,6 +51,9 @@ private:
     std::vector<std::string> foundVarNames;
     std::vector<size_t> foundVarNames_inputVariableInfoIndices;
     std::vector<std::string> foundVarCountStrings;
+
+    // debug data members
+    calcTime debugTimers;
 
 };
 
