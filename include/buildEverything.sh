@@ -3,6 +3,7 @@
 ### the basic idea of this script is that you set the versions and link names for downloading the dependencies, set the directory locations and other stuff as needed for other packages that need built, then you just run this script and it will download and build all 3rd library packages and extra applications used by this script. It will also create a config/cmake file with the paths, and a .cpp file needed by the code with paths, so that at the end of this script, an attempt to build the program is made using all these extra applications and libraries. If there are any problems found in any of the process, errors will be given so you can pinpoint what paths or variables set at the beginning of the script need changed. Warnings are given if certain steps aren't built in case they already exist, in which case you can decide to keep what you have or delete and retry certain steps, so if the process is interrupted, you can avoid rebuilding everything each time.
 ### in order to get the paths correct for the final script build, it turns out you don't need to edit the .bashrc file to add exports to the LD_LIBRARY_PATH for each new path, or even export the paths in such a way in the middle of the process. Instead a config/cmake file is written from scratch with the new paths as found when building everything, so if you need to edit the way that file is made, that stuff isn't specified at the beginning of the script like all the other variables.
 
+nCores="8"  # this is the attempted number of cores when running any make process (except WindNinja which got mad when I tried using more than 4 cores during one of my builds). Could potentially change this value as a user to maybe get some speedup building gdal and netcdf libraries. Definitely important to somewhat get that annoying insert password trick to actually SOMEWHAT work.
 
 # setup base directory variables
 baseDir=$(pwd)
@@ -242,7 +243,7 @@ setupDownloadableLib()
     export LDFLAGS=$libLDFLAGS
     ${libConfigure}  # run the passed in configure command
     echo "building "$libDirName
-    make && make install
+    make -j$nCores && make install
     if [ ! -d "${libBuildDir}" ]; then
       echo "!!!failed to build "$libDirName"!!!"
       return 1
@@ -270,7 +271,7 @@ success=0  # 1 if failing, 0 if successful
 if [ $success == 0 ]; then
   if [ "$#" != 1 ]; then
     echo "not enough inputs! Inputs must be \"tryPasswordInjection\""
-    echo "  \"tryPasswordInjection\" is a boolean value of \"0\" or \"1\" where \"0\" means the script will not attempt to use sudo -v periodically to avoid password timeout (which can fail which means lots of excess password input), and \"1\" means the script will attempt to use sudo -v periodically to avoid password timeout, meaning if successful, should only need password once at the beginning of the script"
+    echo "  \"tryPasswordInjection\" is a boolean value of \"0\" or \"1\" where \"0\" means the script will not attempt to use sudo -v periodically to avoid password timeout (which can fail which means lots of excess password input), and \"1\" means the script will attempt to use sudo -v periodically to avoid password timeout, meaning if successful, should only need password once at the beginning of the script. Note that of late, this has only been successful on PC's with more than 2 processors"
     success=1
   fi
 fi
@@ -300,7 +301,7 @@ fi
 
 if [ $success == 0 ]; then
   if [ $tryPasswordInjection == 1 ]; then
-    echo "running sudo -v so all future sudo commands shouldn't pause the process to ask for a password. Will run sudo -v at different points in the code to try to avoid password tracking timeout in bash, so if the script pauses to ask for passwords again, it means sudo -v wasn't run frequently enough to get bash to keep the password. Unfortunately the script is sometimes time consuming enough that the section for building WindNinja still asks for a password."
+    echo "running sudo -v so all future sudo commands shouldn't pause the process to ask for a password. Will run sudo -v at different points in the code to try to avoid password tracking timeout in bash, so if the script pauses to ask for passwords again, it means sudo -v wasn't run frequently enough to get bash to keep the password. Unfortunately the script is sometimes time consuming enough that the section for building WindNinja still asks for a password at least once even with password injection. If your CPU is slow enough (Windows subsystem of Ubuntu instead of VMWare), the number of passwords required when doing password injection can get really annoying."
     sudo -v
     echo "" # want a nice clean line
   fi
@@ -432,6 +433,7 @@ if [ $success == 0 ]; then
     cmake ..
     make -j4
     success=$? # result of last action, 0 if good, 1 if failed
+    sudo ldconfig
     cd $extraAppsDir
     if [ $success == 0 ]; then
       echo "finished building WindNinja"
@@ -468,7 +470,7 @@ if [ $success == 0 ]; then
   if [ ! -f "${farsiteSrcDir}/TestFARSITE" ]; then
     echo "building farsite"
     cd $farsiteSrcDir
-    make
+    make -j$nCores
     success=$? # result of last action, 0 if good, 1 if failed
     cd $extraAppsDir
     if [ $success == 0 ]; then
@@ -528,7 +530,7 @@ if [ $success == 0 ]; then
     echo "building final script"
     cd $finalBuildDir
     cmake $finalScriptDir
-    make -j4
+    make -j$nCores
     success=$? # result of last action, 0 if good, 1 if failed
     cd $baseDir
     if [ $success == 0 ]; then
