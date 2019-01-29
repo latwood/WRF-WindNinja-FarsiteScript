@@ -17,7 +17,7 @@ If you have any trouble using this script or have any suggestions, email the ori
 
 
 
-IMPORTANT: DO NOT RUN "sudo make install" step if you have multiple versions of WindNinja as this will overwrite your current installation. At least some version of WindNinja needs this step done to it for the pipeline call to WindNinja to function properly.
+IMPORTANT: DO NOT RUN "sudo make install" step if you have multiple versions of WindNinja as this will overwrite your current installation. At least some version of WindNinja needs this step done to it for the pipeline call to WindNinja to function properly. You should only need the "sudo ldconfig" step if and after you run "sudo make install".
 
 The following worked on fresh installations of Ubuntu 16.04 and 18.04:
 sudo apt update
@@ -28,10 +28,11 @@ cd WRF-WindNinja-FarsiteScript/include
 ./buildEverything.sh 1
 cd ./extraApps/windninja/build_windninja
 sudo make install
+sudo ldconfig
 cd bin
 ./WRF-WindNinja-FarsiteScript ../examples/cougarCreek-fire/firstRunCougarCreekFire.txt
 
-IMPORTANT: DO NOT RUN "sudo make install" step if you have multiple versions of WindNinja as this will overwrite your current installation. At least some version of WindNinja needs this step done to it for the pipeline call to WindNinja to function properly.
+IMPORTANT: DO NOT RUN "sudo make install" step if you have multiple versions of WindNinja as this will overwrite your current installation. At least some version of WindNinja needs this step done to it for the pipeline call to WindNinja to function properly. You should only need the "sudo ldconfig" step if and after you run "sudo make install".
 
 Note that buildEverything takes completely different times depending on the computer, I've seen it take 2 hours on my relatively fast computer, to 4 hours with the Windows Subsystem of Ubuntu. If you are on a slow enough computer, change the 1 to a 0 for the line with ./buildEverything or you will find yourself constantly in pause waiting for a password cause the password injection fails. Note that the example run in this case is the one that goes to completion, which takes about 14.5 minutes on my relatively fast computer. It might be helpful to try out one of the other examples that take less time just to see if the installation succeeded or not. If things don't at least get to the farsite step, there's a problem.
 

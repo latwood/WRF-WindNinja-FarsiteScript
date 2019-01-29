@@ -433,7 +433,6 @@ if [ $success == 0 ]; then
     cmake ..
     make -j4
     success=$? # result of last action, 0 if good, 1 if failed
-    sudo ldconfig
     cd $extraAppsDir
     if [ $success == 0 ]; then
       echo "finished building WindNinja"
