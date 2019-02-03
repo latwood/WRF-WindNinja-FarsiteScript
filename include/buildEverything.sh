@@ -416,7 +416,6 @@ if [ $success == 0 ]; then
     echo "creating WindNinja build dir "$windninjaBuildDir
     cd $windninjaDir
     mkdir $windninjaBuildDir
-    cd $windninjaBuildDir
     if [ ! -d "${windninjaBuildDir}" ]; then
       echo "!!!failed to make WindNinja build dir!!!"
       success=1
@@ -438,6 +437,7 @@ if [ $success == 0 ]; then
       echo "finished building WindNinja"
     else
       echo "!!!failed to build WindNinja!!!"
+      success=1
     fi
   else
     echo "!warning, WindNinja executable "${windninjaBuildDir}"/src/cli/WindNinja_cli already exits. Not running cmake or make on WindNinja!"
@@ -476,6 +476,7 @@ if [ $success == 0 ]; then
       echo "finished building farsite"
     else
       echo "!!!failed to build farsite!!!"
+      success=1
     fi
   else
     echo "!warning, farsite executable "${farsiteSrcDir}"/TestFARSITE already exits. Not running make on farsite!"
@@ -542,7 +543,7 @@ if [ $success == 0 ]; then
     mkdir $finalBuildDir
     if [ ! -d "${finalBuildDir}" ]; then
       echo "!!!failed to create "$finalBuildDir"!!!"
-      $success=1
+      success=1
     fi
   else
     echo "!warning, "$finalBuildDir" already exists!"
@@ -561,6 +562,7 @@ if [ $success == 0 ]; then
       echo "finished building final script"
     else
       echo "!!!failed to build final script!!!"
+      success=1
     fi
   else
     echo "!warning, WRF-WindNinja-FarsiteScript executable "${finalScriptDir}"/bin/WRF-WindNinja-FarsiteScript already exits. Not running make on WRF-WindNinja-FarsiteScript!"

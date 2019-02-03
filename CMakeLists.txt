@@ -74,14 +74,3 @@ link_libraries(${LIBS})
 #add_executable(utahlsm ${SOURCES})
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-  configure_file(config/doxygen.conf.in ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
-  add_custom_target(doc
-    ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf
-    COMMENT "Generating API documentation with Doxygen." VERBATIM
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
-  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/doc DESTINATION ${CMAKE_SOURCE_DIR})
-else(DOXYGEN)
-  message(STATUS "WARNING: Doxygen not found - Reference manual will not be created.")
-endif()
