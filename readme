@@ -25,12 +25,12 @@ sudo apt upgrade
 sudo apt install build-essential cmake git m4
 git clone https://github.com/latwood/WRF-WindNinja-FarsiteScript.git
 cd WRF-WindNinja-FarsiteScript/include
-./buildEverything.sh 1
+./buildEverything.sh 1 2>&1 | tee buildEverything.log
 cd ./extraApps/windninja/build_windninja
 sudo make install
 sudo ldconfig
 cd bin
-./WRF-WindNinja-FarsiteScript ../examples/cougarCreek-fire/firstRunCougarCreekFire.txt
+./WRF-WindNinja-FarsiteScript ../examples/cougarCreek-fire/firstRunCougarCreekFire.txt 2>&1 | tee scriptRun.log
 
 IMPORTANT: DO NOT RUN "sudo make install" step if you have multiple versions of WindNinja as this will overwrite your current installation. At least some version of WindNinja needs this step done to it for the pipeline call to WindNinja to function properly. You should only need the "sudo ldconfig" step if and after you run "sudo make install".
 
@@ -69,6 +69,34 @@ Description of buildEverything.sh
 ** final script is build using "cmake" and "make -j$nCores".
 
 Note that if you want to modify files that have been setup to be ignored during "git status", you need to run the command "git update-index --no-assume-unchanged <file>" for each file. This should make it easier to ignore changes to these files but still track them, so less accidental modifications of these files happen when pushing to the repo.
+
+Specific Dependency Listing for buildEverything.sh (not sure how to count stuff grabbed by the "sudo apt install" step)
+--GNU bash, version 4.3.48(1)-release 
+--gcc version 5.4.0
+--cmake version 2.8.12.1
+--git version 2.7.4
+--GNU Make version 4.1
+
+--GNU Wget version 1.17.1
+--tar (GNU tar) version 1.28
+--sed (GNU sed) version 4.2.2
+--grep (GNU grep) version 2.25
+--xargs (GNU findutils) version 4.7.0-git
+
+Dependencies Currently Downloaded by buildEverything.sh
+--zlib version 1.2.11
+--szip version 2.1
+--curl version 7.61.1
+--hdf5 version 1.10.2
+--netcdf-c version 4.6.1
+--netcdf-cxx version 4.3.0
+--jasper version 1.900.1 (not used, probably will remove in future work)
+--gdal version 2.0.3
+
+Dependencies Currently Downloaded by WindNinja's buildDepsh.sh (could change, is independent of this repo)
+--poppler version 0.23.4
+--proj version 4.8.0
+--gdal version 2.0.3 (built differently than buildEverything.sh version)
 
 
 Description of utility_scripts/wrfTrimmer.sh
