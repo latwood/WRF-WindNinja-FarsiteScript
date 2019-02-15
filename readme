@@ -1,10 +1,39 @@
+
+
+#################  Project General Overview  #################
+
+This project is still under work, but at least at this point the code can run with simple inputs on Ubuntu 16.04 and Ubuntu 18.04 machines. The WRF-WindNinja-FarsiteScript code is designed to run Farsite and WindNinja automatically using a single input file and a number of inputs, including WRF weather output netcdf files, a landscape .lcp file, and ignition shape files. They haven't been linked in yet, but the optional barrier files used in Farsite could also be provided.
+
+The end goal for the AIRPACT-Fire project was for the user to provide WRF files, provide the .lcp file or have it automatically download, provide the ignition shape files or ignition point locations or download GeoMAC fire perimeters for use as ignitions. While WindNinja can run in many more modes than just providing WRF files, the WRF-WindNinja-FarsiteScript currently limits the WindNinja functionality to only be the WRF weather file inputs. This functionality may be added in at some time, but hasn't been focused on yet, since the focus has been on the needs of the AIRPACT-Fire project. To add this functionality, in theory would just be doing a little more work that playing around with the inputs to the WRF-WindNinja-FarsiteScript, but in practice might mean much more work, as it would basically mean having each and every WindNinja input repeated as inputs to the WRF-WindNinja-FarsiteScript.
+
+The WRF-WindNinja-FarsiteScript code also runs Farsite in a more limited mode as well. Basically the number of inputs that are required to this script are less than those required by WindNinja and Farsite, as the other inputs are chosen automatically by the WRF-WindNinja-Farsite script. The inputs to this script should be decently documented, and there is an example in the repo that shows the inputs at each stage of the process. WindNinja also has nicely documented inputs. Farsite's inputs are not well documented, I spent two months trying to piece together what they were at the start of the project, and I never quite got to a good clear way of explaining them. But you should be able to see what inputs for Farsite are expected from the user vs the actual inputs for Farsite used by the script by comparing inputs at each stage of the process.
+
+One last thing, Loren Atwood is still pretty much the only one working on this script, but since the end of summer 2018, the work to advance this script has been limited to 5 hours every two weeks. Come summer 2019, I will probably go back to 20 hrs a week on this script. This means that for users of the script that want to use the script outside the scope of the AIRPACT-Fire project, if the script is still far away from what you need, I may not be able to help get the script to where you need it till around Summertime.
+
+
+
+#################  General Overview of Code Flow in WRF-WindNinja-FarsiteScript  #################
+
+1) main.cpp calls constructors for the input loading, lcp downloading, ignitions processing, WindNinja processessng and running, weather processing and running, and Farsite processing and running classes. Most of these classes do not do much during construction, but the inputs class does a lot during construction, including setting up a general list of all available and possible inputs.
+2) command line inputs are processed to determine if they are valid, and if they are not, the inputs information is printed
+3) if command line inputs are good, the inputs file to the script are loaded. This process is quite complicated, but basically everything is read into a vector of vectors (lines and words per line) where separators are used to determine what the words mean (variable name, number of values or single value, list of values) in order to give each line a type (variable name, value listing, empty line, comment line). The order of the word types is checked to make sure input syntax is valid. If input syntax is valid, the list of variable names are checked to see if the user specified a bad combination of inputs. If the minimum required inputs are in the file, with the right combinations of inputs, the input class then loads in all the values for each input, warning if they are not valid to the format or types used in the input storage container classes. These input values are then used by all the rest of the code by calling the inputVariablesHandler class which manages data transfer with the input variable storage classes.
+3-stopToExplain) if the inputs are loaded in correctly, the rest of the code runs, doing the required tasks for each of the other classes, quitting at any time an error occurs. The usual process is to make a call to a semi constructor for each class, passing in all the inputs temporarily so that the class can grab and store into itself all the inputs it needs as their basic type without always needing the full set of inputs. Then functions for a given class are run using these stored inputs.
+4) the order of whether to process the ignitions into a form suitable for Farsite or whether to automatically download an lcp file is a bit convoluted and might change. Basically both classes need each other, and the order depends on whether files are just given or if downloading is required. But basically the lcpDownloader class just downloads an lcp file using the largest input ignition size and a multiplication factor. The createIgnitions class processes the input ignition files to make new copies that are in the form required by Farsite (matching projection of lcp to ignition file, turning point ignitions into small polygons, grabbing the last fire perimeter of an old farsite run to use as a starting ignition).
+5) the WindNinjaAPI class is not the same as the actual WindNinja API (yet), but basically creates the input config files for running WindNinja, runs WindNinja, then uses WindNinja logs to get the times for each WRF file (this might not be the best spot to grab these times).
+6) the wrfGetWeather class goes through the input WRF files to obtain temperature, precipitation, cloud cover, and other variables needed for the RAWS input in Farsite. Since these values are for the entire field, but Farsite RAWS files only want a single value, different choices for interpolation or point selection are used depending on user input.
+7) the farsiteAPI class takes information from each of the other classes to setup a list of all files and inputs required to run Farsite, then runs Farsite. It will also be where post processing of results can be added later.
+
+
+
+#################  General Overview for Building and Running the Script  #################
+
 The basic idea of this script is that running /include/buildEverything.sh downloads, unpacks, and builds all required libraries and required separate applications, writes a required cmake file to update the paths to all these dependencies, and builds the WRF-WindNinja_FarsiteScript, putting the executable in the bin/ directory. Then you run the script from the command line without a proper input file to get help on what is required in the input file, then run the script from the command line with a path to the required input file to run the script.
 
 If there is anything wrong with the inputs, the input parser should catch the problem and warn if input data is off or more is required. The script also has error checking to stop at any point that it runs into trouble, so if you have problems without getting understandable errors, somehow you've caused an edge case where the programmers need to add some more error checking.
 
-If there is anything wrong with running buildEverything.sh, it should stop and warn where in the process an error has occured so you can go into the file and edit the download source links or any other required unpacked filenames that might have changed. Running buildEverything.sh multiple times should warn if different files are already found so it avoids redoing steps in the process unless you delete files. You should delete the last file or folder that was being worked on before resuming the script if the script is interrupted in the process.
+If there is anything wrong with running buildEverything.sh, it should stop and warn where in the process an error has occured so you can go into the file and edit the download source links or any other required unpacked filenames that might have changed. Running buildEverything.sh multiple times should warn if different files are already found so it avoids redoing steps in the process unless you delete files. You should delete the last file or folder that was being worked on before resuming the script if the script is interrupted in the process during a make or cmake ./configure or build step.
 
-The example input files should now run after buildEverything.sh runs properly, as this script also takes the keyword "$scriptRoot" and replaces it with the correct to home path for the user. Note that only one of the example config files is meant to run to completion because only one of these files uses enough wrf files and the correct start and end farsite simulation times to get farsite to process anything.
+The example input files should now run after buildEverything.sh runs properly, as this script also takes the keyword "$scriptRoot" and replaces it with the correct path to home for the user. Note that only one of the example config files is meant to run to completion because only one of these files uses enough wrf files and the correct start and end farsite simulation times to get farsite to process anything.
 
 Of the current examples, the expected behavior for firstRunCougarCreekFire.txt is as follows: firstRunCougarCreekFire.txt will run all the way to completion, and you can use the resulting a-originalInputs/cougarCreekFire.lcp with its corresponding projection file and a-originalInputs/colorInput.CLR files in farsite4 from firelab.org to view the lcp of the example. You can then take info from the finalOutputs folder to view the resulting fire stuff in said farsite4. Eventually will move on to use flammap6 instead of farsite4 for viewing.
 
@@ -15,7 +44,17 @@ If you have any trouble using this script or have any suggestions, email the ori
 
 
 
+#################  General Overview of WRF-WindNinja-FarsiteScript Examples  #################
 
+For now the only examples revolve around a single cougarCreek-Fire landscape file. The three different input files for WRF-WindNinja-FarsiteScript are firstRunCougarCreekFire.txt (runs to completion), runCougarCreek-fire.txt (not enough inputs to run all the way through Farsite), template-runCougarCreek-fire.txt (similar to runCougarCreek-fire.txt, but now more ignitions at once, functionality not fully built yet). Each of these input files are pulling inputs to the WRF-WindNinja-FarsiteScript from the a-originalInputs folder, which contains a bunch of ignition files, wrf files, and the input landscape .lcp file. When running WRF-WindNinja-FarsiteScript with these input files, the createInputs and finalOutput folders are created. The ones that are currently carried around with the repo are those generated by running the firstRunCougarCreekFire.txt input file.
+
+The createInputs folder contains files generated by the WRF-WindNinja-FarsiteScript by running createIgnitions, WindNinja, and wrfGetWeather for running in Farsite. The WindNinja folder contains outputs for each WindNinja run while the Farsite folder contains all files to be used if running Farsite by itself. In the Farsite folder, the .raws files are from stuff from wrfGetWeather, the .atm and .asc files (with their .prj files) are those grabbed from the WindNinja folder, the ignition .shp files (with all associated .shx, dbf, and .prj files) are created by createIgnitions, the .input file is created to point to all these files as inputs, the run_7a-cougarCreek-polygonIgnit.txt file is the file fed into farsite at the command line to run Farsite (points to more inputs).
+
+The finalOutput folder contains files generated by WRF-WindNinja-FarsiteScript running Farsite with the createInputs/Farsite stuff as input. To look at the results, probably need the .lcp and .clr files from the a-originalInputs folder for viewing with these output files.
+
+
+
+#################  Step by Step Guide for Building and Running the Script  #################
 
 IMPORTANT: DO NOT RUN "sudo make install" step if you have multiple versions of WindNinja as this will overwrite your current installation. At least some version of WindNinja needs this step done to it for the pipeline call to WindNinja to function properly. You should only need the "sudo ldconfig" step if and after you run "sudo make install".
 
@@ -45,6 +84,7 @@ Note that you can see other files as well, but might need to hunt down their spe
 
 
 
+#################  Close to Step by Step description of buildEverything.sh  #################
 
 Description of buildEverything.sh
 --Downloads 3rd party libs using "wget" with a link specified in all the variables at the start of the script
@@ -69,6 +109,10 @@ Description of buildEverything.sh
 ** final script is build using "cmake" and "make -j$nCores".
 
 Note that if you want to modify files that have been setup to be ignored during "git status", you need to run the command "git update-index --no-assume-unchanged <file>" for each file. This should make it easier to ignore changes to these files but still track them, so less accidental modifications of these files happen when pushing to the repo.
+
+
+
+#################  General Dependency List  #################
 
 Specific Dependency Listing for buildEverything.sh (not sure how to count stuff grabbed by the "sudo apt install" step)
 --GNU bash, version 4.3.48(1)-release 
@@ -98,6 +142,9 @@ Dependencies Currently Downloaded by WindNinja's buildDepsh.sh (could change, is
 --proj version 4.8.0
 --gdal version 2.0.3 (built differently than buildEverything.sh version)
 
+
+
+#################  Close to Step by Step description of wrfTrimmer.sh  #################
 
 Description of utility_scripts/wrfTrimmer.sh
 --Makes sure the input directory does not match the output directory
