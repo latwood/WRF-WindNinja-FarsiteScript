@@ -146,6 +146,8 @@ windninjaScriptsDir=$windninjaDir"/scripts"
 windninjaBuildDir=$windninjaDir"/build_windninja"
 windninjaConfigure=""
 
+WindNinjaBranch="3.5"
+
 # setup farsite variables
 farsiteDir=$extraAppsDir"/farsite"
 farsiteSource="https://github.com/firelab/farsite"
@@ -388,6 +390,15 @@ if [ $success == 0 ]; then
     if [ ! -d "${windninjaDir}" ]; then
       echo "!!!failed to download WindNinja!!!"
       success=1
+    else
+      echo "changing WindNinja branch to hopefully stable "$WindNinjaBranch" branch"
+      cd windninja
+      git checkout $WindNinjaBranch
+      success=$?
+      if [ $success != 0 ]; then
+        echo "!!!failed to change WindNinja branch to "$WindNinjaBranch" branch!!!"
+	success=1
+      fi
     fi
   else
     echo "!warning, "$windninjaDir" already exists!"
@@ -429,6 +440,7 @@ if [ $success == 0 ]; then
   if [ ! -f "${windninjaBuildDir}/src/cli/WindNinja_cli" ]; then
     echo "building WindNinja"
     cd $windninjaBuildDir
+    sudo ldconfig
     cmake ..
     make -j4
     success=$? # result of last action, 0 if good, 1 if failed
