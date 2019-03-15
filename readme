@@ -70,7 +70,7 @@ cd WRF-WindNinja-FarsiteScript/include
 cd ./extraApps/windninja/build_windninja
 sudo make install
 sudo ldconfig
-cd bin
+cd ../../../../bin/
 ./WRF-WindNinja-FarsiteScript ../examples/cougarCreek-fire/firstRunCougarCreekFire.txt 2>&1 | tee scriptRun.log
 
 IMPORTANT: DO NOT RUN "sudo make install" step if you have multiple versions of WindNinja as this will overwrite your current installation. At least some version of WindNinja needs this step done to it for the pipeline call to WindNinja to function properly. You should only need the "sudo ldconfig" step if and after you run "sudo make install".
