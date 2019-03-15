@@ -39,6 +39,8 @@ Of the current examples, the expected behavior for firstRunCougarCreekFire.txt i
 
 For other current examples, the code will stop at farsite, as there are not enough wind files for said cases, but they will show output resulting empty folders as it attempts to run multiple separate fires for different ignition files on a single set of wind data. Just there are not enough wind files (min of 1 day's worth before the fire) for farsite to actually run with the inputs provided by the outputs of everything else (not enough wrf files as input to the entire script).
 
+A quick clarification, there is a buildEverything_Ubuntu.sh script and soon to be a buildEverything_Aeolus.sh script. The script for Aeolus might be interesting, as it is for a centos system that does module loading of the packages, so it might not even be important to run a buildEverything.sh script, just load modules. An alternative might be to use the Aeolus package singularity (docker) which could have an image of Ubuntu where the buildEverything_Ubuntu.sh script could be used.
+
 
 If you have any trouble using this script or have any suggestions, email the original developer, Loren Atwood, at pianotocador@gmail.com
 
@@ -61,10 +63,10 @@ IMPORTANT: DO NOT RUN "sudo make install" step if you have multiple versions of 
 The following worked on fresh installations of Ubuntu 16.04 and 18.04:
 sudo apt update
 sudo apt upgrade
-sudo apt install build-essential cmake git m4
+sudo apt install git
 git clone https://github.com/latwood/WRF-WindNinja-FarsiteScript.git
 cd WRF-WindNinja-FarsiteScript/include
-./buildEverything.sh 1 2>&1 | tee buildEverything.log
+./buildEverything_Ubuntu.sh 2>&1 | tee buildEverything.log
 cd ./extraApps/windninja/build_windninja
 sudo make install
 sudo ldconfig
@@ -73,7 +75,8 @@ cd bin
 
 IMPORTANT: DO NOT RUN "sudo make install" step if you have multiple versions of WindNinja as this will overwrite your current installation. At least some version of WindNinja needs this step done to it for the pipeline call to WindNinja to function properly. You should only need the "sudo ldconfig" step if and after you run "sudo make install".
 
-Note that buildEverything takes completely different times depending on the computer, I've seen it take 2 hours on my relatively fast computer, to 4 hours with the Windows Subsystem of Ubuntu. If you are on a slow enough computer, change the 1 to a 0 for the line with ./buildEverything or you will find yourself constantly in pause waiting for a password cause the password injection fails. Note that the example run in this case is the one that goes to completion, which takes about 14.5 minutes on my relatively fast computer. It might be helpful to try out one of the other examples that take less time just to see if the installation succeeded or not. If things don't at least get to the farsite step, there's a problem.
+Note that buildEverything takes completely different times depending on the computer, I've seen it take 2 hours on a virtual machine of Ubuntu on my relatively fast computer, to 4 hours with the Windows Subsystem of Ubuntu (which be warned, can pause periodically). Password injection has been dropped cause that idea failed, so expect the script to pause and ask you for your password again, especially during the WindNinja installation part. On slow computers (Windows Subsystem of Ubuntu), I've seen the build_deps.sh script run for WindNinja ask for passwords multiple times.
+Note that the example run in this case is the one that goes to completion, which takes about 14.5 minutes on my relatively fast computer. It might be helpful to try out one of the other examples that take less time just to see if the installation succeeded or not. If things don't at least get to the farsite step, there's a problem.
 
 Step by step method to view results on a Windows machine. If you don't want to install farsite, your on your own, just need some kind of GIS software:
 go to https://www.firelab.org/, on this webpage look for "apps and products/fire behavior/farsite". On this farsite page, look for "farsite software". This leads you to a farsite for windows installer.
@@ -87,16 +90,19 @@ Note that you can see other files as well, but might need to hunt down their spe
 #################  Close to Step by Step description of buildEverything.sh  #################
 
 Description of buildEverything.sh
+--Runs "sudo apt-get install" to install the following packages: "gcc g++ cmake m4"
+--Runs "mkdir" to create the /include/extraApps and /include/extraLibs folders if they do not exist
 --Downloads 3rd party libs using "wget" with a link specified in all the variables at the start of the script
 --Unzips downloaded compressed folder with "tar -xzf"
 --Runs "./configure" on the 3rd party lib package, using CPP and LD flags and other parameters as specified in all the variables at the start of the script
 --Runs "make -j$nCores && make install" to build the 3rd party library
 ** 3rd party libraries are built in this order: zlib, szlib, curl, hdf5, netcdf_c, netcdf_cxx, jasper, gdal. See the parameteres specified at the start of the script for version numbers and downloadable link locations. A lot of the extra variables are just trying to manipulate the folder and filenames in a manageable way that is slightly specific to each package so the process works without messing with the process, just some variables at the start of the script. Note might not need all these packages, was what I always started with originally as stuff I thought normally went with gdal.
 --Downloads WindNinja using "git clone"
---Builds WindNinja's 3rd party libraries by running "windninja/scripts/buildDepsh.sh" which uses "sudo apt install" for installing a bunch of stuff, "wget, tar, ./configure, make and sudo make instal" for installing some other 3rd party libs from source. Since this script is managed by the WindNinja people, can't easily edit the number of cores used for this process, unfortunately. Note the gdal is the same as what was downloaded before, but builds with different dependencies, and can diverge from the gdal needed by this overall script, so need both downloads.
+--Switches branches to the branch specified in the "$WindNinjaBranch" variable, usually the latest stable release, but user can change if issues with current branch selection
+--Builds WindNinja's 3rd party libraries by running "windninja/scripts/build_deps.sh" which uses "sudo apt-get install" for installing a bunch of stuff, "wget, tar, ./configure, make and sudo make install" for installing some other 3rd party libs from source. Since this script is managed by the WindNinja people, can't easily edit the number of cores used for this process, unfortunately. Note the gdal is the same as what was downloaded before, but builds with different dependencies, and can diverge from the gdal needed by this overall script, so need both downloads.
+--Runs "sudo ldconfig" to make sure WindNinja can find the paths to some of it's libraries correctly.
 --Configures WindNinja using "cmake"
 --Builds WindNinja by just doing "make -j4". Note that you have to manually do the "sudo make install" since I didn't want to override anyone's current version of WindNinja on accident.
---Runs "sudo ldconfig" to make sure WindNinja can find the paths to some of it's libraries correctly.
 ** farsite
 --Downloads farsite using "git clone" (note this is not the most up to date version, even the firelab.org version is not the most up to date version)
 --Runs "make -j$nCores" to build farsite
@@ -104,8 +110,8 @@ Description of buildEverything.sh
 --uses "sed" to process input strings so they will work correctly in other utilities for this process
 --uses "grep" to get the files needed, excluding the include and .git directories and the readme file, uses pipeline "|", "xargs", and "sed" to modify the files with the newly updated paths
 ** update local git ignore stuff so that files with paths changed by the script that still need tracked (like the example files) can still be ignored, so it is less easy to accidentally make changes to them
---uses "git update-index --assume-unchanged" on src/getFarsitePath.cpp, src/getWindNinjaPath.cpp, and config/default.cmake to avoid modifications of these files by buildEverything.sh causing unnecessary "git status" showing all these files modified
---uses "git ls-files -- $examplesDir | xargs -l git update-index --assume-unchanged" to also ignore all files found in the examples directory that are modified by buildEverything.sh
+--uses "git update-index --assume-unchanged" on src/getFarsitePath.cpp, src/getWindNinjaPath.cpp, and config/default.cmake to avoid modifications of these files by buildEverything_Ubuntu.sh causing unnecessary "git status" showing all these files modified
+--uses "git ls-files -- $examplesDir | xargs -l git update-index --assume-unchanged" to also ignore all files found in the examples directory that are modified by buildEverything_Ubuntu.sh
 ** final script is build using "cmake" and "make -j$nCores".
 
 Note that if you want to modify files that have been setup to be ignored during "git status", you need to run the command "git update-index --no-assume-unchanged <file>" for each file. This should make it easier to ignore changes to these files but still track them, so less accidental modifications of these files happen when pushing to the repo.
