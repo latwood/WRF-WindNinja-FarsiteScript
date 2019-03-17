@@ -1,0 +1,140 @@
+Note that these files come from all over the place and are hard to keep apart. So this is a guide to know what each one is, how it was generated, and how it was used, and if that was successful. May or may not update with methods for converting to get them to work successfully, but this will be the starting point for doing that conversion. Will also create an ogr or gdal info file for each of these successive files, and a description for what the differences probably mean. This technically would help explain quite a few of the files in the farsiteStuff/windows/CougarCreekFire-1stCreateIgnition/ folder wherever you find that.
+
+
+1a-wrfout_d3.2015080912.f12.0000
+This is one of the standard wrf netcdf input files. There is an issue with the way to read it that needs to follow windninja tricks. I think it has to do with the sublayers as well as the geolocation problems. Supposedly they are differing sized stuff and that messes up with the way it interprets geolocation so it thinks that there aren't any bands when I try to read it.
+1b-gdalinfo-wrfout_d3.2015080912.f12.0000
+Maybe the reason the tutorial for netcdf files fails with bands is because instead of bands this file has subdatasets. Turns out that the size of each subdataset is NOT the same and does NOT match the size given by the output. It also reports no geolocation though there is a metadata variable for lat and long so technically it does have some kind of projection info. So it might be having problems because the data doesn't have a single size for everything, and there is no direct normal geolocation as is the normal format. Looks like the output is basically the same for the extraLibs/gdalinfo. From now on going to use extraLibs version since that is what should be reading it, plus ogrinfo complains otherwise. Added -listmdd to gdalinfo, doesn't do much but seems to show that it has subdatasets instead of bands.
+
+
+2a-wa_cougar_creek_20150811_2300_dd83
+This is one of the early geomac fire perimeters. Doesn't work currently as input for either farsite. Idea is need to figure out from the other cases how to translate this file into what is actually needed as an ignition file.
+2b-ogrinfo-2a-wa_cougar_creek_20150811_2300_dd83
+ogrinfo is happy to read the shp, shx, or dbf file and gives the same result. Doesn't seem to care or even want (gets mad at) any of these other files that are brought down, including .prj files. Info is super simple, it just says it is a polygon and that is it, so maybe there is more it is missing? Okay so the fix was to add the -al to the commands to actually print info for all sections. Added the -rl just in case they are put inside in strange order to see if that might be the problem between ignition types.
+Looks pretty normal to me at first glance, has a ton of what seems like extra/excess metadata.
+2c-wa_cougar_creek_20150819_0155_dd83
+This is just a later day (day 14 if I remember correctly instead of day 1) of the same geomac fire perimeters as 2a-wa_cougar_creek-20150811_2300_dd83.
+2d-ogrinfo-wa_cougar_creek_20150819_0155_dd83
+Also looks fine, so not sure why even firelab.org farsite can't read these geomac shape files as fire inputs.
+
+
+3a-test1177973_NTFBIgnition
+This is the working ignition file used in the 1177973 panther case. So it works in linux farsite. Haven't tried it in firelab.org farsite (not really time to), but it should work.
+3b-ogrinfo-test1177973_NTFBIgnition
+Looks pretty normal to me, though it has multipolygon instead of polygon in it, and the extent now has negative values. Maybe there is something off with the way farsite handles coordinate systems since it seems to only care about lat, so that is why it has the strange negative values for extent? Need to make, read, and understand way more of the shapefiles.
+
+
+4a-centerIgnit
+This is the working ignition file used in the flatland case for linux farsite. So it works in linux farsite, haven't tried it in firelab.org farsite (not really time to), but it should work.
+4b-ogrinfo-centerIgnit
+Notice that this has almost no metadata or any other information compared to everything else. Seems to have the smallest and cleanest of all inputs, and it does work so why is the question.
+
+
+5a-cougarCreek-pointIgnit
+I created a guess point location for the cougarCreek lcp location. Turns out that the firelab.org farsite can handle it (probably by turning it into a polygon ignit), but the linux farsite thinks something is there but does nothing with ignition locations. Turning it into a polygon ignit works though. So I want to run ogrinfo to see what is wrong with this one compared to the polygon ignit and need to make another one or two multipoint locations just to see if farsite still works and how the files are different.
+5b-ogrinfo-cougarCreek-pointIgnit
+This one has even less info than 4a-centerIgnit. Need to compare this one with the polygon to really learn what is going on though.
+
+
+6a-cougarCreek-3pointIgnit
+Same thing basically as the cougarCreek-pointIgnit shape file, but with three point ignitions. It still worked in firelab.org farsite and still did not work in linux farsite.
+6b-ogrinfo-cougarCreek-3pointIgnit
+Seems the same as 5a-cougarCreek-pointIgnit but now there are three points.
+
+
+7a-cougarCreek-polygonIgnit
+I created a guess polygon location (a few left clicks then right click) for the cougarCreek lcp location. This legitly works in linux farsite, though I need to create another case with a few more ignition locations to compare. So I want to run ogrinfo to see what makes this one work compared to the point ignit and need to make another one or two multipoint locations just to see if farsite still works and how the files are different.
+7b-ogrinfo-cougarCreek-polygonIgnit
+I see literally no difference between this one and 5a-cougarCreek-pointIgnit other than the extent is bigger and there are more points in the polygon section. That appears to be the ONLY difference! So it is literally that points don't start fire fast enough and that is it?
+
+
+8a-cougarCreek-3polygonIgnit
+Same thing basically as the cougarCreek-polygonIgnit shape file, but with three polygon ignitions. It still worked in both firelab.org farsie and linux farsite.
+8b-ogrinfo-cougarCreek-3polygonIgnit
+Not really that much difference. I'm thinking at this point I need to go into the code and see what actually goes on to see why the geomac has trouble, as well as simply manipulate by hand the point one to see if I can improve the fire stuff.
+
+
+9a-test1177973_Perimeters
+output linux fire perimeters from test1177973_NTFBIgnition. Doesn't work currently as input for linux farsite (haven't tried it for firelab.org farsite yet but based on other results, it should work on firelab.org farsite). Idea is need to figure out from the other cases how to translate this file into what is actually needed as an ignition file.
+9b-ogrinfo-test1177973_Perimeters
+Looks like a gajillion line strings instead of polygons, ones at multiple times. So probably it just needs to grab the last set of them, but also maybe convert them into a polygon.
+
+
+10a-flatland_Perimeters
+output linux fire perimeters from centerIgnit, for the flatland case of RAWS-3mph180deg7hr. Doesn't work currently as input for linux farsite (haven't tried it for firelab.org farsite, but based on other results it should work for firelab.org farsite). The idea is to figure out from the other cases how to translate this file into what is actually needed as an ignition file.
+10b-ogrinfo-flatland_Perimeters
+Similar to 9a-test1177973_Perimeters, in that it is a linestring instead of a polygon for every hour, just this time there is only a single feature for every hour. So the complex terrain must make the fires split up and break down in the other case. Again my guess is it is needing to grab the last day of information, as well as maybe it needs polygon instead of linestring input.
+
+
+11a-cougarCreekFire_Perimeters
+This is the output fire perimeter for the cougarCreek-polygonIgnit on linux. It is the same thing as the cougarCreek-polygonIgnit-perimeters-linux file, just that was the renaming to try it out on firelab.org farsite. Doesn't work currently as input for linux farsite, though it did work as input for firelab.org farsite. It just ran way way slower. Idea is need to figure out from the other cases how to translate this file into what is actually needed as an ignition file.
+11b-ogrinfo-cougarCreekFire_Perimeters
+Looks pretty similar to 10a-flatland_Perimeters, but this time it starts to do some splitting and merging of the fire. You can see the effect of the burn periods making it jump to a new day. Doesn't look like anything is out of order, which is good. Maybe there's a keyword that farsite is looking for to do stuff with ignitions vs fire perimeters?
+
+
+12a-cougarCreek-polygonIgnit-perimetersAsIgnit-perimeters-linuxOnFirelaborg
+This is the output fire perimeter for the cougarCreekFire_Perimeters (cougarCreek-polygonIgnit-perimeters-linux) file, run on firelab.org farsite. This fire took forever to run, but it did run. Didn't seem too different from the start either, except filling in a bunch of areas as fires.
+12b-ogrinfo-cougarCreek-polygonIgnit-perimetersAsIgnit-perimeters-linuxOnFirelaborg
+This is the first set of fire perimeters from firelab.org farsite vs linux farsite. Looks similar to all the other fire perimeters, except this time they are polygons instead of linestrings, which makes sense cause it gives the option of choosing which type of output you want. There are a ton of splits, but who knows if that has something to do with going between representation types of polygon to linestring, which has more splits per day or even if just switching types introduces more splits per day? That would explain why this ran a bunch slower, it thinks there are a ton more fires!
+
+
+13a-cougarCreek-pointIgnit-perimeters-firelaborg
+firelab.org fire perimeters result from using cougarCreek-pointIgnit as the ignition source.
+13b-ogrinfo-cougarCreek-pointIgnit-perimeters-firelaborg
+Similar to 10a-flatland_Perimeters and the other perimeters, except now they are polygons and there were no splitups for multiple times. So it seems to me like polygons are the much cleaner way to go to not need to represent near so many fire merging situations.
+
+
+14a-cougarCreek-pointIgnit-perimetersAsIgnit-perimeters-firelaborg
+firelab.org fire perimeters result from using cougarCreek-pointIgnit-perimeters-firelaborg as the ignition source. So firelab.org farsite can use past fire perimeters as input, though the other cases I tried something like this on linux farsite did not work.
+14b-ogrinfo-cougarCreek-pointIgnit-perimetersAsIgnit-perimeters-firelaborg
+Similar thing to 13-acougarCreek-pointIgnit-perimeters-firelaborg except now it has split up into a ton more fire perimeters at each time. So farsite will likely always run a ton slower when trying to use fire areas instead of a single location, or trying to run off of past fire areas. Or maybe it has to do with specifying whether the area has burnt or not, so it thinks parts of the inside have not burnt yet so it tries again, making it have to start out split? Looks like at the second timestep the other fires have turned from expanding to enclave fire and are now smaller, but they are still repeated so I guess no merging has occurred.
+
+
+15a-cougarCreek-3pointIgnit-perimeters-firelaborg
+firelab.org fire perimeters result from using cougarCreek-3pointIgnit as the ignition source.
+15b-ogrinfo-cougarCreek-3pointIgnit-perimeters-firelaborg
+Similar to 13a-cougarCreek-pointIgnit-perimeters-firelaborg except now there are three fires at a given time. They always stay as expanding fires so that is good.
+
+
+16a-cougarCreek-3pointIgnit-perimetersAsIgnit-perimeters-firelaborg
+firelab.org fire perimeters result from using cougarCreek-3pointIgnit-perimeters-firelaborg as the ignition source. So firelab.org farsite can use past fire perimeters as input, though the other cases I tried something like this on linux farsite did not work.
+16b-ogrinfo-cougarCreek-3pointIgnit-perimetersAsIgnit-perimeters-firelaborg
+Similar to 14a-cougarCreek-pointIgnit-perimetersAsIgnit-perimeters-firelaborg except now there are a gajillion split fires, I think a ton for each of the three fires. By the end they have all become enclave fires except for three of them, so maybe the problem is fires are linestrings in the code and not polygons, so it splits them into multiple locations at each place?
+
+
+17a-cougarCreek-polygonIgnit-perimeters-firelaborg
+firelab.org fire perimeters result from using cougarCreek-polygonIgnit as the ignition source.
+17b-ogrinfo-cougarCreek-polygonIgnit-perimeters-firelaborg
+Starts out with a single fire that is expanding, and at one point it splits up into a bunch of enclave fires with the main fire. But some of the enclave fires disappear so there is some kind of merging or crossover action going on?
+
+
+18a-cougarCreek-polygonIgnit-perimetersAsIgnit-perimeters-firelaborg
+firelab.org fire perimeters result from using cougarCreek-polygonIgnit-perimeters-firelaborg as the ignition source. So firelab.org farsite can use past fire perimeters as input, though the other cases I tried something like this on linux farsite did not work.
+18b-ogrinfo-cougarCreek-polygonIgnit-perimetersAsIgnit-perimeters-firelaborg
+Similar to 17a-cougarCreek-polygonIgnit-perimeters-firelaborg except that a bunch more starting fires. So I guess polygon to polygon it still split up one fire into multiple polygons. Worse, it seems to have done that with the enclave fires as there are extra starting fires compared to some of the other cases. So I wonder if trying to do everything in linefires would improve it or if it would get even slower, depends on what is the better representation. Definitely looks like it has something that converts a single ignition into multiple points if it is trying to work with later fire perimeters. Doesn't quite do that with a single starting ignition location.
+
+
+19a-cougarCreek-3polygonIgnit-perimeters-firelaborg
+firelab.org fire perimeters result from using cougarCreek-3polygonIgnit as the ignition source.
+19b-ogrinfo-cougarCreek-3polygonIgnit-perimeters-firelaborg
+Similar to others, just three fires that are tracked now.
+
+
+20a-cougarCreek-3polygonIgnit-perimetersAsIgnit-perimeters-firelaborg
+firelab.org fire perimeters result from using cougarCreek-3polygonIgnit-perimeters-firelaborg as the ignition source. So firelab.org farsite can use past fire perimeters as input, though the other cases I tried something like this on linux farsite did not work.
+20b-ogrinfo-cougarCreek-3polygonIgnit-perimetersAsIgnit-perimeters-firelaborg
+Probably the most expanding starting fires I have ever seen out of all of these cases. Seems to have merged most of them by the end cause there are quite a bit fewer by the end.
+
+
+21a-cougarCreekFire
+this is the lcp for the cougar creek fire. I'm guessing that either projection info is missing or mixed up, or something else is going on. So need to compare with mostly all the stuff, but especially 2a-wa_cougar_creek_20150811_2300_dd83
+
+
+22a-22a-flatland
+this is the lcp for the flatland case. I've had stuff work for this one so projections are probably the same or similar. Need to compare with 4a-centerIgnit.
+
+
+23a-test1177973
+this is the lcp for the test1177973 case. Idea is to compare the ogrinfo projection stuff with 3a-test1177973_NTFBIgnition
+
+

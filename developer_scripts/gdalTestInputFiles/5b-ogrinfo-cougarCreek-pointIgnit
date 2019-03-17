@@ -1,0 +1,22 @@
+INFO: Open of `5a-cougarCreek-pointIgnit.shp'
+      using driver `ESRI Shapefile' successful.
+
+Layer name: 5a-cougarCreek-pointIgnit
+Geometry: Polygon
+Feature Count: 1
+Extent: (627647.863972, 5109132.306024) - (627649.766085, 5109134.306024)
+Layer SRS WKT:
+(unknown)
+Fire_Type: String (64.0)
+Month: Real (32.0)
+Day: Real (32.0)
+Hour: Real (32.0)
+Elapsed_Mi: Real (32.4)
+OGRFeature(5a-cougarCreek-pointIgnit):0
+  Fire_Type (String) = Expanding Fire
+  Month (Real) = 0
+  Day (Real) = 0
+  Hour (Real) = 0
+  Elapsed_Mi (Real) = 0.0000
+  POLYGON ((627648.815028902 5109134.3060241,627648.227243649 5109134.11504109,627647.863972385 5109133.61504109,627647.863972385 5109132.9970071,627648.227243649 5109132.4970071,627648.815028902 5109132.3060241,627649.402814154 5109132.4970071,627649.766085418 5109132.9970071,627649.766085418 5109133.61504109,627649.402814154 5109134.11504109,627648.815028902 5109134.3060241))
+
