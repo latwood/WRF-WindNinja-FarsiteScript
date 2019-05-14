@@ -140,7 +140,7 @@ jasperBuildDir=$jasperDir"/build_jasper-1.900.1"
 jasperCPPFLAGS=""
 jasperLDFLAGS=""
 jasperConfigure="./configure --prefix="$jasperBuildDir" --enable-shared"
-jasper_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+jasper_shouldMakeClean=1	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
 gdalLink="http://download.osgeo.org/gdal/2.0.3/gdal-2.0.3.tar.gz"
@@ -152,7 +152,7 @@ gdalBuildDir=$gdalDir"/build_gdal-2.0.3"
 gdalCPPFLAGS=""
 gdalLDFLAGS=""
 gdalConfigure="./configure --prefix="$gdalBuildDir" --with-curl="$curlBuildDir" --with-jasper="$jasperBuildDir" --with-netcdf="$netcdf_cBuildDir" --with-hdf5="$hdf5BuildDir" --with-libz="$zlibBuildDir
-gdal_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+gdal_shouldMakeClean=1	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
 
@@ -162,7 +162,7 @@ windNinjaDir=$extraAppsDir"/windninja"				# this is defining the location inside
 windNinjaLink="https://github.com/firelab/windninja.git"	# this is the link to the WindNinja script Repo
 windNinjaBuildDir=$windNinjaDir"/build_windninja"			# this is defining the location of the WindNinja build directory, for when running "make" on the WindNinja application
 
-windNinjaBranch="3.5"								# this is for defining which version of WindNinja (which branch) to switch to by running "git checkout $branch", so defining which version of WindNinja to compile
+windNinjaBranch="3.5.2"								# this is for defining which version of WindNinja (which branch) to switch to by running "git checkout $branch", so defining which version of WindNinja to compile
 windninjaScriptsDir=$windNinjaDir"/scripts"
 
 
@@ -299,6 +299,26 @@ buildLib()		### this function is to be run on libs after they've been downloaded
 	echo "" # want a nice clean line
 	echo "checking if "$libName" needs to be built"
 
+
+
+	if [[ $shouldMakeClean == 1 && -d "${libBuildDir}" ]]; then
+		echo "shouldMakeClean is \"${shouldMakeClean}\" so deleting old ${libDir} directory for a clean build"
+		rm -r ${libDir}
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running rm -r command !!!"
+			return 1
+		fi
+		echo "running the download and unpacking function again, should ignore the downloading part"
+		downloadAndUnpackLib "${extraLibsDir}" "null" "${libTarDir}" "${libTarDirName}" "${libDir}" "${libBuildDir}"		### notice the link won't matter cause it will detect that the tar dir exists
+		success=$? # result of last action, 0 if good, 1 if failed
+		if [ $success != 0 ]; then
+			echo "!!! error running downloadAndUnpackLib function !!!"
+			return 1
+		fi
+	fi
+
+
 	if [ ! -d "${libBuildDir}" ]; then
 		echo "entering ${libDir} directory"		
 		cd $libDir
@@ -337,64 +357,9 @@ buildLib()		### this function is to be run on libs after they've been downloaded
 			return 1
 		fi
 	else
-		if [ $shouldMakeClean == 1 ]; then
-			echo "deleting old ${libDir} directory for a clean build"
-			rm -r ${libDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -r command !!!"
-				return 1
-			fi
-			echo "running the download and unpacking function again, should ignore the downloading part"
-			downloadAndUnpackLib "${extraLibsDir}" "null" "${libTarDir}" "${libTarDirName}" "${libDir}" "${libBuildDir}"		### notice the link won't matter cause it will detect that the tar dir exists
-			success=$? # result of last action, 0 if good, 1 if failed
-			if [ $success != 0 ]; then
-				echo "!!! error running downloadAndUnpackLib function !!!"
-				return 1
-			fi
-			### I'm half tempted to have this function run itself, wouldn't even need to change the input, it should detect that the build directory doesn't exist
-			### guess instead I'll just copy and paste the stuff, I don't know/trust recursion, even though in theory it is a brilliant idea
-			echo "entering ${libDir} directory"		
-			cd $libDir
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running cd command !!!"
-				return 1
-			fi
-			echo "running configure "$libConfigure
-			export CPPFLAGS=$libCPPFLAGS
-			export LDFLAGS=$libLDFLAGS
-			${libConfigure}  # run the passed in configure command
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running configure command !!!"
-				return 1
-			fi
-			echo "building "$libDirName
-			make -j$nCores
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running make command !!!"
-				return 1
-			fi
-			echo "running make install (not sudo make install)"
-			make install
-			if [ $success != 0 ]; then
-				echo "!!! error running make install command !!!"
-				return 1
-			fi
-			echo "returning to ${extraLibsDir} directory"
-			cd $extraLibsDir
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running cd command !!!"
-				return 1
-			fi
-			echo "finished rebuilding steps"
-		else
-			echo "${libBuildDir} already exists and shouldMakeClean is set to ${shouldMakeClean} so skipping build process"
-		fi
+		echo "${libBuildDir} already exists and shouldMakeClean is set to ${shouldMakeClean} so skipping build process"
 	fi
+
 	
 	echo "finished building "$libName
 	echo "" # add a nice clean line
