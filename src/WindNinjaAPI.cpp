@@ -222,9 +222,18 @@ bool WindNinjaAPI::run_WindNinja()
         char data[4096 + 1];
         std::string s;
 
-        const char *const papszArgv[] = { "WindNinja_cli",
+        //const char *const papszArgv[] = { "WindNinja_cli",
+        //                                  WindNinjaCfgFileNames[wrfCount].c_str(),
+        //                                  NULL };
+        //const char *const papszArgv[] = { "/home/atw09001/src/comboScript/WRF-WindNinja-FarsiteScript/include/extraApps/windninja/build_windninja/src/cli/WindNinja_cli",
+        //                                  WindNinjaCfgFileNames[wrfCount].c_str(),
+        //                                  NULL };
+        //printf("papszArgv is /home/atw09001/src/comboScript/WRF-WindNinja-FarsiteScript/include/extraApps/windninja/build_windninja/src/cli/WindNinja_cli %s",WindNinjaCfgFileNames[wrfCount].c_str());
+
+        const char *const papszArgv[] = { WindNinjaApplicationPath.c_str(),
                                           WindNinjaCfgFileNames[wrfCount].c_str(),
                                           NULL };
+        printf("papszArgv is %s %s",WindNinjaApplicationPath.c_str(),WindNinjaCfgFileNames[wrfCount].c_str());
 
         // this method appears to be limited by whatever is the current application in the command line. Doesn't appear possible to supply a path to an executable
         // would like to replace a lot of stuff with WindNinja API

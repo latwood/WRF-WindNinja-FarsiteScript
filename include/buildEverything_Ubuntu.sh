@@ -140,7 +140,7 @@ jasperBuildDir=$jasperDir"/build_jasper-1.900.1"
 jasperCPPFLAGS=""
 jasperLDFLAGS=""
 jasperConfigure="./configure --prefix="$jasperBuildDir" --enable-shared"
-jasper_shouldMakeClean=1	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+jasper_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
 gdalLink="http://download.osgeo.org/gdal/2.0.3/gdal-2.0.3.tar.gz"
@@ -152,7 +152,7 @@ gdalBuildDir=$gdalDir"/build_gdal-2.0.3"
 gdalCPPFLAGS=""
 gdalLDFLAGS=""
 gdalConfigure="./configure --prefix="$gdalBuildDir" --with-curl="$curlBuildDir" --with-jasper="$jasperBuildDir" --with-netcdf="$netcdf_cBuildDir" --with-hdf5="$hdf5BuildDir" --with-libz="$zlibBuildDir
-gdal_shouldMakeClean=1	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+gdal_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
 
