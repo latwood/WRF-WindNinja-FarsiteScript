@@ -67,23 +67,19 @@ git clone https://github.com/latwood/WRF-WindNinja-FarsiteScript.git
 cd WRF-WindNinja-FarsiteScript/include
 ./buildEverything_Ubuntu.sh 2>&1 | tee buildEverything.log
 
-This should be enough to build the script, but currently WindNinja is required to be installed as an application via "sudo make install"and "sudo ldconfig" commands, as well as adding a version of "export WINDNINJA_DATA=~/src/wind/windninja/data" to your .bashrc file. Some version of WindNinja needs installed in this way in order for the current pipeline call to WindNinja to function properly. If you already have multiple versions of WindNinja, you probably can skip this step
+Used to be that you needed to run "sudo make install" and "sudo ldconfig" in order to have at least one fully installed version of WindNinja in order for the current pipeline call of WindNinja to work properly. This is not true anymore, though the buildEverything_Ubuntu.sh script still runs "sudo ldconfig". But it is still true that the user's .bashrc file needs modified with a version of "export WINDNINJA_DATA=~/src/wind/windninja/data". If you already have multiple versions of WindNinja, you probably can skip this step
 
-cd ./extraApps/windninja/build_windninja
-sudo make install
-sudo ldconfig
 
-now add the a modified version of this to your .bashrc file:
+now add the a modified version of this to your .bashrc file (found in $HOME):
 export WINDNINJA_DATA=/PATHTOSCRIPTREPO/WRF-WindNinja-FarsiteScript/include/extraApps/windninja/data
 
 run the following to update .bashrc usage
 source $HOME/.bashrc
 
 
-now do the following to run the script:
-cd ../../../../bin/
+The script is now fully compiled. Here is an example of a run:
+cd /WRF-WindNinja-FarsiteScript/bin/
 ./WRF-WindNinja-FarsiteScript ../examples/cougarCreek-fire/firstRunCougarCreekFire.txt 2>&1 | tee scriptRun.log
-
 
 
 
