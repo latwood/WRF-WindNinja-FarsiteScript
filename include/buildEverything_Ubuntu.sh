@@ -60,6 +60,7 @@ finalBuildDir=$baseDir"/build"						# this is defining the location of the overa
 ### third party lib variables
 
 zlibLink="http://www.zlib.net/zlib-1.2.11.tar.gz"
+zlibTarFormat="-xzf"
 zlibTarDir=$extraLibsDir"/zlib-1.2.11.tar.gz"
 zlibTarDirName=$extraLibsDir"/zlib-1.2.11"
 zlibDir=$extraLibsDir"/zlib-1.2.11"
@@ -72,6 +73,7 @@ zlib_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before
 
 
 szlibLink="ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4/szip-2.1.tar.gz"
+szlibTarFormat="-xzf"
 szlibTarDir=$extraLibsDir"/szip-2.1.tar.gz"
 szlibTarDirName=$extraLibsDir"/szip-2.1"
 szlibDir=$extraLibsDir"/szip-2.1"
@@ -84,6 +86,7 @@ szlib_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted befor
 
 
 curlLink="https://curl.haxx.se/download/curl-7.61.1.tar.gz"
+curlTarFormat="-xzf"
 curlTarDir=$extraLibsDir"/curl-7.61.1.tar.gz"
 curlTarDirName=$extraLibsDir"/curl-7.61.1"
 curlDir=$extraLibsDir"/curl-7.61.1"
@@ -96,6 +99,7 @@ curl_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before
 
 
 hdf5Link="https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.2/src/hdf5-1.10.2.tar.gz"
+hdf5TarFormat="-xzf"
 hdf5TarDir=$extraLibsDir"/hdf5-1.10.2.tar.gz"
 hdf5TarDirName=$extraLibsDir"/hdf5-1.10.2"
 hdf5Dir=$extraLibsDir"/hdf5-1.10.2"
@@ -108,6 +112,7 @@ hdf5_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before
 
 
 netcdf_cLink="https://github.com/Unidata/netcdf-c/archive/v4.6.1.tar.gz"
+netcdf_cTarFormat="-xzf"
 netcdf_cTarDir=$extraLibsDir"/v4.6.1.tar.gz"
 netcdf_cTarDirName=$extraLibsDir"/netcdf-c-4.6.1"
 netcdf_cDir=$extraLibsDir"/netcdf-c-4.6.1"
@@ -120,6 +125,7 @@ netcdf_c_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted be
 
 
 netcdf_cxxLink="https://github.com/Unidata/netcdf-cxx4/archive/v4.3.0.tar.gz"
+netcdf_cxxTarFormat="-xzf"
 netcdf_cxxTarDir=$extraLibsDir"/v4.3.0.tar.gz"
 netcdf_cxxTarDirName=$extraLibsDir"/netcdf-cxx4-4.3.0"
 netcdf_cxxDir=$extraLibsDir"/netcdf-cxx-4.3.0"
@@ -132,6 +138,7 @@ netcdf_cxx_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted 
 
 
 jasperLink="https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/jasper/1.900.1-14ubuntu3/jasper_1.900.1.orig.tar.gz"
+jasperTarFormat="-xzf"
 jasperTarDir=$extraLibsDir"/jasper_1.900.1.orig.tar.gz"
 jasperTarDirName=$extraLibsDir"/jasper-1.900.1"
 jasperDir=$extraLibsDir"/jasper-1.900.1"
@@ -144,6 +151,7 @@ jasper_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted befo
 
 
 gdalLink="http://download.osgeo.org/gdal/2.0.3/gdal-2.0.3.tar.gz"
+gdalTarFormat="-xzf"
 gdalTarDir=$extraLibsDir"/gdal-2.0.3.tar.gz"
 gdalTarDirName=$extraLibsDir"/gdal-2.0.3"
 gdalDir=$extraLibsDir"/gdal-2.0.3"
@@ -184,20 +192,21 @@ varToReplace="\$scriptRoot"							# this is the predefined placeholder text for 
 ############# define functions used by all the other processes ##############
 downloadAndUnpackLib()		### this function downloads and unzips a given 3rd party lib, then if the name is not what is wanted, renames the unpacked the directory to what is wanted
 {
-	if [ "$#" != 6 ]; then
+	if [ "$#" != 7 ]; then
 		echo "" # want a nice clean line
 		echo "!!!Incorrect Number of parameters for downloadAndUnpackLib!!!"
-		echo "need 6 parameters: \"extraLibsDir\" \"libLink\" \"libTarDir\" \"libTarDirName\" \"libDir\" \"libBuildDir\""
+		echo "need 7 parameters: \"extraLibsDir\" \"libLink\" \"tarFormat\" \"libTarDir\" \"libTarDirName\" \"libDir\" \"libBuildDir\""
 		echo "" # want a nice clean line
 		return 1
 	fi
 
 	local extraLibsDir="${1}"
 	local libLink="${2}"
-	local libTarDir="${3}"
-	local libTarDirName="${4}"
-	local libDir="${5}"
-	local libBuildDir="${6}"
+	local tarFormat="${3}"
+	local libTarDir="${4}"
+	local libTarDirName="${5}"
+	local libDir="${6}"
+	local libBuildDir="${7}"
 	
 	
 	### make some intermediate variables that used to be passed in, but technically come from these input variables
@@ -239,10 +248,10 @@ downloadAndUnpackLib()		### this function downloads and unzips a given 3rd party
 			return 1
 		fi
 		echo "unpacking "$libTarDir
-		tar -xzf $libTarDir
+		tar $tarFormat $libTarDir
 		success=$?
 		if [ $success != 0 ]; then
-			echo "!!! error running tar command !!!"
+			echo "!!! error running tar command with tarFormat \"${tarFormat}\" !!!"
 			return 1
 		fi
 		if [ "${libTarDirName}" != "${libDir}" ]; then
@@ -268,10 +277,10 @@ downloadAndUnpackLib()		### this function downloads and unzips a given 3rd party
 
 buildLib()		### this function is to be run on libs after they've been downloaded and unpacked, basically just builds the lib
 {
-	if [ "$#" != 10 ]; then
+	if [ "$#" != 11 ]; then
 		echo "" # want a nice clean line
 		echo "!!!Incorrect Number of parameters for buildLib!!!"
-		echo "need 10 parameters: \"extraLibsDir\" \"nCores\" \"libDir\" \"libBuildDir\" \"libCPPFLAGS\" \"libLDFLAGS\" \"libConfigure\" \"shouldMakeClean\" \"libTarDir\" \"libTarDirName\""
+		echo "need 10 parameters: \"extraLibsDir\" \"nCores\" \"libDir\" \"libBuildDir\" \"libCPPFLAGS\" \"libLDFLAGS\" \"libConfigure\" \"shouldMakeClean\" \"tarFormat\" \"libTarDir\" \"libTarDirName\""
 		echo "" # want a nice clean line
 		return 1
 	fi
@@ -284,8 +293,9 @@ buildLib()		### this function is to be run on libs after they've been downloaded
 	local libLDFLAGS="${6}"
 	local libConfigure="${7}"
 	local shouldMakeClean="${8}"
-	local libTarDir="${9}"
-	local libTarDirName="${10}"
+	local tarFormat="${9}"
+	local libTarDir="${10}"
+	local libTarDirName="${11}"
 
 
 	### make some intermediate variables that used to be passed in, but technically come from these input variables
@@ -310,7 +320,7 @@ buildLib()		### this function is to be run on libs after they've been downloaded
 			return 1
 		fi
 		echo "running the download and unpacking function again, should ignore the downloading part"
-		downloadAndUnpackLib "${extraLibsDir}" "null" "${libTarDir}" "${libTarDirName}" "${libDir}" "${libBuildDir}"		### notice the link won't matter cause it will detect that the tar dir exists
+		downloadAndUnpackLib "${extraLibsDir}" "null" "${tarFormat}" "${libTarDir}" "${libTarDirName}" "${libDir}" "${libBuildDir}"		### notice the link won't matter cause it will detect that the tar dir exists
 		success=$? # result of last action, 0 if good, 1 if failed
 		if [ $success != 0 ]; then
 			echo "!!! error running downloadAndUnpackLib function !!!"
@@ -536,42 +546,42 @@ fi
 ######## download via "wget" and unpack with "tar" each of the third party packages required for the overall script ###########
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${zlibLink}" "${zlibTarDir}" "${zlibTarDirName}" "${zlibDir}" "${zlibBuildDir}"
+	downloadAndUnpackLib "${extraLibsDir}" "${zlibLink}" "${zlibTarFormat}" "${zlibTarDir}" "${zlibTarDirName}" "${zlibDir}" "${zlibBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${szlibLink}" "${szlibTarDir}" "${szlibTarDirName}" "${szlibDir}" "${szlibBuildDir}"
+	downloadAndUnpackLib "${extraLibsDir}" "${szlibLink}" "${szlibTarFormat}" "${szlibTarDir}" "${szlibTarDirName}" "${szlibDir}" "${szlibBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${curlLink}" "${curlTarDir}" "${curlTarDirName}" "${curlDir}" "${curlBuildDir}"
+	downloadAndUnpackLib "${extraLibsDir}" "${curlLink}" "${curlTarFormat}" "${curlTarDir}" "${curlTarDirName}" "${curlDir}" "${curlBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${hdf5Link}" "${hdf5TarDir}" "${hdf5TarDirName}" "${hdf5Dir}" "${hdf5BuildDir}"
+	downloadAndUnpackLib "${extraLibsDir}" "${hdf5Link}" "${hdf5TarFormat}" "${hdf5TarDir}" "${hdf5TarDirName}" "${hdf5Dir}" "${hdf5BuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${netcdf_cLink}" "${netcdf_cTarDir}" "${netcdf_cTarDirName}" "${netcdf_cDir}" "${netcdf_cBuildDir}"
+	downloadAndUnpackLib "${extraLibsDir}" "${netcdf_cLink}" "${netcdf_cTarFormat}" "${netcdf_cTarDir}" "${netcdf_cTarDirName}" "${netcdf_cDir}" "${netcdf_cBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${netcdf_cxxLink}" "${netcdf_cxxTarDir}" "${netcdf_cxxTarDirName}" "${netcdf_cxxDir}" "${netcdf_cxxBuildDir}"
+	downloadAndUnpackLib "${extraLibsDir}" "${netcdf_cxxLink}" "${netcdf_cxxTarFormat}" "${netcdf_cxxTarDir}" "${netcdf_cxxTarDirName}" "${netcdf_cxxDir}" "${netcdf_cxxBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${jasperLink}" "${jasperTarDir}" "${jasperTarDirName}" "${jasperDir}" "${jasperBuildDir}"
+	downloadAndUnpackLib "${extraLibsDir}" "${jasperLink}" "${jasperTarFormat}" "${jasperTarDir}" "${jasperTarDirName}" "${jasperDir}" "${jasperBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${gdalLink}" "${gdalTarDir}" "${gdalTarDirName}" "${gdalDir}" "${gdalBuildDir}"
+	downloadAndUnpackLib "${extraLibsDir}" "${gdalLink}" "${gdalTarFormat}" "${gdalTarDir}" "${gdalTarDirName}" "${gdalDir}" "${gdalBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
@@ -673,42 +683,42 @@ fi
 ########## now need to compile all the third party libraries and packages for the overall script ###########
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${zlibDir}" "${zlibBuildDir}" "${zlibCPPFLAGS}" "${zlibLDFLAGS}" "${zlibConfigure}" "${zlib_shouldMakeClean}" "${zlibTarDir}" "${zlibTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${zlibDir}" "${zlibBuildDir}" "${zlibCPPFLAGS}" "${zlibLDFLAGS}" "${zlibConfigure}" "${zlib_shouldMakeClean}" "${zlibTarFormat}" "${zlibTarDir}" "${zlibTarDirName}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${szlibDir}" "${szlibBuildDir}" "${szlibCPPFLAGS}" "${szlibLDFLAGS}" "${szlibConfigure}" "${szlib_shouldMakeClean}" "${szlibTarDir}" "${szlibTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${szlibDir}" "${szlibBuildDir}" "${szlibCPPFLAGS}" "${szlibLDFLAGS}" "${szlibConfigure}" "${szlib_shouldMakeClean}" "${szlibTarFormat}" "${szlibTarDir}" "${szlibTarDirName}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${curlDir}" "${curlBuildDir}" "${curlCPPFLAGS}" "${curlLDFLAGS}" "${curlConfigure}" "${curl_shouldMakeClean}" "${curlTarDir}" "${curlTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${curlDir}" "${curlBuildDir}" "${curlCPPFLAGS}" "${curlLDFLAGS}" "${curlConfigure}" "${curl_shouldMakeClean}" "${curlTarFormat}" "${curlTarDir}" "${curlTarDirName}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${hdf5Dir}" "${hdf5BuildDir}" "${hdf5CPPFLAGS}" "${hdf5LDFLAGS}" "${hdf5Configure}" "${hdf5_shouldMakeClean}" "${hdf5TarDir}" "${hdf5TarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${hdf5Dir}" "${hdf5BuildDir}" "${hdf5CPPFLAGS}" "${hdf5LDFLAGS}" "${hdf5Configure}" "${hdf5_shouldMakeClean}" "${hdf5TarFormat}" "${hdf5TarDir}" "${hdf5TarDirName}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${netcdf_cDir}" "${netcdf_cBuildDir}" "${netcdf_cCPPFLAGS}" "${netcdf_cLDFLAGS}" "${netcdf_cConfigure}" "${netcdf_c_shouldMakeClean}" "${netcdf_cTarDir}" "${netcdf_cTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${netcdf_cDir}" "${netcdf_cBuildDir}" "${netcdf_cCPPFLAGS}" "${netcdf_cLDFLAGS}" "${netcdf_cConfigure}" "${netcdf_c_shouldMakeClean}" "${netcdf_cTarFormat}" "${netcdf_cTarDir}" "${netcdf_cTarDirName}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${netcdf_cxxDir}" "${netcdf_cxxBuildDir}" "${netcdf_cxxCPPFLAGS}" "${netcdf_cxxLDFLAGS}" "${netcdf_cxxConfigure}" "${netcdf_cxx_shouldMakeClean}" "${netcdf_cxxTarDir}" "${netcdf_cxxTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${netcdf_cxxDir}" "${netcdf_cxxBuildDir}" "${netcdf_cxxCPPFLAGS}" "${netcdf_cxxLDFLAGS}" "${netcdf_cxxConfigure}" "${netcdf_cxx_shouldMakeClean}" "${netcdf_cxxTarFormat}" "${netcdf_cxxTarDir}" "${netcdf_cxxTarDirName}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${jasperDir}" "${jasperBuildDir}" "${jasperCPPFLAGS}" "${jasperLDFLAGS}" "${jasperConfigure}" "${jasper_shouldMakeClean}" "${jasperTarDir}" "${jasperTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${jasperDir}" "${jasperBuildDir}" "${jasperCPPFLAGS}" "${jasperLDFLAGS}" "${jasperConfigure}" "${jasper_shouldMakeClean}" "${jasperTarFormat}" "${jasperTarDir}" "${jasperTarDirName}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${gdalDir}" "${gdalBuildDir}" "${gdalCPPFLAGS}" "${gdalLDFLAGS}" "${gdalConfigure}" "${gdal_shouldMakeClean}" "${gdalTarDir}" "${gdalTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${gdalDir}" "${gdalBuildDir}" "${gdalCPPFLAGS}" "${gdalLDFLAGS}" "${gdalConfigure}" "${gdal_shouldMakeClean}" "${gdalTarFormat}" "${gdalTarDir}" "${gdalTarDirName}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 

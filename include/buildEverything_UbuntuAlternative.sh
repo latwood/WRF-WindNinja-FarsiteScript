@@ -859,29 +859,20 @@ if [ $success == 0 ]; then
 			echo "!!! error running cd command !!!"
 			success=1
 		else
-			##echo "running \"sudo ldconfig\""
-			##sudo ldconfig
-			##success=$?
-			##if [ $success != 0 ]; then
-			##	echo "!!! error running \"sudo ldconfig\" !!!"
-			##	success=1
-			##else
-				echo "building WindNinja"
-				##cmake ..
-				cmake .. -DGDAL_CONFIG=$WindNinja_gdalBuildDir/bin/gdal-config -DGDAL_INCLUDE_DIR=$WindNinja_gdalBuildDir/include -DGDAL_LIBRARY=$WindNinja_gdalBuildDir/lib/libgdal.so
+			echo "building WindNinja"
+			cmake .. -DGDAL_CONFIG=$WindNinja_gdalBuildDir/bin/gdal-config -DGDAL_INCLUDE_DIR=$WindNinja_gdalBuildDir/include -DGDAL_LIBRARY=$WindNinja_gdalBuildDir/lib/libgdal.so
+			success=$?
+			if [ $success != 0 ]; then
+				echo " !!! error running cmake command !!!"
+				success=1
+			else
+				make -j4
 				success=$?
 				if [ $success != 0 ]; then
-					echo " !!! error running cmake command !!!"
+					echo " !!! error running make command !!!"
 					success=1
-				else
-					make -j4
-					success=$?
-					if [ $success != 0 ]; then
-						echo " !!! error running make command !!!"
-						success=1
-					fi
 				fi
-			##fi
+			fi
 		fi
 	else
 		echo "WindNinja executable already exists so skipping WindNinja build process"

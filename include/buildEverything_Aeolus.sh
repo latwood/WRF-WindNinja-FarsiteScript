@@ -80,6 +80,7 @@ finalBuildDir=$baseDir"/build"						# this is defining the location of the overa
 ### third party lib variables
 
 zlibLink="http://www.zlib.net/zlib-1.2.11.tar.gz"
+zlibTarFormat="-xzf"
 zlibTarDir=$extraLibsDir"/zlib-1.2.11.tar.gz"
 zlibTarDirName=$extraLibsDir"/zlib-1.2.11"
 zlibDir=$extraLibsDir"/zlib-1.2.11"
@@ -92,6 +93,7 @@ zlib_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before
 
 
 szlibLink="ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4/szip-2.1.tar.gz"
+szlibTarFormat="-xzf"
 szlibTarDir=$extraLibsDir"/szip-2.1.tar.gz"
 szlibTarDirName=$extraLibsDir"/szip-2.1"
 szlibDir=$extraLibsDir"/szip-2.1"
@@ -104,6 +106,7 @@ szlib_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted befor
 
 
 curlLink="https://curl.haxx.se/download/curl-7.61.1.tar.gz"
+curlTarFormat="-xzf"
 curlTarDir=$extraLibsDir"/curl-7.61.1.tar.gz"
 curlTarDirName=$extraLibsDir"/curl-7.61.1"
 curlDir=$extraLibsDir"/curl-7.61.1"
@@ -116,6 +119,7 @@ curl_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before
 
 
 hdf5Link="https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.2/src/hdf5-1.10.2.tar.gz"
+hdf5TarFormat="-xzf"
 hdf5TarDir=$extraLibsDir"/hdf5-1.10.2.tar.gz"
 hdf5TarDirName=$extraLibsDir"/hdf5-1.10.2"
 hdf5Dir=$extraLibsDir"/hdf5-1.10.2"
@@ -128,6 +132,7 @@ hdf5_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before
 
 
 netcdf_cLink="https://github.com/Unidata/netcdf-c/archive/v4.6.1.tar.gz"
+netcdf_cTarFormat="-xzf"
 netcdf_cTarDir=$extraLibsDir"/v4.6.1.tar.gz"
 netcdf_cTarDirName=$extraLibsDir"/netcdf-c-4.6.1"
 netcdf_cDir=$extraLibsDir"/netcdf-c-4.6.1"
@@ -140,6 +145,7 @@ netcdf_c_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted be
 
 
 netcdf_cxxLink="https://github.com/Unidata/netcdf-cxx4/archive/v4.3.0.tar.gz"
+netcdf_cxxTarFormat="-xzf"
 netcdf_cxxTarDir=$extraLibsDir"/v4.3.0.tar.gz"
 netcdf_cxxTarDirName=$extraLibsDir"/netcdf-cxx4-4.3.0"
 netcdf_cxxDir=$extraLibsDir"/netcdf-cxx-4.3.0"
@@ -152,6 +158,7 @@ netcdf_cxx_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted 
 
 
 jasperLink="https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/jasper/1.900.1-14ubuntu3/jasper_1.900.1.orig.tar.gz"
+jasperTarFormat="-xzf"
 jasperTarDir=$extraLibsDir"/jasper_1.900.1.orig.tar.gz"
 jasperTarDirName=$extraLibsDir"/jasper-1.900.1"
 jasperDir=$extraLibsDir"/jasper-1.900.1"
@@ -164,6 +171,7 @@ jasper_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted befo
 
 
 gdalLink="http://download.osgeo.org/gdal/2.0.3/gdal-2.0.3.tar.gz"
+gdalTarFormat="-xzf"
 gdalTarDir=$extraLibsDir"/gdal-2.0.3.tar.gz"
 gdalTarDirName=$extraLibsDir"/gdal-2.0.3"
 gdalDir=$extraLibsDir"/gdal-2.0.3"
@@ -191,6 +199,46 @@ farsiteSrcDir=$farsiteDir"/src"						# this is the place where "make" needs run 
 
 
 
+### third party app their dependency libary variables
+
+WindNinja_popplerLink="http://poppler.freedesktop.org/poppler-0.23.4.tar.xz"
+WindNinja_popplerTarFormat="-xvf"
+WindNinja_popplerTarDir=$windninjaScriptsDir"/poppler-0.23.4.tar.xz"
+WindNinja_popplerTarDirName=$windninjaScriptsDir"/poppler-0.23.4"
+WindNinja_popplerDir=$windninjaScriptsDir"/poppler-0.23.4"
+WindNinja_popplerBuildDir=$WindNinja_popplerDir"/build_poppler-0.23.4"
+
+WindNinja_popplerCPPFLAGS=""
+WindNinja_popplerLDFLAGS=""
+WindNinja_popplerConfigure="./configure --prefix="$WindNinja_popplerBuildDir" --enable-xpdf-headers"
+WindNinja_poppler_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build	
+
+WindNinja_projLink="http://download.osgeo.org/proj/proj-4.8.0.tar.gz"
+WindNinja_projTarFormat="xvfz"
+WindNinja_projTarDir=$windninjaScriptsDir"/proj-4.8.0.tar.gz"
+WindNinja_projTarDirName=$windninjaScriptsDir"/proj-4.8.0"
+WindNinja_projDir=$windninjaScriptsDir"/proj-4.8.0"
+WindNinja_projBuildDir=$WindNinja_projDir"/build_proj-4.8.0"
+
+WindNinja_projCPPFLAGS=""
+WindNinja_projLDFLAGS=""
+WindNinja_projConfigure="./configure --prefix="$WindNinja_projBuildDir
+WindNinja_proj_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
+WindNinja_gdalLink="http://download.osgeo.org/gdal/2.0.3/gdal-2.0.3.tar.gz"
+WindNinja_gdalTarFormat="-xvf"
+WindNinja_gdalTarDir=$windninjaScriptsDir"/gdal-2.0.3.tar.gz"
+WindNinja_gdalTarDirName=$windninjaScriptsDir"/gdal-2.0.3"
+WindNinja_gdalDir=$windninjaScriptsDir"/gdal-2.0.3"
+WindNinja_gdalBuildDir=$WindNinja_gdalDir"/build_gdal-2.0.3"
+
+WindNinja_gdalCPPFLAGS=""
+WindNinja_gdalLDFLAGS=""
+WindNinja_gdalConfigure="./configure --prefix="$WindNinja_gdalBuildDir"  --with-poppler="$WindNinja_popplerBuildDir
+WindNinja_gdal_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
+
+
 ### replacing paths in files variables
 
 varToReplace="\$scriptRoot"							# this is the predefined placeholder text for the user paths in all the examples and src files, to be replaced with the user path found by this script so compiling can be done by this script in one step (instead of the user changing these paths manually)
@@ -207,20 +255,21 @@ success=0
 ############# define functions used by all the other processes ##############
 downloadAndUnpackLib()		### this function downloads and unzips a given 3rd party lib, then if the name is not what is wanted, renames the unpacked the directory to what is wanted
 {
-	if [ "$#" != 6 ]; then
+	if [ "$#" != 7 ]; then
 		echo "" # want a nice clean line
 		echo "!!!Incorrect Number of parameters for downloadAndUnpackLib!!!"
-		echo "need 6 parameters: \"extraLibsDir\" \"libLink\" \"libTarDir\" \"libTarDirName\" \"libDir\" \"libBuildDir\""
+		echo "need 7 parameters: \"extraLibsDir\" \"libLink\" \"tarFormat\" \"libTarDir\" \"libTarDirName\" \"libDir\" \"libBuildDir\""
 		echo "" # want a nice clean line
 		return 1
 	fi
 
 	local extraLibsDir="${1}"
 	local libLink="${2}"
-	local libTarDir="${3}"
-	local libTarDirName="${4}"
-	local libDir="${5}"
-	local libBuildDir="${6}"
+	local tarFormat="${3}"
+	local libTarDir="${4}"
+	local libTarDirName="${5}"
+	local libDir="${6}"
+	local libBuildDir="${7}"
 	
 	
 	### make some intermediate variables that used to be passed in, but technically come from these input variables
@@ -262,10 +311,10 @@ downloadAndUnpackLib()		### this function downloads and unzips a given 3rd party
 			return 1
 		fi
 		echo "unpacking "$libTarDir
-		tar -xzf $libTarDir
+		tar $tarFormat $libTarDir
 		success=$?
 		if [ $success != 0 ]; then
-			echo "!!! error running tar command !!!"
+			echo "!!! error running tar command with tarFormat \"${tarFormat}\" !!!"
 			return 1
 		fi
 		if [ "${libTarDirName}" != "${libDir}" ]; then
@@ -291,10 +340,10 @@ downloadAndUnpackLib()		### this function downloads and unzips a given 3rd party
 
 buildLib()		### this function is to be run on libs after they've been downloaded and unpacked, basically just builds the lib
 {
-	if [ "$#" != 10 ]; then
+	if [ "$#" != 11 ]; then
 		echo "" # want a nice clean line
 		echo "!!!Incorrect Number of parameters for buildLib!!!"
-		echo "need 10 parameters: \"extraLibsDir\" \"nCores\" \"libDir\" \"libBuildDir\" \"libCPPFLAGS\" \"libLDFLAGS\" \"libConfigure\" \"shouldMakeClean\" \"libTarDir\" \"libTarDirName\""
+		echo "need 10 parameters: \"extraLibsDir\" \"nCores\" \"libDir\" \"libBuildDir\" \"libCPPFLAGS\" \"libLDFLAGS\" \"libConfigure\" \"shouldMakeClean\" \"tarFormat\" \"libTarDir\" \"libTarDirName\""
 		echo "" # want a nice clean line
 		return 1
 	fi
@@ -307,8 +356,9 @@ buildLib()		### this function is to be run on libs after they've been downloaded
 	local libLDFLAGS="${6}"
 	local libConfigure="${7}"
 	local shouldMakeClean="${8}"
-	local libTarDir="${9}"
-	local libTarDirName="${10}"
+	local tarFormat="${9}"
+	local libTarDir="${10}"
+	local libTarDirName="${11}"
 
 
 	### make some intermediate variables that used to be passed in, but technically come from these input variables
@@ -333,7 +383,7 @@ buildLib()		### this function is to be run on libs after they've been downloaded
 			return 1
 		fi
 		echo "running the download and unpacking function again, should ignore the downloading part"
-		downloadAndUnpackLib "${extraLibsDir}" "null" "${libTarDir}" "${libTarDirName}" "${libDir}" "${libBuildDir}"		### notice the link won't matter cause it will detect that the tar dir exists
+		downloadAndUnpackLib "${extraLibsDir}" "null" "${tarFormat}" "${libTarDir}" "${libTarDirName}" "${libDir}" "${libBuildDir}"		### notice the link won't matter cause it will detect that the tar dir exists
 		success=$? # result of last action, 0 if good, 1 if failed
 		if [ $success != 0 ]; then
 			echo "!!! error running downloadAndUnpackLib function !!!"
@@ -556,48 +606,64 @@ fi
 ######## download via "wget" and unpack with "tar" each of the third party packages required for the overall script ###########
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${zlibLink}" "${zlibTarDir}" "${zlibTarDirName}" "${zlibDir}" "${zlibBuildDir}"
+	downloadAndUnpackLib "${extraLibsDir}" "${zlibLink}" "${zlibTarFormat}" "${zlibTarDir}" "${zlibTarDirName}" "${zlibDir}" "${zlibBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${szlibLink}" "${szlibTarDir}" "${szlibTarDirName}" "${szlibDir}" "${szlibBuildDir}"
+	downloadAndUnpackLib "${extraLibsDir}" "${szlibLink}" "${szlibTarFormat}" "${szlibTarDir}" "${szlibTarDirName}" "${szlibDir}" "${szlibBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${curlLink}" "${curlTarDir}" "${curlTarDirName}" "${curlDir}" "${curlBuildDir}"
+	downloadAndUnpackLib "${extraLibsDir}" "${curlLink}" "${curlTarFormat}" "${curlTarDir}" "${curlTarDirName}" "${curlDir}" "${curlBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${hdf5Link}" "${hdf5TarDir}" "${hdf5TarDirName}" "${hdf5Dir}" "${hdf5BuildDir}"
+	downloadAndUnpackLib "${extraLibsDir}" "${hdf5Link}" "${hdf5TarFormat}" "${hdf5TarDir}" "${hdf5TarDirName}" "${hdf5Dir}" "${hdf5BuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${netcdf_cLink}" "${netcdf_cTarDir}" "${netcdf_cTarDirName}" "${netcdf_cDir}" "${netcdf_cBuildDir}"
+	downloadAndUnpackLib "${extraLibsDir}" "${netcdf_cLink}" "${netcdf_cTarFormat}" "${netcdf_cTarDir}" "${netcdf_cTarDirName}" "${netcdf_cDir}" "${netcdf_cBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${netcdf_cxxLink}" "${netcdf_cxxTarDir}" "${netcdf_cxxTarDirName}" "${netcdf_cxxDir}" "${netcdf_cxxBuildDir}"
+	downloadAndUnpackLib "${extraLibsDir}" "${netcdf_cxxLink}" "${netcdf_cxxTarFormat}" "${netcdf_cxxTarDir}" "${netcdf_cxxTarDirName}" "${netcdf_cxxDir}" "${netcdf_cxxBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${jasperLink}" "${jasperTarDir}" "${jasperTarDirName}" "${jasperDir}" "${jasperBuildDir}"
+	downloadAndUnpackLib "${extraLibsDir}" "${jasperLink}" "${jasperTarFormat}" "${jasperTarDir}" "${jasperTarDirName}" "${jasperDir}" "${jasperBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${gdalLink}" "${gdalTarDir}" "${gdalTarDirName}" "${gdalDir}" "${gdalBuildDir}"
+	downloadAndUnpackLib "${extraLibsDir}" "${gdalLink}" "${gdalTarFormat}" "${gdalTarDir}" "${gdalTarDirName}" "${gdalDir}" "${gdalBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 
 
 ######## download via "wget" and unpack with "tar" each of the third party packages required specifically for WindNinja ############
+
+
+if [ $success == 0 ]; then
+	downloadAndUnpackLib "${windninjaScriptsDir}" "${WindNinja_popplerLink}" "${WindNinja_popplerTarFormat}" "${WindNinja_popplerTarDir}" "${WindNinja_popplerTarDirName}" "${WindNinja_popplerDir}" "${WindNinja_popplerBuildDir}"
+	success=$? # result of last action, 0 if good, 1 if failed
+fi
+
+if [ $success == 0 ]; then
+	downloadAndUnpackLib "${windninjaScriptsDir}" "${WindNinja_projLink}" "${WindNinja_projTarFormat}" "${WindNinja_projTarDir}" "${WindNinja_projTarDirName}" "${WindNinja_projDir}" "${WindNinja_projBuildDir}"
+	success=$? # result of last action, 0 if good, 1 if failed
+fi
+
+if [ $success == 0 ]; then
+	downloadAndUnpackLib "${windninjaScriptsDir}" "${WindNinja_gdalLink}" "${WindNinja_gdalTarFormat}" "${WindNinja_gdalTarDir}" "${WindNinja_gdalTarDirName}" "${WindNinja_gdalDir}" "${WindNinja_gdalBuildDir}"
+	success=$? # result of last action, 0 if good, 1 if failed
+fi
 
 
 
@@ -689,48 +755,73 @@ fi
 ########## now need to compile all the third party libraries and packages for the overall script ###########
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${zlibDir}" "${zlibBuildDir}" "${zlibCPPFLAGS}" "${zlibLDFLAGS}" "${zlibConfigure}" "${zlib_shouldMakeClean}" "${zlibTarDir}" "${zlibTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${zlibDir}" "${zlibBuildDir}" "${zlibCPPFLAGS}" "${zlibLDFLAGS}" "${zlibConfigure}" "${zlib_shouldMakeClean}" "${zlibTarFormat}" "${zlibTarDir}" "${zlibTarDirName}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${szlibDir}" "${szlibBuildDir}" "${szlibCPPFLAGS}" "${szlibLDFLAGS}" "${szlibConfigure}" "${szlib_shouldMakeClean}" "${szlibTarDir}" "${szlibTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${szlibDir}" "${szlibBuildDir}" "${szlibCPPFLAGS}" "${szlibLDFLAGS}" "${szlibConfigure}" "${szlib_shouldMakeClean}" "${szlibTarFormat}" "${szlibTarDir}" "${szlibTarDirName}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${curlDir}" "${curlBuildDir}" "${curlCPPFLAGS}" "${curlLDFLAGS}" "${curlConfigure}" "${curl_shouldMakeClean}" "${curlTarDir}" "${curlTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${curlDir}" "${curlBuildDir}" "${curlCPPFLAGS}" "${curlLDFLAGS}" "${curlConfigure}" "${curl_shouldMakeClean}" "${curlTarFormat}" "${curlTarDir}" "${curlTarDirName}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${hdf5Dir}" "${hdf5BuildDir}" "${hdf5CPPFLAGS}" "${hdf5LDFLAGS}" "${hdf5Configure}" "${hdf5_shouldMakeClean}" "${hdf5TarDir}" "${hdf5TarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${hdf5Dir}" "${hdf5BuildDir}" "${hdf5CPPFLAGS}" "${hdf5LDFLAGS}" "${hdf5Configure}" "${hdf5_shouldMakeClean}" "${hdf5TarFormat}" "${hdf5TarDir}" "${hdf5TarDirName}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${netcdf_cDir}" "${netcdf_cBuildDir}" "${netcdf_cCPPFLAGS}" "${netcdf_cLDFLAGS}" "${netcdf_cConfigure}" "${netcdf_c_shouldMakeClean}" "${netcdf_cTarDir}" "${netcdf_cTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${netcdf_cDir}" "${netcdf_cBuildDir}" "${netcdf_cCPPFLAGS}" "${netcdf_cLDFLAGS}" "${netcdf_cConfigure}" "${netcdf_c_shouldMakeClean}" "${netcdf_cTarFormat}" "${netcdf_cTarDir}" "${netcdf_cTarDirName}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${netcdf_cxxDir}" "${netcdf_cxxBuildDir}" "${netcdf_cxxCPPFLAGS}" "${netcdf_cxxLDFLAGS}" "${netcdf_cxxConfigure}" "${netcdf_cxx_shouldMakeClean}" "${netcdf_cxxTarDir}" "${netcdf_cxxTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${netcdf_cxxDir}" "${netcdf_cxxBuildDir}" "${netcdf_cxxCPPFLAGS}" "${netcdf_cxxLDFLAGS}" "${netcdf_cxxConfigure}" "${netcdf_cxx_shouldMakeClean}" "${netcdf_cxxTarFormat}" "${netcdf_cxxTarDir}" "${netcdf_cxxTarDirName}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${jasperDir}" "${jasperBuildDir}" "${jasperCPPFLAGS}" "${jasperLDFLAGS}" "${jasperConfigure}" "${jasper_shouldMakeClean}" "${jasperTarDir}" "${jasperTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${jasperDir}" "${jasperBuildDir}" "${jasperCPPFLAGS}" "${jasperLDFLAGS}" "${jasperConfigure}" "${jasper_shouldMakeClean}" "${jasperTarFormat}" "${jasperTarDir}" "${jasperTarDirName}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${gdalDir}" "${gdalBuildDir}" "${gdalCPPFLAGS}" "${gdalLDFLAGS}" "${gdalConfigure}" "${gdal_shouldMakeClean}" "${gdalTarDir}" "${gdalTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${gdalDir}" "${gdalBuildDir}" "${gdalCPPFLAGS}" "${gdalLDFLAGS}" "${gdalConfigure}" "${gdal_shouldMakeClean}" "${gdalTarFormat}" "${gdalTarDir}" "${gdalTarDirName}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 
 
-########## now need to compile all the third party libraries and packages for WindNinja ###########
+############# now attempt to build third party libraries for third party applications   #########################
+
+if [ $success == 0 ]; then
+	buildLib "${windninjaScriptsDir}" "${nCores}" "${WindNinja_popplerDir}" "${WindNinja_popplerBuildDir}" "${WindNinja_popplerCPPFLAGS}" "${WindNinja_popplerLDFLAGS}" "${WindNinja_popplerConfigure}" "${WindNinja_poppler_shouldMakeClean}" "${WindNinja_popplerTarFormat}" "${WindNinja_popplerTarDir}" "${WindNinja_popplerTarDirName}"
+	success=$? # result of last action, 0 if good, 1 if failed
+fi
+
+if [ $success == 0 ]; then
+	buildLib "${windninjaScriptsDir}" "${nCores}" "${WindNinja_projDir}" "${WindNinja_projBuildDir}" "${WindNinja_projCPPFLAGS}" "${WindNinja_projLDFLAGS}" "${WindNinja_projConfigure}" "${WindNinja_proj_shouldMakeClean}" "${WindNinja_projTarFormat}" "${WindNinja_projTarDir}" "${WindNinja_projTarDirName}"
+	success=$? # result of last action, 0 if good, 1 if failed
+fi
+
+if [ $success == 0 ]; then
+	echo "running cp on proj header file"
+	cp ${WindNinja_projBuildDir}/include/proj_api.h ${WindNinja_projBuildDir}/lib
+	success=$?
+	if [ $success != 0 ]; then
+		echo "!!! error running cp command !!!"
+		success=1
+	fi
+fi
+
+if [ $success == 0 ]; then
+	buildLib "${windninjaScriptsDir}" "${nCores}" "${WindNinja_gdalDir}" "${WindNinja_gdalBuildDir}" "${WindNinja_gdalCPPFLAGS}" "${WindNinja_gdalLDFLAGS}" "${WindNinja_gdalConfigure}" "${WindNinja_gdal_shouldMakeClean}" "${WindNinja_gdalTarFormat}" "${WindNinja_gdalTarDir}" "${WindNinja_gdalTarDirName}"
+	success=$? # result of last action, 0 if good, 1 if failed
+fi
 
 
 
@@ -772,26 +863,18 @@ if [ $success == 0 ]; then
 			echo "!!! error running cd command !!!"
 			success=1
 		else
-			echo "running \"sudo ldconfig\""
-			sudo ldconfig
+			echo "building WindNinja"
+			cmake ..
 			success=$?
 			if [ $success != 0 ]; then
-				echo "!!! error running \"sudo ldconfig\" !!!"
+				echo " !!! error running cmake command !!!"
 				success=1
 			else
-				echo "building WindNinja"
-				cmake ..
+				make -j4
 				success=$?
 				if [ $success != 0 ]; then
-					echo " !!! error running cmake command !!!"
+					echo " !!! error running make command !!!"
 					success=1
-				else
-					make -j4
-					success=$?
-					if [ $success != 0 ]; then
-						echo " !!! error running make command !!!"
-						success=1
-					fi
 				fi
 			fi
 		fi
