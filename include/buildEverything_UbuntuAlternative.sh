@@ -150,6 +150,32 @@ jasperConfigure="./configure --prefix="$jasperBuildDir" --enable-shared"
 jasper_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
+popplerLink="http://poppler.freedesktop.org/poppler-0.23.4.tar.xz"
+popplerTarFormat="-xvf"
+popplerTarDir=$extraLibsDir"/poppler-0.23.4.tar.xz"
+popplerTarDirName=$extraLibsDir"/poppler-0.23.4"
+popplerDir=$extraLibsDir"/poppler-0.23.4"
+popplerBuildDir=$popplerDir"/build_poppler-0.23.4"
+
+popplerCPPFLAGS=""
+popplerLDFLAGS=""
+popplerConfigure="./configure --prefix="$popplerBuildDir" --enable-xpdf-headers"
+poppler_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
+
+projLink="http://download.osgeo.org/proj/proj-4.8.0.tar.gz"
+projTarFormat="xzf"
+projTarDir=$extraLibsDir"/proj-4.8.0.tar.gz"
+projTarDirName=$extraLibsDir"/proj-4.8.0"
+projDir=$extraLibsDir"/proj-4.8.0"
+projBuildDir=$projDir"/build_proj-4.8.0"
+
+projCPPFLAGS=""
+projLDFLAGS=""
+projConfigure="./configure --prefix="$projBuildDir
+proj_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
+
 gdalLink="http://download.osgeo.org/gdal/2.0.3/gdal-2.0.3.tar.gz"
 gdalTarFormat="-xzf"
 gdalTarDir=$extraLibsDir"/gdal-2.0.3.tar.gz"
@@ -159,7 +185,7 @@ gdalBuildDir=$gdalDir"/build_gdal-2.0.3"
 
 gdalCPPFLAGS=""
 gdalLDFLAGS=""
-gdalConfigure="./configure --prefix="$gdalBuildDir" --with-curl="$curlBuildDir" --with-jasper="$jasperBuildDir" --with-netcdf="$netcdf_cBuildDir" --with-hdf5="$hdf5BuildDir" --with-libz="$zlibBuildDir
+gdalConfigure="./configure --prefix="$gdalBuildDir" --with-curl="$curlBuildDir" --with-jasper="$jasperBuildDir" --with-netcdf="$netcdf_cBuildDir" --with-hdf5="$hdf5BuildDir" --with-libz="$zlibBuildDir"  --with-poppler="$popplerBuildDir" --with-static-proj4="$projBuildDir
 gdal_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
@@ -192,7 +218,7 @@ WindNinja_popplerBuildDir=$WindNinja_popplerDir"/build_poppler-0.23.4"
 WindNinja_popplerCPPFLAGS=""
 WindNinja_popplerLDFLAGS=""
 WindNinja_popplerConfigure="./configure --prefix="$WindNinja_popplerBuildDir" --enable-xpdf-headers"
-WindNinja_poppler_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build	
+WindNinja_poppler_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 WindNinja_projLink="http://download.osgeo.org/proj/proj-4.8.0.tar.gz"
 WindNinja_projTarFormat="xvfz"
@@ -215,7 +241,7 @@ WindNinja_gdalBuildDir=$WindNinja_gdalDir"/build_gdal-2.0.3"
 
 WindNinja_gdalCPPFLAGS=""
 WindNinja_gdalLDFLAGS=""
-WindNinja_gdalConfigure="./configure --prefix="$WindNinja_gdalBuildDir"  --with-poppler="$WindNinja_popplerBuildDir
+WindNinja_gdalConfigure="./configure --prefix="$WindNinja_gdalBuildDir"  --with-poppler="$WindNinja_popplerBuildDir" --with-static-proj4="$WindNinja_projBuildDir
 WindNinja_gdal_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
@@ -621,6 +647,16 @@ if [ $success == 0 ]; then
 fi
 
 if [ $success == 0 ]; then
+	downloadAndUnpackLib "${extraLibsDir}" "${popplerLink}" "${popplerTarFormat}" "${popplerTarDir}" "${popplerTarDirName}" "${popplerDir}" "${popplerBuildDir}"
+	success=$? # result of last action, 0 if good, 1 if failed
+fi
+
+if [ $success == 0 ]; then
+	downloadAndUnpackLib "${extraLibsDir}" "${projLink}" "${projTarFormat}" "${projTarDir}" "${projTarDirName}" "${projDir}" "${projBuildDir}"
+	success=$? # result of last action, 0 if good, 1 if failed
+fi
+
+if [ $success == 0 ]; then
 	downloadAndUnpackLib "${extraLibsDir}" "${gdalLink}" "${gdalTarFormat}" "${gdalTarDir}" "${gdalTarDirName}" "${gdalDir}" "${gdalBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
@@ -782,6 +818,26 @@ fi
 if [ $success == 0 ]; then
 	buildLib "${extraLibsDir}" "${nCores}" "${jasperDir}" "${jasperBuildDir}" "${jasperCPPFLAGS}" "${jasperLDFLAGS}" "${jasperConfigure}" "${jasper_shouldMakeClean}" "${jasperTarFormat}" "${jasperTarDir}" "${jasperTarDirName}"
 	success=$? # result of last action, 0 if good, 1 if failed
+fi
+
+if [ $success == 0 ]; then
+	buildLib "${extraLibsDir}" "${nCores}" "${popplerDir}" "${popplerBuildDir}" "${popplerCPPFLAGS}" "${popplerLDFLAGS}" "${popplerConfigure}" "${poppler_shouldMakeClean}" "${popplerTarFormat}" "${popplerTarDir}" "${popplerTarDirName}"
+	success=$? # result of last action, 0 if good, 1 if failed
+fi
+
+if [ $success == 0 ]; then
+	buildLib "${extraLibsDir}" "${nCores}" "${projDir}" "${projBuildDir}" "${projCPPFLAGS}" "${projLDFLAGS}" "${projConfigure}" "${proj_shouldMakeClean}" "${projTarFormat}" "${projTarDir}" "${projTarDirName}"
+	success=$? # result of last action, 0 if good, 1 if failed
+fi
+
+if [ $success == 0 ]; then
+	echo "running cp on proj header file"
+	cp ${projBuildDir}/include/proj_api.h ${projBuildDir}/lib
+	success=$?
+	if [ $success != 0 ]; then
+		echo "!!! error running cp command !!!"
+		success=1
+	fi
 fi
 
 if [ $success == 0 ]; then
