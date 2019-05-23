@@ -150,19 +150,6 @@ jasperConfigure="./configure --prefix="$jasperBuildDir" --enable-shared"
 jasper_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
-popplerLink="http://poppler.freedesktop.org/poppler-0.23.4.tar.xz"
-popplerTarFormat="-xvf"
-popplerTarDir=$extraLibsDir"/poppler-0.23.4.tar.xz"
-popplerTarDirName=$extraLibsDir"/poppler-0.23.4"
-popplerDir=$extraLibsDir"/poppler-0.23.4"
-popplerBuildDir=$popplerDir"/build_poppler-0.23.4"
-
-popplerCPPFLAGS=""
-popplerLDFLAGS=""
-popplerConfigure="./configure --prefix="$popplerBuildDir" --enable-xpdf-headers"
-poppler_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
-
-
 projLink="http://download.osgeo.org/proj/proj-4.8.0.tar.gz"
 projTarFormat="xzf"
 projTarDir=$extraLibsDir"/proj-4.8.0.tar.gz"
@@ -185,8 +172,17 @@ gdalBuildDir=$gdalDir"/build_gdal-2.0.3"
 
 gdalCPPFLAGS=""
 gdalLDFLAGS=""
-gdalConfigure="./configure --prefix="$gdalBuildDir" --with-curl="$curlBuildDir" --with-jasper="$jasperBuildDir" --with-netcdf="$netcdf_cBuildDir" --with-hdf5="$hdf5BuildDir" --with-libz="$zlibBuildDir"  --with-poppler="$popplerBuildDir" --with-static-proj4="$projBuildDir
+gdalConfigure="./configure --prefix="$gdalBuildDir" --with-curl="$curlBuildDir" --with-jasper="$jasperBuildDir" --with-netcdf="$netcdf_cBuildDir" --with-hdf5="$hdf5BuildDir" --with-libz="$zlibBuildDir" --with-static-proj4="$projBuildDir
 gdal_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
+## boost is different from other 3rd party libs cause it doesn't use configure, but it is still similar
+boostLink="https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz"
+boostTarFormat="-zxvf"
+boostTarDir=$extraLibsDir"/boost_1_69_0.tar.gz"
+boostTarDirName=$extraLibsDir"/boost_1_69_0"
+boostDir=$extraLibsDir"/boost_1_69_0"
+boostBuildDir=$boostDir"/build_boost_1_69_0"
+## instead of the regular build process, run bootstrap then b2 with an installation setup
 
 
 
@@ -208,6 +204,7 @@ farsiteSrcDir=$farsiteDir"/src"						# this is the place where "make" needs run 
 
 ### third party app their dependency libary variables
 
+
 WindNinja_popplerLink="http://poppler.freedesktop.org/poppler-0.23.4.tar.xz"
 WindNinja_popplerTarFormat="-xvf"
 WindNinja_popplerTarDir=$windninjaScriptsDir"/poppler-0.23.4.tar.xz"
@@ -219,6 +216,7 @@ WindNinja_popplerCPPFLAGS=""
 WindNinja_popplerLDFLAGS=""
 WindNinja_popplerConfigure="./configure --prefix="$WindNinja_popplerBuildDir" --enable-xpdf-headers"
 WindNinja_poppler_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
 
 WindNinja_projLink="http://download.osgeo.org/proj/proj-4.8.0.tar.gz"
 WindNinja_projTarFormat="xvfz"
@@ -243,6 +241,10 @@ WindNinja_gdalCPPFLAGS=""
 WindNinja_gdalLDFLAGS=""
 WindNinja_gdalConfigure="./configure --prefix="$WindNinja_gdalBuildDir"  --with-poppler="$WindNinja_popplerBuildDir" --with-static-proj4="$WindNinja_projBuildDir
 WindNinja_gdal_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
+
+## use WRF-WindNinja-FarsiteScript netcdf libraries instead of building another copy for WindNinja
+## same thing for boost
 
 
 
@@ -647,17 +649,17 @@ if [ $success == 0 ]; then
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${popplerLink}" "${popplerTarFormat}" "${popplerTarDir}" "${popplerTarDirName}" "${popplerDir}" "${popplerBuildDir}"
-	success=$? # result of last action, 0 if good, 1 if failed
-fi
-
-if [ $success == 0 ]; then
 	downloadAndUnpackLib "${extraLibsDir}" "${projLink}" "${projTarFormat}" "${projTarDir}" "${projTarDirName}" "${projDir}" "${projBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
 	downloadAndUnpackLib "${extraLibsDir}" "${gdalLink}" "${gdalTarFormat}" "${gdalTarDir}" "${gdalTarDirName}" "${gdalDir}" "${gdalBuildDir}"
+	success=$? # result of last action, 0 if good, 1 if failed
+fi
+
+if [ $success == 0 ]; then
+	downloadAndUnpackLib "${extraLibsDir}" "${boostLink}" "${boostTarFormat}" "${boostTarDir}" "${boostTarDirName}" "${boostDir}" "${boostBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
@@ -684,12 +686,23 @@ if [ $success == 9999 ]; then
 fi
 
 
-if [ $success == 0 ]; then
+if [ $success == 9999 ]; then
 	echo "running sudo apt install for WindNinja required 3rd party stuff"
 	sudo apt-get install libfontconfig1-dev libcurl4-gnutls-dev libnetcdf-dev qt4-dev-tools libqtwebkit-dev libboost-program-options-dev libboost-date-time-dev libgeos-dev libboost-test-dev
 	success=$?
 	if [ $success != 0 ]; then
 		echo "!!! error running sudo apt install for WindNinja 3rd party lib binary dependencies !!!"
+		success=1
+	fi
+fi
+
+if [ $success == 0 ]; then
+	echo "running minimum sudo apt install for WindNinja required 3rd party stuff"	### some of this already on Aeolus, so trying to narrow down the minimum already on Aeolus, see what stuff needs done without a package manager. I think the hard part of all these is that they are prebuilt .deb files instead of source code to build!
+	## problem with libfontconfig1-dev is that apparently pkg-config is installed, but fontconfig is not a new enough version, which needs a new enough version of freefont2
+	sudo apt-get install libfontconfig1-dev
+	success=$?
+	if [ $success != 0 ]; then
+		echo "!!! error running minimum sudo apt install for WindNinja 3rd party lib binary dependencies !!!"
 		success=1
 	fi
 fi
@@ -821,11 +834,6 @@ if [ $success == 0 ]; then
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${popplerDir}" "${popplerBuildDir}" "${popplerCPPFLAGS}" "${popplerLDFLAGS}" "${popplerConfigure}" "${poppler_shouldMakeClean}" "${popplerTarFormat}" "${popplerTarDir}" "${popplerTarDirName}"
-	success=$? # result of last action, 0 if good, 1 if failed
-fi
-
-if [ $success == 0 ]; then
 	buildLib "${extraLibsDir}" "${nCores}" "${projDir}" "${projBuildDir}" "${projCPPFLAGS}" "${projLDFLAGS}" "${projConfigure}" "${proj_shouldMakeClean}" "${projTarFormat}" "${projTarDir}" "${projTarDirName}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
@@ -843,6 +851,47 @@ fi
 if [ $success == 0 ]; then
 	buildLib "${extraLibsDir}" "${nCores}" "${gdalDir}" "${gdalBuildDir}" "${gdalCPPFLAGS}" "${gdalLDFLAGS}" "${gdalConfigure}" "${gdal_shouldMakeClean}" "${gdalTarFormat}" "${gdalTarDir}" "${gdalTarDirName}"
 	success=$? # result of last action, 0 if good, 1 if failed
+fi
+
+## boost is built differently
+if [ $success == 0 ]; then
+	if [ ! -d "${boostBuildDir}" ]; then
+		echo "entering ${boostDir} directory"		
+		cd $boostDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cd command !!!"
+			success=1
+		else
+			echo "running ./bootstrap.sh command"
+			./bootstrap.sh
+			success=$?
+			if [ $success != 0 ]; then
+				echo "!!! error running ./bootstrap.sh command !!!"
+				success=1
+			else
+				echo "running ./b2 install --prefix=${boostBuildDir} command"
+				./b2 install --prefix=$boostBuildDir
+				##success=$?
+				##if [ $success != 0 ]; then
+				#### usually isn't fully successful cause not doing python build stuff
+				if [ ! -d "${boostBuildDir}" ]; then
+					echo "!!! error running ./b2 install --prefix=${boostBuildDir} command !!!"
+					success=1
+				else
+					echo "returning to ${extraLibsDir} directory"
+					cd $extraLibsDir
+					success=$?
+					if [ $success != 0 ]; then
+						echo "!!! error running cd command !!!"
+						success=1
+					fi
+				fi
+			fi
+		fi
+	else
+		echo "${boostBuildDir} already exists so skipping build process"
+	fi
 fi
 
 
@@ -916,7 +965,7 @@ if [ $success == 0 ]; then
 			success=1
 		else
 			echo "building WindNinja"
-			cmake .. -DGDAL_CONFIG=$WindNinja_gdalBuildDir/bin/gdal-config -DGDAL_INCLUDE_DIR=$WindNinja_gdalBuildDir/include -DGDAL_LIBRARY=$WindNinja_gdalBuildDir/lib/libgdal.so
+			cmake .. -DGDAL_CONFIG=$WindNinja_gdalBuildDir/bin/gdal-config -DGDAL_INCLUDE_DIR=$WindNinja_gdalBuildDir/include -DGDAL_LIBRARY=$WindNinja_gdalBuildDir/lib/libgdal.so -DBOOST_INCLUDE_DIR=$boostBuildDir/include -DBOOST_LIBRARY_DIR=$boostBuildDir/lib -DNETCDF_INCLUDES=$netcdf_cBuildDir/include -DNETCDF_LIBRARIES=$netcdf_cBuildDir/lib/libnetcdf.so -DNETCDF_LIBRARIES_C=$netcdf_cBuildDir/lib/libnetcdf.so
 			success=$?
 			if [ $success != 0 ]; then
 				echo " !!! error running cmake command !!!"

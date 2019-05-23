@@ -9,8 +9,8 @@
 
 ## Define compute options
 #PBS -l nodes=1:dev:ppn=4
-#PBS -l mem=2048mb
-#PBS -l walltime=00:15:00
+#PBS -l mem=3024mb
+#PBS -l walltime=01:00:00
 #PBS -q batch
 
 ## Define path for output & error logs
@@ -60,7 +60,6 @@ echo "outputDir = \""$outputDir"\""
 
 
 compilerModuleString="gcc/5.5.0"		# this is a string with spaces containing what will be run with "module load". This used to hold a bunch of netcdf stuff and other packages, but cause of difficulty getting dependencies of dependencies to be happy, this now should just hold probably the compiler module to use for all compiling.
-
 
 
 
@@ -170,6 +169,19 @@ jasperConfigure="./configure --prefix="$jasperBuildDir" --enable-shared"
 jasper_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
+projLink="http://download.osgeo.org/proj/proj-4.8.0.tar.gz"
+projTarFormat="xzf"
+projTarDir=$extraLibsDir"/proj-4.8.0.tar.gz"
+projTarDirName=$extraLibsDir"/proj-4.8.0"
+projDir=$extraLibsDir"/proj-4.8.0"
+projBuildDir=$projDir"/build_proj-4.8.0"
+
+projCPPFLAGS=""
+projLDFLAGS=""
+projConfigure="./configure --prefix="$projBuildDir
+proj_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
+
 gdalLink="http://download.osgeo.org/gdal/2.0.3/gdal-2.0.3.tar.gz"
 gdalTarFormat="-xzf"
 gdalTarDir=$extraLibsDir"/gdal-2.0.3.tar.gz"
@@ -179,8 +191,18 @@ gdalBuildDir=$gdalDir"/build_gdal-2.0.3"
 
 gdalCPPFLAGS=""
 gdalLDFLAGS=""
-gdalConfigure="./configure --prefix="$gdalBuildDir" --with-curl="$curlBuildDir" --with-jasper="$jasperBuildDir" --with-netcdf="$netcdf_cBuildDir" --with-hdf5="$hdf5BuildDir" --with-libz="$zlibBuildDir
+gdalConfigure="./configure --prefix="$gdalBuildDir" --with-curl="$curlBuildDir" --with-jasper="$jasperBuildDir" --with-netcdf="$netcdf_cBuildDir" --with-hdf5="$hdf5BuildDir" --with-libz="$zlibBuildDir" --with-static-proj4="$projBuildDir
 gdal_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
+
+## boost is different from other 3rd party libs cause it doesn't use configure, but it is still similar
+boostLink="https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz"
+boostTarFormat="-zxvf"
+boostTarDir=$extraLibsDir"/boost_1_69_0.tar.gz"
+boostTarDirName=$extraLibsDir"/boost_1_69_0"
+boostDir=$extraLibsDir"/boost_1_69_0"
+boostBuildDir=$boostDir"/build_boost_1_69_0"
+## instead of the regular build process, run bootstrap then b2 with an installation setup
 
 
 
@@ -191,6 +213,7 @@ windNinjaLink="https://github.com/firelab/windninja.git"	# this is the link to t
 windNinjaBuildDir=$windNinjaDir"/build_windninja"			# this is defining the location of the WindNinja build directory, for when running "make" on the WindNinja application
 
 windNinjaBranch="3.5.2"								# this is for defining which version of WindNinja (which branch) to switch to by running "git checkout $branch", so defining which version of WindNinja to compile
+windninjaScriptsDir=$windNinjaDir"/scripts"
 
 
 farsiteDir=$extraAppsDir"/farsite"					# this is defining the location inside the overall script directory for placing the Farsite application
@@ -211,7 +234,8 @@ WindNinja_popplerBuildDir=$WindNinja_popplerDir"/build_poppler-0.23.4"
 WindNinja_popplerCPPFLAGS=""
 WindNinja_popplerLDFLAGS=""
 WindNinja_popplerConfigure="./configure --prefix="$WindNinja_popplerBuildDir" --enable-xpdf-headers"
-WindNinja_poppler_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build	
+WindNinja_poppler_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
 
 WindNinja_projLink="http://download.osgeo.org/proj/proj-4.8.0.tar.gz"
 WindNinja_projTarFormat="xvfz"
@@ -234,8 +258,12 @@ WindNinja_gdalBuildDir=$WindNinja_gdalDir"/build_gdal-2.0.3"
 
 WindNinja_gdalCPPFLAGS=""
 WindNinja_gdalLDFLAGS=""
-WindNinja_gdalConfigure="./configure --prefix="$WindNinja_gdalBuildDir"  --with-poppler="$WindNinja_popplerBuildDir
+WindNinja_gdalConfigure="./configure --prefix="$WindNinja_gdalBuildDir"  --with-poppler="$WindNinja_popplerBuildDir" --with-static-proj4="$WindNinja_projBuildDir
 WindNinja_gdal_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
+
+## use WRF-WindNinja-FarsiteScript netcdf libraries instead of building another copy for WindNinja
+## same thing for boost
 
 
 
@@ -641,7 +669,17 @@ if [ $success == 0 ]; then
 fi
 
 if [ $success == 0 ]; then
+	downloadAndUnpackLib "${extraLibsDir}" "${projLink}" "${projTarFormat}" "${projTarDir}" "${projTarDirName}" "${projDir}" "${projBuildDir}"
+	success=$? # result of last action, 0 if good, 1 if failed
+fi
+
+if [ $success == 0 ]; then
 	downloadAndUnpackLib "${extraLibsDir}" "${gdalLink}" "${gdalTarFormat}" "${gdalTarDir}" "${gdalTarDirName}" "${gdalDir}" "${gdalBuildDir}"
+	success=$? # result of last action, 0 if good, 1 if failed
+fi
+
+if [ $success == 0 ]; then
+	downloadAndUnpackLib "${extraLibsDir}" "${boostLink}" "${boostTarFormat}" "${boostTarDir}" "${boostTarDirName}" "${boostDir}" "${boostBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
@@ -790,10 +828,65 @@ if [ $success == 0 ]; then
 fi
 
 if [ $success == 0 ]; then
+	buildLib "${extraLibsDir}" "${nCores}" "${projDir}" "${projBuildDir}" "${projCPPFLAGS}" "${projLDFLAGS}" "${projConfigure}" "${proj_shouldMakeClean}" "${projTarFormat}" "${projTarDir}" "${projTarDirName}"
+	success=$? # result of last action, 0 if good, 1 if failed
+fi
+
+if [ $success == 0 ]; then
+	echo "running cp on proj header file"
+	cp ${projBuildDir}/include/proj_api.h ${projBuildDir}/lib
+	success=$?
+	if [ $success != 0 ]; then
+		echo "!!! error running cp command !!!"
+		success=1
+	fi
+fi
+
+if [ $success == 0 ]; then
 	buildLib "${extraLibsDir}" "${nCores}" "${gdalDir}" "${gdalBuildDir}" "${gdalCPPFLAGS}" "${gdalLDFLAGS}" "${gdalConfigure}" "${gdal_shouldMakeClean}" "${gdalTarFormat}" "${gdalTarDir}" "${gdalTarDirName}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
+## boost is built differently
+if [ $success == 0 ]; then
+	if [ ! -d "${boostBuildDir}" ]; then
+		echo "entering ${boostDir} directory"		
+		cd $boostDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cd command !!!"
+			success=1
+		else
+			echo "running ./bootstrap.sh command"
+			./bootstrap.sh
+			success=$?
+			if [ $success != 0 ]; then
+				echo "!!! error running ./bootstrap.sh command !!!"
+				success=1
+			else
+				echo "running ./b2 install --prefix=${boostBuildDir} command"
+				./b2 install --prefix=$boostBuildDir
+				##success=$?
+				##if [ $success != 0 ]; then
+				#### usually isn't fully successful cause not doing python build stuff
+				if [ ! -d "${boostBuildDir}" ]; then
+					echo "!!! error running ./b2 install --prefix=${boostBuildDir} command !!!"
+					success=1
+				else
+					echo "returning to ${extraLibsDir} directory"
+					cd $extraLibsDir
+					success=$?
+					if [ $success != 0 ]; then
+						echo "!!! error running cd command !!!"
+						success=1
+					fi
+				fi
+			fi
+		fi
+	else
+		echo "${boostBuildDir} already exists so skipping build process"
+	fi
+fi
 
 
 ############# now attempt to build third party libraries for third party applications   #########################
@@ -864,7 +957,7 @@ if [ $success == 0 ]; then
 			success=1
 		else
 			echo "building WindNinja"
-			cmake ..
+			cmake .. -DGDAL_CONFIG=$WindNinja_gdalBuildDir/bin/gdal-config -DGDAL_INCLUDE_DIR=$WindNinja_gdalBuildDir/include -DGDAL_LIBRARY=$WindNinja_gdalBuildDir/lib/libgdal.so -DBOOST_INCLUDE_DIR=$boostBuildDir/include -DBOOST_LIBRARY_DIR=$boostBuildDir/lib -DNETCDF_INCLUDES=$netcdf_cBuildDir/include -DNETCDF_LIBRARIES=$netcdf_cBuildDir/lib/libnetcdf.so -DNETCDF_LIBRARIES_C=$netcdf_cBuildDir/lib/libnetcdf.so
 			success=$?
 			if [ $success != 0 ]; then
 				echo " !!! error running cmake command !!!"
