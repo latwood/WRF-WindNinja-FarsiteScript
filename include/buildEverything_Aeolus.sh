@@ -10,7 +10,7 @@
 ## Define compute options
 #PBS -l nodes=1:dev:ppn=4
 #PBS -l mem=3024mb
-#PBS -l walltime=01:00:00
+#PBS -l walltime=02:00:00
 #PBS -q batch
 
 ## Define path for output & error logs
@@ -778,7 +778,7 @@ fi
 
 
 ########### now need to load the necessary modules for compiling (going to manually compile other dependencies from source) ############
-if [ $sucess == 0]; then
+if [ $success == 0 ]; then
 	echo "" # add extra line
 	echo "loading modules required for compiling: "$compilerModuleString
 	module load $compilerModuleString
@@ -957,7 +957,7 @@ if [ $success == 0 ]; then
 			success=1
 		else
 			echo "building WindNinja"
-			cmake .. -DGDAL_CONFIG=$WindNinja_gdalBuildDir/bin/gdal-config -DGDAL_INCLUDE_DIR=$WindNinja_gdalBuildDir/include -DGDAL_LIBRARY=$WindNinja_gdalBuildDir/lib/libgdal.so -DBOOST_INCLUDE_DIR=$boostBuildDir/include -DBOOST_LIBRARY_DIR=$boostBuildDir/lib -DNETCDF_INCLUDES=$netcdf_cBuildDir/include -DNETCDF_LIBRARIES=$netcdf_cBuildDir/lib/libnetcdf.so -DNETCDF_LIBRARIES_C=$netcdf_cBuildDir/lib/libnetcdf.so
+			cmake .. -DGDAL_CONFIG=$WindNinja_gdalBuildDir/bin/gdal-config -DGDAL_INCLUDE_DIR=$WindNinja_gdalBuildDir/include -DGDAL_LIBRARY=$WindNinja_gdalBuildDir/lib/libgdal.so -DNETCDF_INCLUDES=$netcdf_cBuildDir/include -DNETCDF_LIBRARIES=$netcdf_cBuildDir/lib/libnetcdf.so -DNETCDF_LIBRARIES_C=$netcdf_cBuildDir/lib/libnetcdf.so -DBOOST_INCLUDEDIR=$boostBuildDir/include
 			success=$?
 			if [ $success != 0 ]; then
 				echo " !!! error running cmake command !!!"
