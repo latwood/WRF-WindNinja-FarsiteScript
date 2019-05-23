@@ -59,7 +59,7 @@ echo "" # add extra line
 echo "outputDir = \""$outputDir"\""
 
 
-compilerModuleString="gcc/5.5.0"		# this is a string with spaces containing what will be run with "module load". This used to hold a bunch of netcdf stuff and other packages, but cause of difficulty getting dependencies of dependencies to be happy, this now should just hold probably the compiler module to use for all compiling.
+compilerModuleString="gcc/5.5.0 python/2.7.15/gcc/5.5.0 boost/1.61.0"		# this is a string with spaces containing what will be run with "module load". This used to hold a bunch of netcdf stuff and other packages, but cause of difficulty getting dependencies of dependencies to be happy, this now should just hold probably the compiler module to use for all compiling.
 
 
 
@@ -865,11 +865,9 @@ if [ $success == 0 ]; then
 				success=1
 			else
 				echo "running ./b2 install --prefix=${boostBuildDir} command"
-				./b2 install --prefix=$boostBuildDir
-				##success=$?
-				##if [ $success != 0 ]; then
-				#### usually isn't fully successful cause not doing python build stuff
-				if [ ! -d "${boostBuildDir}" ]; then
+				./b2 -j$nCores toolset=gcc cxxflags="-std=c++11" install --prefix=$boostBuildDir
+				success=$?
+				if [ $success != 0 ]; then
 					echo "!!! error running ./b2 install --prefix=${boostBuildDir} command !!!"
 					success=1
 				else
@@ -944,6 +942,10 @@ if [ $success == 0 ]; then
 		echo "Farsite executable already exists so skipping Farsite build process"
 	fi
 fi
+
+
+### set the boostBuildDir to the module path
+boostBuildDir="/share/apps/boost_1.61.0"
 
 ### now attempt to build WindNinja
 if [ $success == 0 ]; then
