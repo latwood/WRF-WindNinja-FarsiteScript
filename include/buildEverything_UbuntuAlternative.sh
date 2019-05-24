@@ -176,12 +176,19 @@ gdalConfigure="./configure --prefix="$gdalBuildDir" --with-curl="$curlBuildDir" 
 gdal_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 ## boost is different from other 3rd party libs cause it doesn't use configure, but it is still similar
-boostLink="https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz"
+bzipLink="-O bzip2-1.0.6.tar.gz https://pilotfiber.dl.sourceforge.net/project/bzip2/bzip2-1.0.6.tar.gz"
+bzipTarFormat="-xzf"
+bzipTarDir=$extraLibsDir"/bzip2-1.0.6.tar.gz"
+bzipTarDirName=$extraLibsDir"/bzip2-1.0.6"
+bzipDir=$extraLibsDir"/bzip2-1.0.6"
+bzipBuildDir=$bzipDir"/build_bzip2-1.0.6"
+
+boostLink="-O boost_1_55_0.tar.gz https://sourceforge.net/projects/boost/files/boost/1.55.0/boost_1_55_0.tar.gz/download"
 boostTarFormat="-zxvf"
-boostTarDir=$extraLibsDir"/boost_1_69_0.tar.gz"
-boostTarDirName=$extraLibsDir"/boost_1_69_0"
-boostDir=$extraLibsDir"/boost_1_69_0"
-boostBuildDir=$boostDir"/build_boost_1_69_0"
+boostTarDir=$extraLibsDir"/boost_1_55_0.tar.gz"
+boostTarDirName=$extraLibsDir"/boost_1_55_0"
+boostDir=$extraLibsDir"/boost_1_55_0"
+boostBuildDir=$boostDir"/build_boost_1_55_0"
 ## instead of the regular build process, run bootstrap then b2 with an installation setup
 
 
@@ -659,6 +666,11 @@ if [ $success == 0 ]; then
 fi
 
 if [ $success == 0 ]; then
+	downloadAndUnpackLib "${extraLibsDir}" "${bzipLink}" "${bzipTarFormat}" "${bzipTarDir}" "${bzipTarDirName}" "${bzipDir}" "${bzipBuildDir}"
+	success=$? # result of last action, 0 if good, 1 if failed
+fi
+
+if [ $success == 0 ]; then
 	downloadAndUnpackLib "${extraLibsDir}" "${boostLink}" "${boostTarFormat}" "${boostTarDir}" "${boostTarDirName}" "${boostDir}" "${boostBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
@@ -700,6 +712,8 @@ if [ $success == 0 ]; then
 	echo "running minimum sudo apt install for WindNinja required 3rd party stuff"	### some of this already on Aeolus, so trying to narrow down the minimum already on Aeolus, see what stuff needs done without a package manager. I think the hard part of all these is that they are prebuilt .deb files instead of source code to build!
 	## problem with libfontconfig1-dev is that apparently pkg-config is installed, but fontconfig is not a new enough version, which needs a new enough version of freefont2
 	sudo apt-get install libfontconfig1-dev
+	## building boost requires python header files not in a current python installation. Fortunately can module load python on aeolus, so this is allowable to install in order to get boost to work
+	sudo apt-get install python-dev
 	success=$?
 	if [ $success != 0 ]; then
 		echo "!!! error running minimum sudo apt install for WindNinja 3rd party lib binary dependencies !!!"
@@ -855,6 +869,52 @@ fi
 
 ## boost is built differently
 if [ $success == 0 ]; then
+	if [ ! -d "${bzipBuildDir}" ]; then
+		echo "entering ${bzipDir} directory"
+		cd $bzipDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cd command !!!"
+			success=1
+		else
+			echo "running make command"
+			make -f Makefile-libbz2_so
+			success=$?
+			if [ $success != 0 ]; then
+				echo "!!! error running make command !!!"
+				success=1
+			else
+				echo "running make install with prefix command"
+				make install PREFIX=$bzipBuildDir
+				success=$?
+				if [ $success != 0 ]; then
+					echo "!!! error running make install command !!!"
+					success=1
+				else
+					echo "copying resulting libbz2.so.* libraries to bzip build dir"
+					cp -ar libbz2.so.* $bzipBuildDir/lib
+					success=$?
+					if [ $success != 0 ]; then
+						echo "!!! error running cp command !!!"
+						success=1
+					else
+						echo "returning to ${extraLibsDir} directory"
+						cd $extraLibsDir
+						success=$?
+						if [ $success != 0 ]; then
+							echo "!!! error running cd command !!!"
+							success=1
+						fi
+					fi
+				fi
+			fi
+		fi
+	else
+		echo "${bzipBuildDir} already exists so skipping build process"
+	fi
+fi
+
+if [ $success == 0 ]; then
 	if [ ! -d "${boostBuildDir}" ]; then
 		echo "entering ${boostDir} directory"		
 		cd $boostDir
@@ -871,11 +931,9 @@ if [ $success == 0 ]; then
 				success=1
 			else
 				echo "running ./b2 install --prefix=${boostBuildDir} command"
-				./b2 install --prefix=$boostBuildDir
-				##success=$?
-				##if [ $success != 0 ]; then
-				#### usually isn't fully successful cause not doing python build stuff
-				if [ ! -d "${boostBuildDir}" ]; then
+				./b2 -j$nCores toolset=gcc cxxflags="-std=c++11" install --prefix=$boostBuildDir -sBZIP2_INCLUDE=$bzipBuildDir/include -sBZIP2_LIBPATH=$bzipBuildDir/lib
+				success=$?
+				if [ $success != 0 ]; then
 					echo "!!! error running ./b2 install --prefix=${boostBuildDir} command !!!"
 					success=1
 				else
@@ -965,7 +1023,7 @@ if [ $success == 0 ]; then
 			success=1
 		else
 			echo "building WindNinja"
-			cmake .. -DGDAL_CONFIG=$WindNinja_gdalBuildDir/bin/gdal-config -DGDAL_INCLUDE_DIR=$WindNinja_gdalBuildDir/include -DGDAL_LIBRARY=$WindNinja_gdalBuildDir/lib/libgdal.so -DNETCDF_INCLUDES=$netcdf_cBuildDir/include -DNETCDF_LIBRARIES=$netcdf_cBuildDir/lib/libnetcdf.so -DNETCDF_LIBRARIES_C=$netcdf_cBuildDir/lib/libnetcdf.so -DBOOST_INCLUDEDIR=$boostBuildDir/include
+			cmake .. -DGDAL_CONFIG=$WindNinja_gdalBuildDir/bin/gdal-config -DGDAL_INCLUDE_DIR=$WindNinja_gdalBuildDir/include -DGDAL_LIBRARY=$WindNinja_gdalBuildDir/lib/libgdal.so -DNETCDF_INCLUDES=$netcdf_cBuildDir/include -DNETCDF_LIBRARIES=$netcdf_cBuildDir/lib/libnetcdf.so -DNETCDF_LIBRARIES_C=$netcdf_cBuildDir/lib/libnetcdf.so -DBOOST_INCLUDEDIR=$boostBuildDir/include -DNINJAFOAM=OFF -DNINJA_QTGUI=OFF
 			success=$?
 			if [ $success != 0 ]; then
 				echo " !!! error running cmake command !!!"
