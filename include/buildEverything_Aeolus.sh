@@ -59,7 +59,7 @@ echo "" # add extra line
 echo "outputDir = \""$outputDir"\""
 
 
-compilerModuleString="gcc/5.5.0 python/2.7.15/gcc/5.5.0 boost/1.61.0"		# this is a string with spaces containing what will be run with "module load". This used to hold a bunch of netcdf stuff and other packages, but cause of difficulty getting dependencies of dependencies to be happy, this now should just hold probably the compiler module to use for all compiling.
+compilerModuleString="gcc/5.5.0 python/2.7.15/gcc/5.5.0 boost/1.55.0"		# this is a string with spaces containing what will be run with "module load". This used to hold a bunch of netcdf stuff and other packages, but cause of difficulty getting dependencies of dependencies to be happy, this now should just hold probably the compiler module to use for all compiling.
 
 
 
@@ -945,7 +945,8 @@ fi
 
 
 ### set the boostBuildDir to the module path
-boostBuildDir="/share/apps/boost_1.61.0"
+boostBuildDir="/share/apps/boost_1.55.0"
+##boostBuildDir="/share/apps/boost-1.61.0"
 
 ### now attempt to build WindNinja
 if [ $success == 0 ]; then
@@ -959,7 +960,7 @@ if [ $success == 0 ]; then
 			success=1
 		else
 			echo "building WindNinja"
-			cmake .. -DGDAL_CONFIG=$WindNinja_gdalBuildDir/bin/gdal-config -DGDAL_INCLUDE_DIR=$WindNinja_gdalBuildDir/include -DGDAL_LIBRARY=$WindNinja_gdalBuildDir/lib/libgdal.so -DNETCDF_INCLUDES=$netcdf_cBuildDir/include -DNETCDF_LIBRARIES=$netcdf_cBuildDir/lib/libnetcdf.so -DNETCDF_LIBRARIES_C=$netcdf_cBuildDir/lib/libnetcdf.so -DBOOST_INCLUDEDIR=$boostBuildDir/include
+			cmake .. -DGDAL_CONFIG=$WindNinja_gdalBuildDir/bin/gdal-config -DGDAL_INCLUDE_DIR=$WindNinja_gdalBuildDir/include -DGDAL_LIBRARY=$WindNinja_gdalBuildDir/lib/libgdal.so -DNETCDF_INCLUDES=$netcdf_cBuildDir/include -DNETCDF_LIBRARIES=$netcdf_cBuildDir/lib/libnetcdf.so -DNETCDF_LIBRARIES_C=$netcdf_cBuildDir/lib/libnetcdf.so -DBOOST_INCLUDEDIR=$boostBuildDir/include -DNINJAFOAM=OFF -DNINJA_QTGUI=OFF
 			success=$?
 			if [ $success != 0 ]; then
 				echo " !!! error running cmake command !!!"
