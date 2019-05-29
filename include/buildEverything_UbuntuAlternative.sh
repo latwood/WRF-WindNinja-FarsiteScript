@@ -85,6 +85,45 @@ szlibConfigure="./configure --prefix="$szlibBuildDir
 szlib_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
+gmpLink="https://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.xz"
+gmpTarFormat="-xvf"
+gmpTarDir=$extraLibsDir"/gmp-6.1.2.tar.xz"
+gmpTarDirName=$extraLibsDir"/gmp-6.1.2"
+gmpDir=$extraLibsDir"/gmp-6.1.2"
+gmpBuildDir=$gmpDir"/build_gmp-6.1.2"
+
+gmpCPPFLAGS=""
+gmpLDFLAGS=""
+gmpConfigure="./configure --enable-cxx --prefix="$gmpBuildDir
+gmp_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
+
+nettleLink="ftp://ftp.gnu.org/gnu/nettle/nettle-3.4.tar.gz"
+nettleTarFormat="-xzf"
+nettleTarDir=$extraLibsDir"/nettle-3.4.tar.gz"
+nettleTarDirName=$extraLibsDir"/nettle-3.4"
+nettleDir=$extraLibsDir"/nettle-3.4"
+nettleBuildDir=$nettleDir"/build_nettle-3.4"
+
+nettleCPPFLAGS=""
+nettleLDFLAGS=""
+nettleConfigure="./configure --prefix="$nettleBuildDir" --with-include-path="$gmpBuildDir"/include --with-lib-path="$gmpBuildDir"/lib"
+nettle_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
+
+gnutlsLink="ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/gnutls-3.6.2.tar.xz"
+gnutlsTarFormat="-xvf"
+gnutlsTarDir=$extraLibsDir"/gnutls-3.6.2.tar.xz"
+gnutlsTarDirName=$extraLibsDir"/gnutls-3.6.2"
+gnutlsDir=$extraLibsDir"/gnutls-3.6.2"
+gnutlsBuildDir=$gnutlsDir"/build_gnutls-3.6.2"
+
+gnutlsCPPFLAGS=""
+gnutlsLDFLAGS=""
+gnutlsConfigure="NETTLE_CFLAGS=\"-I${nettleBuildDir}/include\" NETTLE_LIBS=\"-L${nettleBuildDir}/lib\" GMP_CFLAGS=\"-I${gmpBuildDir}/include\" GMP_LIBS=\"-L${gmpBuildDir}/lib\" HOGWEED_CFLAGS=\"-I${nettleBuildDir}/include\" HOGWEED_LIBS=\"-L${nettleBuildDir}/lib\" ./configure --prefix=${gnutlsBuildDir} --with-included-libtasn1 --with-included-unistring"
+gnutls_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
+
 curlLink="https://curl.haxx.se/download/curl-7.61.1.tar.gz"
 curlTarFormat="-xzf"
 curlTarDir=$extraLibsDir"/curl-7.61.1.tar.gz"
@@ -172,7 +211,8 @@ gdalBuildDir=$gdalDir"/build_gdal-2.0.3"
 
 gdalCPPFLAGS=""
 gdalLDFLAGS=""
-gdalConfigure="./configure --prefix="$gdalBuildDir" --with-curl="$curlBuildDir" --with-jasper="$jasperBuildDir" --with-netcdf="$netcdf_cBuildDir" --with-hdf5="$hdf5BuildDir" --with-libz="$zlibBuildDir" --with-static-proj4="$projBuildDir
+gdalConfigure="./configure --prefix="$gdalBuildDir" --with-jasper="$jasperBuildDir" --with-netcdf="$netcdf_cBuildDir" --with-hdf5="$hdf5BuildDir" --with-libz="$zlibBuildDir" --with-static-proj4="$projBuildDir
+##" --with-curl="$curlBuildDir"/bin/curl-config"
 gdal_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 ## boost is different from other 3rd party libs cause it doesn't use configure, but it is still similar
@@ -247,11 +287,12 @@ WindNinja_gdalBuildDir=$WindNinja_gdalDir"/build_gdal-2.0.3"
 WindNinja_gdalCPPFLAGS=""
 WindNinja_gdalLDFLAGS=""
 WindNinja_gdalConfigure="./configure --prefix="$WindNinja_gdalBuildDir"  --with-poppler="$WindNinja_popplerBuildDir" --with-static-proj4="$WindNinja_projBuildDir
+##" --with-curl="$curlBuildDir"/bin/curl-config"
 WindNinja_gdal_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
 ## use WRF-WindNinja-FarsiteScript netcdf libraries instead of building another copy for WindNinja
-## same thing for boost
+## same thing for boost, also for curl and anything else useful to gdal that might be missing without sudo apt install stuff
 
 
 
@@ -714,6 +755,8 @@ if [ $success == 0 ]; then
 	sudo apt-get install libfontconfig1-dev
 	## building boost requires python header files not in a current python installation. Fortunately can module load python on aeolus, so this is allowable to install in order to get boost to work
 	sudo apt-get install python-dev
+	## this needs removed and built manually but I'm having trouble with it. I want to know if this is what WindNinja's gdal is missing
+	####sudo apt-get install libcurl4-gnutls-dev
 	success=$?
 	if [ $success != 0 ]; then
 		echo "!!! error running minimum sudo apt install for WindNinja 3rd party lib binary dependencies !!!"
