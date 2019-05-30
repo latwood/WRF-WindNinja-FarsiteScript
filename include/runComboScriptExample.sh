@@ -29,7 +29,7 @@
 
 binDir="/home/latwood/src/WRF-WindNinja-FarsiteScript/bin"
 
-compilerModuleString="gcc/5.5.0 python/2.7.15/gcc/5.5.0 boost/1.55.0"
+compilerModuleString="gcc/5.5.0 python/2.7.15/gcc/5.5.0 curl/7.47.1_gcc"
 
 
 
