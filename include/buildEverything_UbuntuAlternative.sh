@@ -86,6 +86,98 @@ szlibConfigure="./configure --prefix=${szlibBuildDir}"
 szlib_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
+gmpLink="https://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.xz"
+gmpTarFormat="-xvf"
+gmpTarDir="${extraLibsDir}/gmp-6.1.2.tar.xz"
+gmpTarDirName="${extraLibsDir}/gmp-6.1.2"
+gmpDir="${extraLibsDir}/gmp-6.1.2"
+gmpBuildDir="${gmpDir}/build_gmp-6.1.2"
+
+gmpCPPFLAGS=""
+gmpLDFLAGS=""
+gmpConfigure="./configure --enable-cxx --prefix=${gmpBuildDir}"
+gmp_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
+
+nettleLink="ftp://ftp.gnu.org/gnu/nettle/nettle-3.4.1.tar.gz"
+nettleTarFormat="-xzf"
+nettleTarDir="${extraLibsDir}/nettle-3.4.1.tar.gz"
+nettleTarDirName="${extraLibsDir}/nettle-3.4.1"
+nettleDir="${extraLibsDir}/nettle-3.4.1"
+nettleBuildDir="${nettleDir}/build_nettle-3.4.1"
+
+nettleCPPFLAGS=""
+nettleLDFLAGS=""
+nettleConfigure="./configure --prefix=${nettleBuildDir} --with-include-path=${gmpBuildDir}/include --with-lib-path=${gmpBuildDir}/lib"
+nettle_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
+
+libtasn1Link="ftp://ftp.gnu.org/gnu/libtasn1/libtasn1-4.13.tar.gz"
+libtasn1TarFormat="-xzf"
+libtasn1TarDir="${extraLibsDir}/libtasn1-4.13.tar.gz"
+libtasn1TarDirName="${extraLibsDir}/libtasn1-4.13"
+libtasn1Dir="${extraLibsDir}/libtasn1-4.13"
+libtasn1BuildDir="${libtasn1Dir}/build_libtasn1-4.13"
+
+libtasn1CPPFLAGS=""
+libtasn1LDFLAGS=""
+libtasn1Configure="./configure --prefix=${libtasn1BuildDir}"
+libtasn1_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
+
+libffiLink="ftp://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz"
+libffiTarFormat="-xzf"
+libffiTarDir="${extraLibsDir}/libffi-3.2.1.tar.gz"
+libffiTarDirName="${extraLibsDir}/libffi-3.2.1"
+libffiDir="${extraLibsDir}/libffi-3.2.1"
+libffiBuildDir="${libffiDir}/build_libffi-3.2.1"
+
+libffiCPPFLAGS=""
+libffiLDFLAGS=""
+libffiConfigure="./configure --prefix=${libffiBuildDir}"
+libffi_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
+
+systemdLink="https://github.com/systemd/systemd/archive/v242.tar.gz"
+systemdTarFormat="-xzf"
+systemdTarDir="${extraLibsDir}/v242.tar.gz"
+systemdTarDirName="${extraLibsDir}/systemd-242"
+systemdDir="${extraLibsDir}/systemd-242"
+systemdBuildDir="${systemdDir}/build_systemd-242"
+
+systemdCPPFLAGS=""
+systemdLDFLAGS=""
+systemdConfigure="./configure --prefix=${systemdBuildDir}"
+systemd_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
+
+p11kitLink="https://github.com/p11-glue/p11-kit/releases/download/0.23.16.1/p11-kit-0.23.16.1.tar.gz"
+p11kitTarFormat="-xzf"
+p11kitTarDir="${extraLibsDir}/p11-kit-0.23.16.1.tar.gz"
+p11kitTarDirName="${extraLibsDir}/p11-kit-0.23.16.1"
+p11kitDir="${extraLibsDir}/p11-kit-0.23.16.1"
+p11kitBuildDir="${p11kitDir}/build_p11-kit-0.23.16.1"
+
+p11kitCPPFLAGS=""
+p11kitLDFLAGS=""
+p11kitConfigure="LIBTASN1_CFLAGS=\"-I${libtasn1BuildDir}/include\" LIBTASN1_LIBS=\"-L${libtasn1BuildDir}/lib\" ./configure --prefix=${p11kitBuildDir} --without-libffi"
+###p11kitConfigure="LIBTASN1_CFLAGS=\"-I${libtasn1BuildDir}/include\" LIBTASN1_LIBS=\"-L${libtasn1BuildDir}/lib\" LIBFFI_CFLAGS=\"-I${libffiBuildDir}/lib/libffi-3.2.1/include\" LIBFFI_LIBS=\"-L${libffiBuildDir}/lib\" ./configure --prefix=${p11kitBuildDir}"		### be careful if changing versions of libffi, for some odd reason the include folder is thrown in the lib folder here! Another dependency left out but could possibly be needed is systemd, whatever that is.
+p11kit_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
+
+gnutlsLink="ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/gnutls-3.6.8.tar.xz"
+gnutlsTarFormat="-xvf"
+gnutlsTarDir="${extraLibsDir}/gnutls-3.6.8.tar.xz"
+gnutlsTarDirName="${extraLibsDir}/gnutls-3.6.8"
+gnutlsDir="${extraLibsDir}/gnutls-3.6.8"
+gnutlsBuildDir="${gnutlsDir}/build_gnutls-3.6.8"
+
+gnutlsCPPFLAGS=""
+gnutlsLDFLAGS=""
+gnutlsConfigure="NETTLE_CFLAGS=\"-I${nettleBuildDir}/include\" NETTLE_LIBS=\"-L${nettleBuildDir}/lib\" GMP_CFLAGS=\"-I${gmpBuildDir}/include\" GMP_LIBS=\"-L${gmpBuildDir}/lib\" HOGWEED_CFLAGS=\"-I${nettleBuildDir}/include\" HOGWEED_LIBS=\"-L${nettleBuildDir}/lib\" ./configure --prefix=${gnutlsBuildDir} --with-included-libtasn1 --with-included-unistring"
+gnutls_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
+
 curlLink="https://curl.haxx.se/download/curl-7.61.1.tar.gz"
 curlTarFormat="-xzf"
 curlTarDir="${extraLibsDir}/curl-7.61.1.tar.gz"
@@ -1127,8 +1219,6 @@ if [ $success == 0 ]; then
 	sudo apt-get install libfontconfig1-dev
 	## building boost requires python header files not in a current python installation. Fortunately can module load python on aeolus, so this is allowable to install in order to get boost to work
 	sudo apt-get install python-dev
-	## this needs removed and built manually but I'm having trouble with it. I want to know if this is what WindNinja's gdal is missing
-	sudo apt-get install libcurl4-gnutls-dev
 	success=$?
 	if [ $success != 0 ]; then
 		echo "!!! error running minimum sudo apt install for WindNinja 3rd party lib binary dependencies !!!"
