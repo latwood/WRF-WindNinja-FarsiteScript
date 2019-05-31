@@ -59,7 +59,7 @@ echo "" # add extra line
 echo "outputDir = \"${outputDir}\""
 
 
-compilerModuleString="gcc/5.5.0 python/2.7.15/gcc/5.5.0 curl/7.47.1_gcc"		# this is a string with spaces containing what will be run with "module load". This used to hold a bunch of netcdf stuff and other packages, but cause of difficulty getting dependencies of dependencies to be happy, this now should just hold probably the compiler module to use for all compiling.
+compilerModuleString="gcc/5.5.0 python/2.7.15/gcc/5.5.0"		# this is a string with spaces containing what will be run with "module load". This used to hold a bunch of netcdf stuff and other packages, but cause of difficulty getting dependencies of dependencies to be happy, this now should just hold probably the compiler module to use for all compiling.
 
 
 

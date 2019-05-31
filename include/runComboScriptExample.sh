@@ -8,9 +8,9 @@
 #PBS -N comboScriptExample
 
 ## Define compute options
-#PBS -l nodes=1:dev:ppn=2
+#PBS -l nodes=1:dev:ppn=4
 #PBS -l mem=3024mb
-#PBS -l walltime=00:20:00
+#PBS -l walltime=00:50:00
 #PBS -q batch
 
 ## Define path for output & error logs
@@ -29,7 +29,7 @@
 
 binDir="/home/latwood/src/WRF-WindNinja-FarsiteScript/bin"
 
-compilerModuleString="gcc/5.5.0 python/2.7.15/gcc/5.5.0 curl/7.47.1_gcc"
+compilerModuleString="gcc/5.5.0 python/2.7.15/gcc/5.5.0"
 
 
 
