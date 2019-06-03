@@ -5,7 +5,7 @@
 #PBS -V
 
 ## Define a job name
-#PBS -N comboScriptExample
+#PBS -N overallScriptExample
 
 ## Define compute options
 #PBS -l nodes=1:dev:ppn=4
@@ -43,7 +43,7 @@ echo "loading modules ${compilerModuleString}"
 module load $compilerModuleString
 
 echo "running WRF-WindNinja-FarsiteScript"
-./WRF-WindNinja-FarsiteScript ../examples/cougarCreek-fire/firstRunCougarCreekFire.txt 2>&1 | tee scriptRun.log
+./WRF-WindNinja-FarsiteScript ../examples/cougarCreek-fire/firstRunCougarCreekFire.txt
 
 echo "" # add extra line
 echo "--------- end of job  ---------"

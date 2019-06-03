@@ -42,6 +42,11 @@ fi
 # it is assumed the user should already have installed git and already done "sudo apt update" and "sudo apt upgrade".
 aptgetInstallString="gcc g++ cmake m4"	# this has everything that will be run at the begginning, finishing "sudo apt-get install ".
 
+## some stuff is assumed to already be on the computer, but these are the things installed by WindNinja's buildDeps.sh script that are not built from scratch in the packages since they were found to already be on Aeolus.
+## problem with libfontconfig1-dev is that apparently pkg-config is installed, but fontconfig is not a new enough version, which needs a new enough version of freefont2
+## building boost requires python header files not in a current python installation. Fortunately can module load python on aeolus, so this is allowable to install in order to get boost to work
+minAptInstallString="libfontconfig1-dev python-dev libcurl4-gnutls-dev"
+
 nCores="8"  # this is the attempted number of cores when running any make process (except WindNinja which got mad when I tried using more than 4 cores during one of my builds). Could potentially change this value as a user to maybe get some speedup building gdal and netcdf libraries. Definitely important to somewhat get that annoying insert password trick to actually SOMEWHAT work.
 
 
@@ -84,98 +89,6 @@ szlibCPPFLAGS=""
 szlibLDFLAGS=""
 szlibConfigure="./configure --prefix=${szlibBuildDir}"
 szlib_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
-
-
-gmpLink="https://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.xz"
-gmpTarFormat="-xvf"
-gmpTarDir="${extraLibsDir}/gmp-6.1.2.tar.xz"
-gmpTarDirName="${extraLibsDir}/gmp-6.1.2"
-gmpDir="${extraLibsDir}/gmp-6.1.2"
-gmpBuildDir="${gmpDir}/build_gmp-6.1.2"
-
-gmpCPPFLAGS=""
-gmpLDFLAGS=""
-gmpConfigure="./configure --enable-cxx --prefix=${gmpBuildDir}"
-gmp_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
-
-
-nettleLink="ftp://ftp.gnu.org/gnu/nettle/nettle-3.4.1.tar.gz"
-nettleTarFormat="-xzf"
-nettleTarDir="${extraLibsDir}/nettle-3.4.1.tar.gz"
-nettleTarDirName="${extraLibsDir}/nettle-3.4.1"
-nettleDir="${extraLibsDir}/nettle-3.4.1"
-nettleBuildDir="${nettleDir}/build_nettle-3.4.1"
-
-nettleCPPFLAGS=""
-nettleLDFLAGS=""
-nettleConfigure="./configure --prefix=${nettleBuildDir} --with-include-path=${gmpBuildDir}/include --with-lib-path=${gmpBuildDir}/lib"
-nettle_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
-
-
-libtasn1Link="ftp://ftp.gnu.org/gnu/libtasn1/libtasn1-4.13.tar.gz"
-libtasn1TarFormat="-xzf"
-libtasn1TarDir="${extraLibsDir}/libtasn1-4.13.tar.gz"
-libtasn1TarDirName="${extraLibsDir}/libtasn1-4.13"
-libtasn1Dir="${extraLibsDir}/libtasn1-4.13"
-libtasn1BuildDir="${libtasn1Dir}/build_libtasn1-4.13"
-
-libtasn1CPPFLAGS=""
-libtasn1LDFLAGS=""
-libtasn1Configure="./configure --prefix=${libtasn1BuildDir}"
-libtasn1_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
-
-
-libffiLink="ftp://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz"
-libffiTarFormat="-xzf"
-libffiTarDir="${extraLibsDir}/libffi-3.2.1.tar.gz"
-libffiTarDirName="${extraLibsDir}/libffi-3.2.1"
-libffiDir="${extraLibsDir}/libffi-3.2.1"
-libffiBuildDir="${libffiDir}/build_libffi-3.2.1"
-
-libffiCPPFLAGS=""
-libffiLDFLAGS=""
-libffiConfigure="./configure --prefix=${libffiBuildDir}"
-libffi_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
-
-
-systemdLink="https://github.com/systemd/systemd/archive/v242.tar.gz"
-systemdTarFormat="-xzf"
-systemdTarDir="${extraLibsDir}/v242.tar.gz"
-systemdTarDirName="${extraLibsDir}/systemd-242"
-systemdDir="${extraLibsDir}/systemd-242"
-systemdBuildDir="${systemdDir}/build_systemd-242"
-
-systemdCPPFLAGS=""
-systemdLDFLAGS=""
-systemdConfigure="./configure --prefix=${systemdBuildDir}"
-systemd_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
-
-
-p11kitLink="https://github.com/p11-glue/p11-kit/releases/download/0.23.16.1/p11-kit-0.23.16.1.tar.gz"
-p11kitTarFormat="-xzf"
-p11kitTarDir="${extraLibsDir}/p11-kit-0.23.16.1.tar.gz"
-p11kitTarDirName="${extraLibsDir}/p11-kit-0.23.16.1"
-p11kitDir="${extraLibsDir}/p11-kit-0.23.16.1"
-p11kitBuildDir="${p11kitDir}/build_p11-kit-0.23.16.1"
-
-p11kitCPPFLAGS=""
-p11kitLDFLAGS=""
-p11kitConfigure="LIBTASN1_CFLAGS=\"-I${libtasn1BuildDir}/include\" LIBTASN1_LIBS=\"-L${libtasn1BuildDir}/lib\" ./configure --prefix=${p11kitBuildDir} --without-libffi"
-###p11kitConfigure="LIBTASN1_CFLAGS=\"-I${libtasn1BuildDir}/include\" LIBTASN1_LIBS=\"-L${libtasn1BuildDir}/lib\" LIBFFI_CFLAGS=\"-I${libffiBuildDir}/lib/libffi-3.2.1/include\" LIBFFI_LIBS=\"-L${libffiBuildDir}/lib\" ./configure --prefix=${p11kitBuildDir}"		### be careful if changing versions of libffi, for some odd reason the include folder is thrown in the lib folder here! Another dependency left out but could possibly be needed is systemd, whatever that is.
-p11kit_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
-
-
-gnutlsLink="ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/gnutls-3.6.8.tar.xz"
-gnutlsTarFormat="-xvf"
-gnutlsTarDir="${extraLibsDir}/gnutls-3.6.8.tar.xz"
-gnutlsTarDirName="${extraLibsDir}/gnutls-3.6.8"
-gnutlsDir="${extraLibsDir}/gnutls-3.6.8"
-gnutlsBuildDir="${gnutlsDir}/build_gnutls-3.6.8"
-
-gnutlsCPPFLAGS=""
-gnutlsLDFLAGS=""
-gnutlsConfigure="NETTLE_CFLAGS=\"-I${nettleBuildDir}/include\" NETTLE_LIBS=\"-L${nettleBuildDir}/lib\" GMP_CFLAGS=\"-I${gmpBuildDir}/include\" GMP_LIBS=\"-L${gmpBuildDir}/lib\" HOGWEED_CFLAGS=\"-I${nettleBuildDir}/include\" HOGWEED_LIBS=\"-L${nettleBuildDir}/lib\" ./configure --prefix=${gnutlsBuildDir} --with-included-libtasn1 --with-included-unistring"
-gnutls_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
 curlLink="https://curl.haxx.se/download/curl-7.61.1.tar.gz"
@@ -296,7 +209,7 @@ gdalBuildDir="${gdalDir}/build_gdal-2.0.3"
 gdalCPPFLAGS=""
 gdalLDFLAGS=""
 gdalConfigure="./configure --prefix=${gdalBuildDir} --with-jasper=${jasperBuildDir} --with-netcdf=${netcdf_cBuildDir} --with-hdf5=${hdf5BuildDir} --with-libz=${zlibBuildDir} --with-static-proj4=${projBuildDir} --with-poppler=${popplerBuildDir} --with-geos=${geosBuildDir}/bin/geos-config"
-##" --with-curl="$curlBuildDir"/bin/curl-config"
+##" --with-curl=${curlBuildDir}/bin/curl-config"
 gdal_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 ## boost is different from other 3rd party libs cause it doesn't use configure, but it is still similar
@@ -469,16 +382,29 @@ processMakeCleanRequests()		### this function takes as input each and every shou
 
 
 	## now go through each shouldMakeClean to decide which files and folders should be deleted and delete them
-	if [ $finalScript_shouldMakeClean != 0 ]; then
-		if [ -d "${finalBuildDir}" ]; then
-			echo "deleting finalBuildDir \"${finalBuildDir}\""
-			rm -rf ${finalBuildDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
+	### first set two arrays, one for the booleans and one for the folder names
+	### don't include farsite since it doesn't have a folder to delete, also need to do exceptions for Bzip2 with boost and for finalScriptDir
+	local shouldMakeClean_array=( ${finalScript_shouldMakeClean} ${windNinja_shouldMakeClean} ${boost_shouldMakeClean} ${gdal_shouldMakeClean} ${geos_shouldMakeClean} ${proj_shouldMakeClean}  ${poppler_shouldMakeClean} ${jasper_shouldMakeClean} ${netcdf_cxx_shouldMakeClean} ${netcdf_c_shouldMakeClean} ${hdf5_shouldMakeClean} ${curl_shouldMakeClean} ${szlib_shouldMakeClean}  ${zlib_shouldMakeClean} )
+	local folderPaths_array=( ${finalBuildDir} ${windNinjaBuildDir} ${boostDir} ${gdalDir} ${geosDir} ${projDir} ${popplerDir} ${jasperDir} ${netcdf_cxxDir} ${netcdf_cDir} ${hdf5Dir} ${curlDir}  ${szlibDir} ${zlibDir} )
+
+	for idx in $(seq 0 $((${#shouldMakeClean_array[@]} - 1)))
+	do
+		###echo "folderPaths_array[${idx}] = ${folderPaths_array[idx]}"
+		if [ ${shouldMakeClean_array[idx]} != 0 ]; then
+			if [ -d "${folderPaths_array[idx]}" ]; then
+				echo "deleting buildDir \"${folderPaths_array[idx]}\""
+				rm -rf ${folderPaths_array[idx]}
+				success=$?
+				if [ $success != 0 ]; then
+					echo "!!! error running rm -rf command !!!"
+					return 1
+				fi
 			fi
 		fi
+	done
+
+	## now do the remaining manual deletions
+	if [ $finalScript_shouldMakeClean != 0 ]; then
 		if [ -f "${finalBuildExecutable}" ]; then
 			echo "deleting finalBuildExecutable \"${finalBuildExecutable}\""
 			rm ${finalBuildExecutable}
@@ -489,18 +415,6 @@ processMakeCleanRequests()		### this function takes as input each and every shou
 		fi
 	fi
 	
-	if [ $windNinja_shouldMakeClean != 0 ]; then
-		if [ -d "${windNinjaBuildDir}" ]; then
-			echo "deleting windNinjaBuildDir \"${windNinjaBuildDir}\""
-			rm -rf ${windNinjaBuildDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
 	if [ $farsite_shouldMakeClean != 0 ]; then
 		if [ -f "${farsiteBuildExecutable}" ]; then
 			echo "deleting farsiteBuildExecutable \"${farsiteBuildExecutable}\""
@@ -513,15 +427,6 @@ processMakeCleanRequests()		### this function takes as input each and every shou
 	fi
 	
 	if [ $boost_shouldMakeClean != 0 ]; then
-		if [ -d "${boostDir}" ]; then
-			echo "deleting boostDir \"${boostDir}\""
-			rm -rf ${boostDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
 		if [ -d "${bzipDir}" ]; then
 			echo "deleting bzipDir \"${bzipDir}\""
 			rm -rf ${bzipDir}
@@ -533,137 +438,6 @@ processMakeCleanRequests()		### this function takes as input each and every shou
 		fi
 	fi
 
-	if [ $gdal_shouldMakeClean != 0 ]; then
-		if [ -d "${gdalDir}" ]; then
-			echo "deleting gdalDir \"${gdalDir}\""
-			rm -rf ${gdalDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
-	if [ $geos_shouldMakeClean != 0 ]; then
-		if [ -d "${geosDir}" ]; then
-			echo "deleting geosDir \"${geosDir}\""
-			rm -rf ${geosDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
-	if [ $proj_shouldMakeClean != 0 ]; then
-		if [ -d "${projDir}" ]; then
-			echo "deleting projDir \"${projDir}\""
-			rm -rf ${projDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
-	if [ $poppler_shouldMakeClean != 0 ]; then
-		if [ -d "${popplerDir}" ]; then
-			echo "deleting popplerDir \"${popplerDir}\""
-			rm -rf ${popplerDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
-	if [ $jasper_shouldMakeClean != 0 ]; then
-		if [ -d "${jasperDir}" ]; then
-			echo "deleting jasperDir \"${jasperDir}\""
-			rm -rf ${jasperDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
-	if [ $netcdf_cxx_shouldMakeClean != 0 ]; then
-		if [ -d "${netcdf_cxxDir}" ]; then
-			echo "deleting netcdf_cxxDir \"${netcdf_cxxDir}\""
-			rm -rf ${netcdf_cxxDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
-	if [ $netcdf_c_shouldMakeClean != 0 ]; then
-		if [ -d "${netcdf_cDir}" ]; then
-			echo "deleting netcdf_cDir \"${netcdf_cDir}\""
-			rm -rf ${netcdf_cDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
-	if [ $hdf5_shouldMakeClean != 0 ]; then
-		if [ -d "${hdf5Dir}" ]; then
-			echo "deleting hdf5Dir \"${hdf5Dir}\""
-			rm -rf ${hdf5Dir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
-	if [ $curl_shouldMakeClean != 0 ]; then
-		if [ -d "${curlDir}" ]; then
-			echo "deleting curlDir \"${curlDir}\""
-			rm -rf ${curlDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
-	if [ $szlib_shouldMakeClean != 0 ]; then
-		if [ -d "${szlibDir}" ]; then
-			echo "deleting szlibDir \"${szlibDir}\""
-			rm -rf ${szlibDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
-	if [ $zlib_shouldMakeClean != 0 ]; then
-		if [ -d "${zlibDir}" ]; then
-			echo "deleting zlibDir \"${zlibDir}\""
-			rm -rf ${zlibDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
 	
 	### if it gets to this point, it worked nicely
 	return 0
@@ -942,7 +716,107 @@ buildLib()		### this function is to be run on libs after they've been downloaded
 	return 0;
 }
 
+buildBoost()		### boost is built differently so going to have its own function
+{
+	if [ "$#" != 6 ]; then
+		echo "" # want a nice clean line
+		echo "!!! Incorrect Number of parameters for buildLib() !!!"
+		echo "need 6 parameters: \"extraLibsDir\" \"nCores\" \"bzipDir\" \"bzipBuildDir\" \"boostDir\" \"boostBuildDir\""
+		echo "" # want a nice clean line
+		return 1
+	fi
 
+	local extraLibsDir="${1}"
+	local nCores="${2}"
+	local bzipDir="${3}"
+	local bzipBuildDir="${4}"
+	local boostDir="${5}"
+	local boostBuildDir="${6}"
+
+
+	echo "" # want a nice clean line
+	echo "checking if boost needs to be built"
+
+
+	if [ ! -d "${bzipBuildDir}" ]; then
+		echo "entering ${bzipDir} directory"
+		cd $bzipDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cd command !!!"
+			return 1
+		fi
+		echo "running make command"
+		make -f Makefile-libbz2_so
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running make command !!!"
+			return 1
+		fi
+		echo "running make install with prefix command"
+		make install PREFIX=$bzipBuildDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running make install command !!!"
+			return 1
+		fi
+		echo "copying resulting libbz2.so.* libraries to bzip build dir"
+		cp -ar libbz2.so.* $bzipBuildDir/lib
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cp command !!!"
+			return 1
+		fi
+		echo "returning to ${extraLibsDir} directory"
+		cd $extraLibsDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cd command !!!"
+			return 1
+		fi
+	else
+		echo "${bzipBuildDir} already exists so skipping build process"
+	fi
+
+	if [ ! -d "${boostBuildDir}" ]; then
+		echo "entering ${boostDir} directory"		
+		cd $boostDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cd command !!!"
+			return 1
+		fi
+		echo "running ./bootstrap.sh command"
+		./bootstrap.sh
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running ./bootstrap.sh command !!!"
+			return 1
+		fi
+		echo "running ./b2 install --prefix=${boostBuildDir} command"
+		./b2 -j$nCores toolset=gcc cxxflags="-std=c++11" install --prefix=$boostBuildDir -sBZIP2_INCLUDE=$bzipBuildDir/include -sBZIP2_LIBPATH=$bzipBuildDir/lib
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running ./b2 install --prefix=${boostBuildDir} command !!!"
+			return 1
+		fi
+		echo "returning to ${extraLibsDir} directory"
+		cd $extraLibsDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cd command !!!"
+			return 1
+		fi
+	else
+		echo "${boostBuildDir} already exists so skipping build process"
+	fi
+
+	
+	echo "finished building boost"
+	echo "" # add a nice clean line
+
+	return 0;
+}
 ############# end defining functions to be used by all the other processes ################
 
 
@@ -1113,6 +987,7 @@ if [ $success == 0 ]; then
 	fi
 fi
 
+
 ######## download via "wget" and unpack with "tar" each of the third party packages required for the overall script ###########
 
 if [ $success == 0 ]; then
@@ -1184,7 +1059,7 @@ fi
 
 ######## download and install via "sudo apt install" as well as download via "wget" and unpack with "tar" each of the third party packages required specifically for WindNinja, all by running WindNinja's "build_deps.sh" script ############
 
-if [ $success == 9999 ]; then
+if [ $success == 9999 ]; then		### set to ridiculous number cause don't want this to run, we are trying to replace these dependencies
 	echo "entering windninja scripts dir ${windNinjaScriptsDir}"
 	cd $windNinjaScriptsDir
 	success=$?
@@ -1203,22 +1078,9 @@ if [ $success == 9999 ]; then
 fi
 
 
-if [ $success == 9999 ]; then
-	echo "running sudo apt install for WindNinja required 3rd party stuff"
-	sudo apt-get install libfontconfig1-dev libcurl4-gnutls-dev libnetcdf-dev qt4-dev-tools libqtwebkit-dev libboost-program-options-dev libboost-date-time-dev libgeos-dev libboost-test-dev
-	success=$?
-	if [ $success != 0 ]; then
-		echo "!!! error running sudo apt install for WindNinja 3rd party lib binary dependencies !!!"
-		success=1
-	fi
-fi
-
 if [ $success == 0 ]; then
-	echo "running minimum sudo apt install for WindNinja required 3rd party stuff"	### some of this already on Aeolus, so trying to narrow down the minimum already on Aeolus, see what stuff needs done without a package manager. I think the hard part of all these is that they are prebuilt .deb files instead of source code to build!
-	## problem with libfontconfig1-dev is that apparently pkg-config is installed, but fontconfig is not a new enough version, which needs a new enough version of freefont2
-	sudo apt-get install libfontconfig1-dev
-	## building boost requires python header files not in a current python installation. Fortunately can module load python on aeolus, so this is allowable to install in order to get boost to work
-	sudo apt-get install python-dev
+	echo "running minimum sudo apt install for WindNinja required 3rd party stuff"
+	sudo apt-get install ${minAptInstallString}
 	success=$?
 	if [ $success != 0 ]; then
 		echo "!!! error running minimum sudo apt install for WindNinja 3rd party lib binary dependencies !!!"
@@ -1231,22 +1093,22 @@ fi
 ############### now need to find and update all paths in the combo script repo to match the current base directory ##############
 ### this should eventually be moved into a separate utility script, named something like "keywordReplacer", which will then need to be called here.
 if [ $success == 0 ]; then
-	echo "entering baseDir ${baseDir}"
-	cd $baseDir
+	editingDir="${baseDir}"
+	echo "" # want a nice clean line
+	echo "entering editingDir ${editingDir}"
+	cd "${editingDir}"
 	success=$?
 	if [ $success != 0 ]; then
 		echo "!!! could not execute cd command !!!"
 		success=1
 	else
 		aboveBaseDir=$(dirname $baseDir)
-		echo "aboveBaseDir = ${aboveBaseDir}"
-		echo "" # want a nice clean line
-		echo "finding all files with \"${varToReplace}\" in them to replace with the above current base directory \"${aboveBaseDir}\""
-		preppedVarToReplace=$(sed 's/\//\\\//g' <<<"$varToReplace")
-		preppedAboveBaseDir=$(sed 's/\//\\\//g' <<<"$aboveBaseDir")
-		#preppedAboveBaseDir="\/home/latwood/src"
-		#preppedAboveBaseDir="\$scriptRoot"
-		grep -rl $preppedVarToReplace $baseDir --exclude-dir=.git --exclude-dir=include --exclude=readme | xargs sed -i 's/'$preppedVarToReplace'/'$preppedAboveBaseDir'/g'
+		desiredTextToReplace="${varToReplace}"
+		desiredReplacementText="${aboveBaseDir}"
+		echo "finding all cases of \"${desiredTextToReplace}\" in ${editingDir} and replacing them with \"${desiredReplacementText}\""
+		preppedTextToReplace=$(sed 's/\//\\\//g' <<<"$desiredTextToReplace")
+		preppedReplacementText=$(sed 's/\//\\\//g' <<<"$desiredReplacementText")
+		grep -rl "${preppedTextToReplace}" "${editingDir}" --exclude-dir=.git --exclude-dir=include --exclude=readme | xargs sed -i 's/'"${preppedTextToReplace}"'/'"${preppedReplacementText}"'/g'
 		success=$?
 		if [ $success != 0 ]; then
 			if [ $success == 123 ]; then
@@ -1369,87 +1231,8 @@ fi
 
 ## boost is built differently
 if [ $success == 0 ]; then
-	if [ ! -d "${bzipBuildDir}" ]; then
-		echo "entering ${bzipDir} directory"
-		cd $bzipDir
-		success=$?
-		if [ $success != 0 ]; then
-			echo "!!! error running cd command !!!"
-			success=1
-		else
-			echo "running make command"
-			make -f Makefile-libbz2_so
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running make command !!!"
-				success=1
-			else
-				echo "running make install with prefix command"
-				make install PREFIX=$bzipBuildDir
-				success=$?
-				if [ $success != 0 ]; then
-					echo "!!! error running make install command !!!"
-					success=1
-				else
-					echo "copying resulting libbz2.so.* libraries to bzip build dir"
-					cp -ar libbz2.so.* $bzipBuildDir/lib
-					success=$?
-					if [ $success != 0 ]; then
-						echo "!!! error running cp command !!!"
-						success=1
-					else
-						echo "returning to ${extraLibsDir} directory"
-						cd $extraLibsDir
-						success=$?
-						if [ $success != 0 ]; then
-							echo "!!! error running cd command !!!"
-							success=1
-						fi
-					fi
-				fi
-			fi
-		fi
-	else
-		echo "${bzipBuildDir} already exists so skipping build process"
-	fi
-fi
-
-if [ $success == 0 ]; then
-	if [ ! -d "${boostBuildDir}" ]; then
-		echo "entering ${boostDir} directory"		
-		cd $boostDir
-		success=$?
-		if [ $success != 0 ]; then
-			echo "!!! error running cd command !!!"
-			success=1
-		else
-			echo "running ./bootstrap.sh command"
-			./bootstrap.sh
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running ./bootstrap.sh command !!!"
-				success=1
-			else
-				echo "running ./b2 install --prefix=${boostBuildDir} command"
-				./b2 -j$nCores toolset=gcc cxxflags="-std=c++11" install --prefix=$boostBuildDir -sBZIP2_INCLUDE=$bzipBuildDir/include -sBZIP2_LIBPATH=$bzipBuildDir/lib
-				success=$?
-				if [ $success != 0 ]; then
-					echo "!!! error running ./b2 install --prefix=${boostBuildDir} command !!!"
-					success=1
-				else
-					echo "returning to ${extraLibsDir} directory"
-					cd $extraLibsDir
-					success=$?
-					if [ $success != 0 ]; then
-						echo "!!! error running cd command !!!"
-						success=1
-					fi
-				fi
-			fi
-		fi
-	else
-		echo "${boostBuildDir} already exists so skipping build process"
-	fi
+	buildBoost "${extraLibsDir}" "${nCores}" "${bzipDir}" "${bzipBuildDir}" "${boostDir}" "${boostBuildDir}"
+	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 
@@ -1563,7 +1346,7 @@ fi
 
 
 echo "" # want a fresh clean line
-echo "finished buildEverything_Ubuntu.sh script"
+echo "finished buildEverything_UbuntuAlternative.sh script"
 echo "" # want a fresh clean line
 
 

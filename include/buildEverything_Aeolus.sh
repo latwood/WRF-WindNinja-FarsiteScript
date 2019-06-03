@@ -57,6 +57,9 @@ nCores="8"  # this is the attempted number of cores when running any make proces
 outputDir="/home/latwood/src"	# this is where this script will place the overall script directory on Aeolus
 echo "" # add extra line
 echo "outputDir = \"${outputDir}\""
+overallScriptOutputDir="/fastscratch/latwood"	# this is where this script will set the output location of the example script runs, by changing the example script input files
+echo "" # add extra line
+echo "overallScriptOutputDir = \"${overallScriptOutputDir}\""
 
 
 compilerModuleString="gcc/5.5.0 python/2.7.15/gcc/5.5.0"		# this is a string with spaces containing what will be run with "module load". This used to hold a bunch of netcdf stuff and other packages, but cause of difficulty getting dependencies of dependencies to be happy, this now should just hold probably the compiler module to use for all compiling.
@@ -223,7 +226,7 @@ gdalBuildDir="${gdalDir}/build_gdal-2.0.3"
 gdalCPPFLAGS=""
 gdalLDFLAGS=""
 gdalConfigure="./configure --prefix=${gdalBuildDir} --with-jasper=${jasperBuildDir} --with-netcdf=${netcdf_cBuildDir} --with-hdf5=${hdf5BuildDir} --with-libz=${zlibBuildDir} --with-static-proj4=${projBuildDir} --with-poppler=${popplerBuildDir} --with-geos=${geosBuildDir}/bin/geos-config"
-##" --with-curl="$curlBuildDir"/bin/curl-config"
+##" --with-curl=${curlBuildDir}/bin/curl-config"
 gdal_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 ## boost is different from other 3rd party libs cause it doesn't use configure, but it is still similar
@@ -268,7 +271,7 @@ farsite_shouldMakeClean=0			# set to 1 if you want the unzipped folder deleted b
 ### replacing paths in files variables
 
 varToReplace="\$scriptRoot"							# this is the predefined placeholder text for the user paths in all the examples and src files, to be replaced with the user path found by this script so compiling can be done by this script in one step (instead of the user changing these paths manually)
-echo "varToReplace is "$varToReplace
+###echo "varToReplace is "$varToReplace
 ###varToReplace="/home/atw09001/src/combinationScript-cmake"	# this is a possible alternative placeholder text, say you want to undo the change of the path back to the original placeholder for pushing changes to the examples
 
 
@@ -400,16 +403,29 @@ processMakeCleanRequests()		### this function takes as input each and every shou
 
 
 	## now go through each shouldMakeClean to decide which files and folders should be deleted and delete them
-	if [ $finalScript_shouldMakeClean != 0 ]; then
-		if [ -d "${finalBuildDir}" ]; then
-			echo "deleting finalBuildDir \"${finalBuildDir}\""
-			rm -rf ${finalBuildDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
+	### first set two arrays, one for the booleans and one for the folder names
+	### don't include farsite since it doesn't have a folder to delete, also need to do exceptions for Bzip2 with boost and for finalScriptDir
+	local shouldMakeClean_array=( ${finalScript_shouldMakeClean} ${windNinja_shouldMakeClean} ${boost_shouldMakeClean} ${gdal_shouldMakeClean} ${geos_shouldMakeClean} ${proj_shouldMakeClean}  ${poppler_shouldMakeClean} ${jasper_shouldMakeClean} ${netcdf_cxx_shouldMakeClean} ${netcdf_c_shouldMakeClean} ${hdf5_shouldMakeClean} ${curl_shouldMakeClean} ${szlib_shouldMakeClean}  ${zlib_shouldMakeClean} )
+	local folderPaths_array=( ${finalBuildDir} ${windNinjaBuildDir} ${boostDir} ${gdalDir} ${geosDir} ${projDir} ${popplerDir} ${jasperDir} ${netcdf_cxxDir} ${netcdf_cDir} ${hdf5Dir} ${curlDir}  ${szlibDir} ${zlibDir} )
+
+	for idx in $(seq 0 $((${#shouldMakeClean_array[@]} - 1)))
+	do
+		###echo "folderPaths_array[${idx}] = ${folderPaths_array[idx]}"
+		if [ ${shouldMakeClean_array[idx]} != 0 ]; then
+			if [ -d "${folderPaths_array[idx]}" ]; then
+				echo "deleting buildDir \"${folderPaths_array[idx]}\""
+				rm -rf ${folderPaths_array[idx]}
+				success=$?
+				if [ $success != 0 ]; then
+					echo "!!! error running rm -rf command !!!"
+					return 1
+				fi
 			fi
 		fi
+	done
+
+	## now do the remaining manual deletions
+	if [ $finalScript_shouldMakeClean != 0 ]; then
 		if [ -f "${finalBuildExecutable}" ]; then
 			echo "deleting finalBuildExecutable \"${finalBuildExecutable}\""
 			rm ${finalBuildExecutable}
@@ -420,18 +436,6 @@ processMakeCleanRequests()		### this function takes as input each and every shou
 		fi
 	fi
 	
-	if [ $windNinja_shouldMakeClean != 0 ]; then
-		if [ -d "${windNinjaBuildDir}" ]; then
-			echo "deleting windNinjaBuildDir \"${windNinjaBuildDir}\""
-			rm -rf ${windNinjaBuildDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
 	if [ $farsite_shouldMakeClean != 0 ]; then
 		if [ -f "${farsiteBuildExecutable}" ]; then
 			echo "deleting farsiteBuildExecutable \"${farsiteBuildExecutable}\""
@@ -444,15 +448,6 @@ processMakeCleanRequests()		### this function takes as input each and every shou
 	fi
 	
 	if [ $boost_shouldMakeClean != 0 ]; then
-		if [ -d "${boostDir}" ]; then
-			echo "deleting boostDir \"${boostDir}\""
-			rm -rf ${boostDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
 		if [ -d "${bzipDir}" ]; then
 			echo "deleting bzipDir \"${bzipDir}\""
 			rm -rf ${bzipDir}
@@ -464,137 +459,6 @@ processMakeCleanRequests()		### this function takes as input each and every shou
 		fi
 	fi
 
-	if [ $gdal_shouldMakeClean != 0 ]; then
-		if [ -d "${gdalDir}" ]; then
-			echo "deleting gdalDir \"${gdalDir}\""
-			rm -rf ${gdalDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
-	if [ $geos_shouldMakeClean != 0 ]; then
-		if [ -d "${geosDir}" ]; then
-			echo "deleting geosDir \"${geosDir}\""
-			rm -rf ${geosDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
-	if [ $proj_shouldMakeClean != 0 ]; then
-		if [ -d "${projDir}" ]; then
-			echo "deleting projDir \"${projDir}\""
-			rm -rf ${projDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
-	if [ $poppler_shouldMakeClean != 0 ]; then
-		if [ -d "${popplerDir}" ]; then
-			echo "deleting popplerDir \"${popplerDir}\""
-			rm -rf ${popplerDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
-	if [ $jasper_shouldMakeClean != 0 ]; then
-		if [ -d "${jasperDir}" ]; then
-			echo "deleting jasperDir \"${jasperDir}\""
-			rm -rf ${jasperDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
-	if [ $netcdf_cxx_shouldMakeClean != 0 ]; then
-		if [ -d "${netcdf_cxxDir}" ]; then
-			echo "deleting netcdf_cxxDir \"${netcdf_cxxDir}\""
-			rm -rf ${netcdf_cxxDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
-	if [ $netcdf_c_shouldMakeClean != 0 ]; then
-		if [ -d "${netcdf_cDir}" ]; then
-			echo "deleting netcdf_cDir \"${netcdf_cDir}\""
-			rm -rf ${netcdf_cDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
-	if [ $hdf5_shouldMakeClean != 0 ]; then
-		if [ -d "${hdf5Dir}" ]; then
-			echo "deleting hdf5Dir \"${hdf5Dir}\""
-			rm -rf ${hdf5Dir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
-	if [ $curl_shouldMakeClean != 0 ]; then
-		if [ -d "${curlDir}" ]; then
-			echo "deleting curlDir \"${curlDir}\""
-			rm -rf ${curlDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
-	if [ $szlib_shouldMakeClean != 0 ]; then
-		if [ -d "${szlibDir}" ]; then
-			echo "deleting szlibDir \"${szlibDir}\""
-			rm -rf ${szlibDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
-
-	if [ $zlib_shouldMakeClean != 0 ]; then
-		if [ -d "${zlibDir}" ]; then
-			echo "deleting zlibDir \"${zlibDir}\""
-			rm -rf ${zlibDir}
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running rm -rf command !!!"
-				return 1
-			fi
-		fi
-	fi
 	
 	### if it gets to this point, it worked nicely
 	return 0
@@ -873,7 +737,107 @@ buildLib()		### this function is to be run on libs after they've been downloaded
 	return 0;
 }
 
+buildBoost()		### boost is built differently so going to have its own function
+{
+	if [ "$#" != 6 ]; then
+		echo "" # want a nice clean line
+		echo "!!! Incorrect Number of parameters for buildLib() !!!"
+		echo "need 6 parameters: \"extraLibsDir\" \"nCores\" \"bzipDir\" \"bzipBuildDir\" \"boostDir\" \"boostBuildDir\""
+		echo "" # want a nice clean line
+		return 1
+	fi
 
+	local extraLibsDir="${1}"
+	local nCores="${2}"
+	local bzipDir="${3}"
+	local bzipBuildDir="${4}"
+	local boostDir="${5}"
+	local boostBuildDir="${6}"
+
+
+	echo "" # want a nice clean line
+	echo "checking if boost needs to be built"
+
+
+	if [ ! -d "${bzipBuildDir}" ]; then
+		echo "entering ${bzipDir} directory"
+		cd $bzipDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cd command !!!"
+			return 1
+		fi
+		echo "running make command"
+		make -f Makefile-libbz2_so
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running make command !!!"
+			return 1
+		fi
+		echo "running make install with prefix command"
+		make install PREFIX=$bzipBuildDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running make install command !!!"
+			return 1
+		fi
+		echo "copying resulting libbz2.so.* libraries to bzip build dir"
+		cp -ar libbz2.so.* $bzipBuildDir/lib
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cp command !!!"
+			return 1
+		fi
+		echo "returning to ${extraLibsDir} directory"
+		cd $extraLibsDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cd command !!!"
+			return 1
+		fi
+	else
+		echo "${bzipBuildDir} already exists so skipping build process"
+	fi
+
+	if [ ! -d "${boostBuildDir}" ]; then
+		echo "entering ${boostDir} directory"		
+		cd $boostDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cd command !!!"
+			return 1
+		fi
+		echo "running ./bootstrap.sh command"
+		./bootstrap.sh
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running ./bootstrap.sh command !!!"
+			return 1
+		fi
+		echo "running ./b2 install --prefix=${boostBuildDir} command"
+		./b2 -j$nCores toolset=gcc cxxflags="-std=c++11" install --prefix=$boostBuildDir -sBZIP2_INCLUDE=$bzipBuildDir/include -sBZIP2_LIBPATH=$bzipBuildDir/lib
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running ./b2 install --prefix=${boostBuildDir} command !!!"
+			return 1
+		fi
+		echo "returning to ${extraLibsDir} directory"
+		cd $extraLibsDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cd command !!!"
+			return 1
+		fi
+	else
+		echo "${boostBuildDir} already exists so skipping build process"
+	fi
+
+	
+	echo "finished building boost"
+	echo "" # add a nice clean line
+
+	return 0;
+}
 ############# end defining functions to be used by all the other processes ################
 
 
@@ -1042,6 +1006,7 @@ if [ $success == 0 ]; then
 	fi
 fi
 
+
 ######## download via "wget" and unpack with "tar" each of the third party packages required for the overall script ###########
 
 if [ $success == 0 ]; then
@@ -1111,26 +1076,58 @@ fi
 
 
 
+##### It is expected that the examples get copied to a spot with faster read and write access (fastscratch probably), so the $scriptRoot needs updated in the examples separate than other directories
+if [ $success == 0 ]; then
+	editingDir="${baseDir}/examples"
+	echo "" # want a nice clean line
+	echo "entering editingDir ${editingDir}"
+	cd "${editingDir}"
+	success=$?
+	if [ $success != 0 ]; then
+		echo "!!! could not execute cd command !!!"
+		success=1
+	else
+		desiredTextToReplace="${varToReplace}"
+		desiredReplacementText="${overallScriptOutputDir}"
+		echo "finding all cases of \"${desiredTextToReplace}\" in ${editingDir} and replacing them with \"${desiredReplacementText}\""
+		preppedTextToReplace=$(sed 's/\//\\\//g' <<<"$desiredTextToReplace")
+		preppedReplacementText=$(sed 's/\//\\\//g' <<<"$desiredReplacementText")
+		grep -rl "${preppedTextToReplace}" "${editingDir}" --exclude-dir=.git --exclude-dir=include --exclude=readme | xargs sed -i 's/'"${preppedTextToReplace}"'/'"${preppedReplacementText}"'/g'
+		success=$?
+		if [ $success != 0 ]; then
+			if [ $success == 123 ]; then
+				echo "!warning, no stuff to replace!"
+				success=0
+			else
+				echo "!!! failed during replace path text process !!!"
+				success=1
+			fi
+		else
+			echo "finished replacing text"
+		fi
+	fi
+fi
+
 
 ############### now need to find and update all paths in the combo script repo to match the current base directory ##############
 ### this should eventually be moved into a separate utility script, named something like "keywordReplacer", which will then need to be called here.
 if [ $success == 0 ]; then
-	echo "entering baseDir ${baseDir}"
-	cd $baseDir
+	editingDir="${baseDir}"
+	echo "" # want a nice clean line
+	echo "entering editingDir ${editingDir}"
+	cd "${editingDir}"
 	success=$?
 	if [ $success != 0 ]; then
 		echo "!!! could not execute cd command !!!"
 		success=1
 	else
 		aboveBaseDir=$(dirname $baseDir)
-		echo "aboveBaseDir = ${aboveBaseDir}"
-		echo "" # want a nice clean line
-		echo "finding all files with \"${varToReplace}\" in them to replace with the above current base directory \"${aboveBaseDir}\""
-		preppedVarToReplace=$(sed 's/\//\\\//g' <<<"$varToReplace")
-		preppedAboveBaseDir=$(sed 's/\//\\\//g' <<<"$aboveBaseDir")
-		#preppedAboveBaseDir="\/home/latwood/src"
-		#preppedAboveBaseDir="\$scriptRoot"
-		grep -rl $preppedVarToReplace $baseDir --exclude-dir=.git --exclude-dir=include --exclude=readme | xargs sed -i 's/'$preppedVarToReplace'/'$preppedAboveBaseDir'/g'
+		desiredTextToReplace="${varToReplace}"
+		desiredReplacementText="${aboveBaseDir}"
+		echo "finding all cases of \"${desiredTextToReplace}\" in ${editingDir} and replacing them with \"${desiredReplacementText}\""
+		preppedTextToReplace=$(sed 's/\//\\\//g' <<<"$desiredTextToReplace")
+		preppedReplacementText=$(sed 's/\//\\\//g' <<<"$desiredReplacementText")
+		grep -rl "${preppedTextToReplace}" "${editingDir}" --exclude-dir=.git --exclude-dir=include --exclude=readme | xargs sed -i 's/'"${preppedTextToReplace}"'/'"${preppedReplacementText}"'/g'
 		success=$?
 		if [ $success != 0 ]; then
 			if [ $success == 123 ]; then
@@ -1265,87 +1262,8 @@ fi
 
 ## boost is built differently
 if [ $success == 0 ]; then
-	if [ ! -d "${bzipBuildDir}" ]; then
-		echo "entering ${bzipDir} directory"
-		cd $bzipDir
-		success=$?
-		if [ $success != 0 ]; then
-			echo "!!! error running cd command !!!"
-			success=1
-		else
-			echo "running make command"
-			make -f Makefile-libbz2_so
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running make command !!!"
-				success=1
-			else
-				echo "running make install with prefix command"
-				make install PREFIX=$bzipBuildDir
-				success=$?
-				if [ $success != 0 ]; then
-					echo "!!! error running make install command !!!"
-					success=1
-				else
-					echo "copying resulting libbz2.so.* libraries to bzip build dir"
-					cp -ar libbz2.so.* $bzipBuildDir/lib
-					success=$?
-					if [ $success != 0 ]; then
-						echo "!!! error running cp command !!!"
-						success=1
-					else
-						echo "returning to ${extraLibsDir} directory"
-						cd $extraLibsDir
-						success=$?
-						if [ $success != 0 ]; then
-							echo "!!! error running cd command !!!"
-							success=1
-						fi
-					fi
-				fi
-			fi
-		fi
-	else
-		echo "${bzipBuildDir} already exists so skipping build process"
-	fi
-fi
-
-if [ $success == 0 ]; then
-	if [ ! -d "${boostBuildDir}" ]; then
-		echo "entering ${boostDir} directory"		
-		cd $boostDir
-		success=$?
-		if [ $success != 0 ]; then
-			echo "!!! error running cd command !!!"
-			success=1
-		else
-			echo "running ./bootstrap.sh command"
-			./bootstrap.sh
-			success=$?
-			if [ $success != 0 ]; then
-				echo "!!! error running ./bootstrap.sh command !!!"
-				success=1
-			else
-				echo "running ./b2 install --prefix=${boostBuildDir} command"
-				./b2 -j$nCores toolset=gcc cxxflags="-std=c++11" install --prefix=$boostBuildDir -sBZIP2_INCLUDE=$bzipBuildDir/include -sBZIP2_LIBPATH=$bzipBuildDir/lib
-				success=$?
-				if [ $success != 0 ]; then
-					echo "!!! error running ./b2 install --prefix=${boostBuildDir} command !!!"
-					success=1
-				else
-					echo "returning to ${extraLibsDir} directory"
-					cd $extraLibsDir
-					success=$?
-					if [ $success != 0 ]; then
-						echo "!!! error running cd command !!!"
-						success=1
-					fi
-				fi
-			fi
-		fi
-	else
-		echo "${boostBuildDir} already exists so skipping build process"
-	fi
+	buildBoost "${extraLibsDir}" "${nCores}" "${bzipDir}" "${bzipBuildDir}" "${boostDir}" "${boostBuildDir}"
+	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 

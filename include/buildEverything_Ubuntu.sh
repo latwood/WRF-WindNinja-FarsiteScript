@@ -54,129 +54,150 @@ outputDir=$(dirname $baseDir)		# find parent directory (pulls off last folder na
 extraAppsDir=$includeDir"/extraApps"				# this is defining the location inside the overall script directory for placing the third party applications
 extraLibsDir=$includeDir"/extraLibs"				# this is defining the location inside the overall script directory for placing the third party libraries and packages
 finalBuildDir=$baseDir"/build"						# this is defining the location of the overall script build directory, for when running "make" on the overall script
-
+finalBuildExecutable="${baseDir}/bin/WRF-WindNinja-FarsiteScript"	# this is the expected executable that is built by make on the final build script
+finalScript_shouldMakeClean=0			# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
 ### third party lib variables
 
 zlibLink="http://www.zlib.net/zlib-1.2.11.tar.gz"
 zlibTarFormat="-xzf"
-zlibTarDir=$extraLibsDir"/zlib-1.2.11.tar.gz"
-zlibTarDirName=$extraLibsDir"/zlib-1.2.11"
-zlibDir=$extraLibsDir"/zlib-1.2.11"
-zlibBuildDir=$zlibDir"/build_zlib-1.2.11"
+zlibTarDir="${extraLibsDir}/zlib-1.2.11.tar.gz"
+zlibTarDirName="${extraLibsDir}/zlib-1.2.11"
+zlibDir="${extraLibsDir}/zlib-1.2.11"
+zlibBuildDir="${zlibDir}/build_zlib-1.2.11"
 
 zlibCPPFLAGS=""
 zlibLDFLAGS=""
-zlibConfigure="./configure --prefix="$zlibBuildDir
+zlibConfigure="./configure --prefix=${zlibBuildDir}"
 zlib_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
 szlibLink="ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4/szip-2.1.tar.gz"
 szlibTarFormat="-xzf"
-szlibTarDir=$extraLibsDir"/szip-2.1.tar.gz"
-szlibTarDirName=$extraLibsDir"/szip-2.1"
-szlibDir=$extraLibsDir"/szip-2.1"
-szlibBuildDir=$szlibDir"/build_szip-2.1"
+szlibTarDir="${extraLibsDir}/szip-2.1.tar.gz"
+szlibTarDirName="${extraLibsDir}/szip-2.1"
+szlibDir="${extraLibsDir}/szip-2.1"
+szlibBuildDir="${szlibDir}/build_szip-2.1"
 
 szlibCPPFLAGS=""
 szlibLDFLAGS=""
-szlibConfigure="./configure --prefix="$szlibBuildDir
+szlibConfigure="./configure --prefix=${szlibBuildDir}"
 szlib_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
 curlLink="https://curl.haxx.se/download/curl-7.61.1.tar.gz"
 curlTarFormat="-xzf"
-curlTarDir=$extraLibsDir"/curl-7.61.1.tar.gz"
-curlTarDirName=$extraLibsDir"/curl-7.61.1"
-curlDir=$extraLibsDir"/curl-7.61.1"
-curlBuildDir=$curlDir"/build_curl-7.61.1"
+curlTarDir="${extraLibsDir}/curl-7.61.1.tar.gz"
+curlTarDirName="${extraLibsDir}/curl-7.61.1"
+curlDir="${extraLibsDir}/curl-7.61.1"
+curlBuildDir="${curlDir}/build_curl-7.61.1"
 
 curlCPPFLAGS=""
 curlLDFLAGS=""
-curlConfigure="./configure --prefix="$curlBuildDir" --with-zlib="$zlibBuildDir
+curlConfigure="./configure --prefix=${curlBuildDir} --with-zlib=${zlibBuildDir}"
 curl_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
 hdf5Link="https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.2/src/hdf5-1.10.2.tar.gz"
 hdf5TarFormat="-xzf"
-hdf5TarDir=$extraLibsDir"/hdf5-1.10.2.tar.gz"
-hdf5TarDirName=$extraLibsDir"/hdf5-1.10.2"
-hdf5Dir=$extraLibsDir"/hdf5-1.10.2"
-hdf5BuildDir=$hdf5Dir"/build_hdf5-1.10.2"
+hdf5TarDir="${extraLibsDir}/hdf5-1.10.2.tar.gz"
+hdf5TarDirName="${extraLibsDir}/hdf5-1.10.2"
+hdf5Dir="${extraLibsDir}/hdf5-1.10.2"
+hdf5BuildDir="${hdf5Dir}/build_hdf5-1.10.2"
 
 hdf5CPPFLAGS=""
 hdf5LDFLAGS=""
-hdf5Configure="./configure --prefix="$hdf5BuildDir" --enable-hl --with-szlib="$szlibBuildDir" --with-zlib="$zlibBuildDir
+hdf5Configure="./configure --prefix=${hdf5BuildDir} --enable-hl --with-szlib=${szlibBuildDir} --with-zlib=${zlibBuildDir}"
 hdf5_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
 netcdf_cLink="https://github.com/Unidata/netcdf-c/archive/v4.6.1.tar.gz"
 netcdf_cTarFormat="-xzf"
-netcdf_cTarDir=$extraLibsDir"/v4.6.1.tar.gz"
-netcdf_cTarDirName=$extraLibsDir"/netcdf-c-4.6.1"
-netcdf_cDir=$extraLibsDir"/netcdf-c-4.6.1"
-netcdf_cBuildDir=$netcdf_cDir"/build_netcdf-c-4.6.1"
+netcdf_cTarDir="${extraLibsDir}/v4.6.1.tar.gz"
+netcdf_cTarDirName="${extraLibsDir}/netcdf-c-4.6.1"
+netcdf_cDir="${extraLibsDir}/netcdf-c-4.6.1"
+netcdf_cBuildDir="${netcdf_cDir}/build_netcdf-c-4.6.1"
 
-netcdf_cCPPFLAGS="-I"$zlibBuildDir"/include -I"$curlBuildDir"/include -I"$hdf5BuildDir"/include"
-netcdf_cLDFLAGS="-L"$zlibBuildDir"/lib -L"$curlBuildDir"/lib -L"$hdf5BuildDir"/lib"
-netcdf_cConfigure="./configure --prefix="$netcdf_cBuildDir
+netcdf_cCPPFLAGS="-I${zlibBuildDir}/include -I${curlBuildDir}/include -I${hdf5BuildDir}/include"
+netcdf_cLDFLAGS="-L${zlibBuildDir}/lib -L${curlBuildDir}/lib -L${hdf5BuildDir}/lib"
+netcdf_cConfigure="./configure --prefix=${netcdf_cBuildDir}"
 netcdf_c_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
 netcdf_cxxLink="https://github.com/Unidata/netcdf-cxx4/archive/v4.3.0.tar.gz"
 netcdf_cxxTarFormat="-xzf"
-netcdf_cxxTarDir=$extraLibsDir"/v4.3.0.tar.gz"
-netcdf_cxxTarDirName=$extraLibsDir"/netcdf-cxx4-4.3.0"
-netcdf_cxxDir=$extraLibsDir"/netcdf-cxx-4.3.0"
-netcdf_cxxBuildDir=$netcdf_cxxDir"/build_netcdf-cxx-4.3.0"
+netcdf_cxxTarDir="${extraLibsDir}/v4.3.0.tar.gz"
+netcdf_cxxTarDirName="${extraLibsDir}/netcdf-cxx4-4.3.0"
+netcdf_cxxDir="${extraLibsDir}/netcdf-cxx-4.3.0"
+netcdf_cxxBuildDir="${netcdf_cxxDir}/build_netcdf-cxx-4.3.0"
 
-netcdf_cxxCPPFLAGS="-I"$hdf5BuildDir"/include -I"$netcdf_cBuildDir"/include"
-netcdf_cxxLDFLAGS="-L"$hdf5BuildDir"/lib -L"$netcdf_cBuildDir"/lib"
-netcdf_cxxConfigure="./configure --prefix="$netcdf_cxxBuildDir
+netcdf_cxxCPPFLAGS="-I${hdf5BuildDir}/include -I${netcdf_cBuildDir}/include"
+netcdf_cxxLDFLAGS="-L${hdf5BuildDir}/lib -L${netcdf_cBuildDir}/lib"
+netcdf_cxxConfigure="./configure --prefix=${netcdf_cxxBuildDir}"
 netcdf_cxx_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
 jasperLink="https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/jasper/1.900.1-14ubuntu3/jasper_1.900.1.orig.tar.gz"
 jasperTarFormat="-xzf"
-jasperTarDir=$extraLibsDir"/jasper_1.900.1.orig.tar.gz"
-jasperTarDirName=$extraLibsDir"/jasper-1.900.1"
-jasperDir=$extraLibsDir"/jasper-1.900.1"
-jasperBuildDir=$jasperDir"/build_jasper-1.900.1"
+jasperTarDir="${extraLibsDir}/jasper_1.900.1.orig.tar.gz"
+jasperTarDirName="${extraLibsDir}/jasper-1.900.1"
+jasperDir="${extraLibsDir}/jasper-1.900.1"
+jasperBuildDir="${jasperDir}/build_jasper-1.900.1"
 
 jasperCPPFLAGS=""
 jasperLDFLAGS=""
-jasperConfigure="./configure --prefix="$jasperBuildDir" --enable-shared"
+jasperConfigure="./configure --prefix=${jasperBuildDir} --enable-shared"
 jasper_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
 gdalLink="http://download.osgeo.org/gdal/2.0.3/gdal-2.0.3.tar.gz"
 gdalTarFormat="-xzf"
-gdalTarDir=$extraLibsDir"/gdal-2.0.3.tar.gz"
-gdalTarDirName=$extraLibsDir"/gdal-2.0.3"
-gdalDir=$extraLibsDir"/gdal-2.0.3"
-gdalBuildDir=$gdalDir"/build_gdal-2.0.3"
+gdalTarDir="${extraLibsDir}/gdal-2.0.3.tar.gz"
+gdalTarDirName="${extraLibsDir}/gdal-2.0.3"
+gdalDir="${extraLibsDir}/gdal-2.0.3"
+gdalBuildDir="${gdalDir}/build_gdal-2.0.3"
 
 gdalCPPFLAGS=""
 gdalLDFLAGS=""
-gdalConfigure="./configure --prefix="$gdalBuildDir" --with-curl="$curlBuildDir" --with-jasper="$jasperBuildDir" --with-netcdf="$netcdf_cBuildDir" --with-hdf5="$hdf5BuildDir" --with-libz="$zlibBuildDir
+gdalConfigure="./configure --prefix=${gdalBuildDir} --with-jasper=${jasperBuildDir} --with-netcdf=${netcdf_cBuildDir} --with-hdf5=${hdf5BuildDir} --with-libz=${zlibBuildDir} --with-curl=${curlBuildDir}" ## --with-curl=${curlBuildDir}/bin/curl-config"
 gdal_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+
+## boost is different from other 3rd party libs cause it doesn't use configure, but it is still similar
+bzipLink="-O bzip2-1.0.6.tar.gz https://pilotfiber.dl.sourceforge.net/project/bzip2/bzip2-1.0.6.tar.gz"
+bzipTarFormat="-xzf"
+bzipTarDir="${extraLibsDir}/bzip2-1.0.6.tar.gz"
+bzipTarDirName="${extraLibsDir}/bzip2-1.0.6"
+bzipDir="${extraLibsDir}/bzip2-1.0.6"
+bzipBuildDir="${bzipDir}/build_bzip2-1.0.6"
+
+boostLink="-O boost_1_55_0.tar.gz https://sourceforge.net/projects/boost/files/boost/1.55.0/boost_1_55_0.tar.gz/download"
+boostTarFormat="-zxvf"
+boostTarDir="${extraLibsDir}/boost_1_55_0.tar.gz"
+boostTarDirName="${extraLibsDir}/boost_1_55_0"
+boostDir="${extraLibsDir}/boost_1_55_0"
+boostBuildDir="${boostDir}/build_boost_1_55_0"
+boost_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
+## instead of the regular build process, run bootstrap then b2 with an installation setup
 
 
 
 ### third party app variables
 
-windNinjaDir=$extraAppsDir"/windninja"				# this is defining the location inside the overall script directory for placing the WindNinja application
+windNinjaDir="${extraAppsDir}/windninja"				# this is defining the location inside the overall script directory for placing the WindNinja application
 windNinjaLink="https://github.com/firelab/windninja.git"	# this is the link to the WindNinja script Repo
-windNinjaBuildDir=$windNinjaDir"/build_windninja"			# this is defining the location of the WindNinja build directory, for when running "make" on the WindNinja application
+windNinjaBuildDir="${windNinjaDir}/build_windninja"			# this is defining the location of the WindNinja build directory, for when running "make" on the WindNinja application
 
 windNinjaBranch="3.5.2"								# this is for defining which version of WindNinja (which branch) to switch to by running "git checkout $branch", so defining which version of WindNinja to compile
-windninjaScriptsDir=$windNinjaDir"/scripts"
+windNinjaScriptsDir="${windNinjaDir}/scripts"
+windNinja_shouldMakeClean=0			# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
-farsiteDir=$extraAppsDir"/farsite"					# this is defining the location inside the overall script directory for placing the Farsite application
+farsiteDir="${extraAppsDir}/farsite"					# this is defining the location inside the overall script directory for placing the Farsite application
 farsiteLink="https://github.com/firelab/farsite.git"	# this is the link to the Farsite script Repo
-farsiteSrcDir=$farsiteDir"/src"						# this is the place where "make" needs run on Farsite to compile it
+farsiteSrcDir="${farsiteDir}/src"						# this is the place where "make" needs run on Farsite to compile it
+farsiteBuildExecutable="${farsiteSrcDir}/TestFARSITE"	# this is the executable created by running make on farsite
+farsite_shouldMakeClean=0			# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
 
@@ -190,11 +211,173 @@ varToReplace="\$scriptRoot"							# this is the predefined placeholder text for 
 
 
 ############# define functions used by all the other processes ##############
-downloadAndUnpackLib()		### this function downloads and unzips a given 3rd party lib, then if the name is not what is wanted, renames the unpacked the directory to what is wanted
+processMakeCleanRequests()		### this function takes as input each and every shouldMakeClean and the corresponding buildDirs and deletes all buildDirs after the first shouldMakeClean so you get a clean build from the first set to true shouldMakeClean that is found
+{
+	if [ "$#" != 26 ]; then
+		echo "" # want a nice clean line
+		echo "!!! Incorrect Number of parameters for processMakeCleanRequests() !!!"
+		echo "need 26 parameters: \"finalScript_shouldMakeClean\" \"finalBuildDir\" \"finalBuildExecutable\"  \"windNinja_shouldMakeClean\" \"windNinjaBuildDir\"  \"farsite_shouldMakeClean\" \"farsiteBuildExecutable\"  \"boost_shouldMakeClean\" \"boostDir\" \"bzipDir\"  \"gdal_shouldMakeClean\" \"gdalDir\"  \"jasper_shouldMakeClean\" \"jasperDir\"  \"netcdf_cxx_shouldMakeClean\" \"netcdf_cxxDir\"  \"netcdf_c_shouldMakeClean\" \"netcdf_cDir\"  \"hdf5_shouldMakeClean\" \"hdf5Dir\"  \"curl_shouldMakeClean\" \"curlDir\"  \"szlib_shouldMakeClean\" \"szlibDir\"  \"zlib_shouldMakeClean\" \"zlibDir\""
+		echo "this also expects that the .configure prefix (the build directory) for third party libs is within the folder generated from unzipping"
+		echo "" # want a nice clean line
+		return 1
+	fi
+
+	local finalScript_shouldMakeClean="${1}"
+	local finalBuildDir="${2}"
+	local finalBuildExecutable="${3}"
+	local windNinja_shouldMakeClean="${4}"
+	local windNinjaBuildDir="${5}"
+	local farsite_shouldMakeClean="${6}"
+	local farsiteBuildExecutable="${7}"
+	local boost_shouldMakeClean="${8}"
+	local boostDir="${9}"
+	local bzipDir="${10}"
+	local gdal_shouldMakeClean="${11}"
+	local gdalDir="${12}"
+	local jasper_shouldMakeClean="${13}"
+	local jasperDir="${14}"
+	local netcdf_cxx_shouldMakeClean="${15}"
+	local netcdf_cxxDir="${16}"
+	local netcdf_c_shouldMakeClean="${17}"
+	local netcdf_cDir="${18}"
+	local hdf5_shouldMakeClean="${19}"
+	local hdf5Dir="${20}"
+	local curl_shouldMakeClean="${21}"
+	local curlDir="${22}"
+	local szlib_shouldMakeClean="${23}"
+	local szlibDir="${24}"
+	local zlib_shouldMakeClean="${25}"
+	local zlibDir="${26}"
+
+	echo ""		## want some extra space
+	echo "finding earliest shouldMakeClean variable and deleting all later build directories for a clean build from that point on"
+	
+	### first reset all shouldMakeClean depending on inputs
+	if [ $zlib_shouldMakeClean != 0 ]; then
+		curl_shouldMakeClean=1
+		hdf5_shouldMakeClean=1
+		netcdf_c_shouldMakeClean=1
+		gdal_shouldMakeClean=1
+		windNinja_shouldMakeClean=1
+		finalScript_shouldMakeClean=1
+	fi
+	if [ $szlib_shouldMakeClean != 0 ]; then
+		hdf5_shouldMakeClean=1
+		windNinja_shouldMakeClean=1
+		finalScript_shouldMakeClean=1
+	fi
+	if [ $curl_shouldMakeClean != 0 ]; then
+		netcdf_c_shouldMakeClean=1
+		gdal_shouldMakeClean=1
+		windNinja_shouldMakeClean=1
+		finalScript_shouldMakeClean=1
+	fi
+	if [ $hdf5_shouldMakeClean != 0 ]; then
+		netcdf_c_shouldMakeClean=1
+		netcdf_cxx_shouldMakeClean=1
+		gdal_shouldMakeClean=1
+		windNinja_shouldMakeClean=1
+		finalScript_shouldMakeClean=1
+	fi
+	if [ $netcdf_c_shouldMakeClean != 0 ]; then
+		gdal_shouldMakeClean=1
+		windNinja_shouldMakeClean=1
+		finalScript_shouldMakeClean=1
+	fi
+	if [ $netcdf_cxx_shouldMakeClean != 0 ]; then
+		windNinja_shouldMakeClean=1
+		finalScript_shouldMakeClean=1
+	fi
+	if [ $jasper_shouldMakeClean != 0 ]; then
+		gdal_shouldMakeClean=1
+		windNinja_shouldMakeClean=1
+		finalScript_shouldMakeClean=1
+	fi
+	if [ $gdal_shouldMakeClean != 0 ]; then
+		windNinja_shouldMakeClean=1
+		finalScript_shouldMakeClean=1
+	fi
+	if [ $boost_shouldMakeClean != 0 ]; then
+		windNinja_shouldMakeClean=1
+		finalScript_shouldMakeClean=1
+	fi
+	if [ $farsite_shouldMakeClean != 0 ]; then
+		finalScript_shouldMakeClean=1
+	fi
+	if [ $windNinja_shouldMakeClean != 0 ]; then
+		finalScript_shouldMakeClean=1
+	fi
+	### no need for one for the $finalScript_shouldMakeClean
+
+
+	## now go through each shouldMakeClean to decide which files and folders should be deleted and delete them
+	### first set two arrays, one for the booleans and one for the folder names
+	### don't include farsite since it doesn't have a folder to delete, also need to do exceptions for Bzip2 with boost and for finalScriptDir
+	local shouldMakeClean_array=( ${finalScript_shouldMakeClean} ${windNinja_shouldMakeClean} ${boost_shouldMakeClean} ${gdal_shouldMakeClean} ${jasper_shouldMakeClean} ${netcdf_cxx_shouldMakeClean} ${netcdf_c_shouldMakeClean} ${hdf5_shouldMakeClean} ${curl_shouldMakeClean} ${szlib_shouldMakeClean}  ${zlib_shouldMakeClean} )
+	local folderPaths_array=( ${finalBuildDir} ${windNinjaBuildDir} ${boostDir} ${gdalDir} ${jasperDir} ${netcdf_cxxDir} ${netcdf_cDir} ${hdf5Dir} ${curlDir}  ${szlibDir} ${zlibDir} )
+
+	for idx in $(seq 0 $((${#shouldMakeClean_array[@]} - 1)))
+	do
+		###echo "folderPaths_array[${idx}] = ${folderPaths_array[idx]}"
+		if [ ${shouldMakeClean_array[idx]} != 0 ]; then
+			if [ -d "${folderPaths_array[idx]}" ]; then
+				echo "deleting buildDir \"${folderPaths_array[idx]}\""
+				rm -rf ${folderPaths_array[idx]}
+				success=$?
+				if [ $success != 0 ]; then
+					echo "!!! error running rm -rf command !!!"
+					return 1
+				fi
+			fi
+		fi
+	done
+
+	## now do the remaining manual deletions
+	if [ $finalScript_shouldMakeClean != 0 ]; then
+		if [ -f "${finalBuildExecutable}" ]; then
+			echo "deleting finalBuildExecutable \"${finalBuildExecutable}\""
+			rm ${finalBuildExecutable}
+			if [ $success != 0 ]; then
+				echo "!!! error running rm command !!!"
+				return 1
+			fi
+		fi
+	fi
+	
+	if [ $farsite_shouldMakeClean != 0 ]; then
+		if [ -f "${farsiteBuildExecutable}" ]; then
+			echo "deleting farsiteBuildExecutable \"${farsiteBuildExecutable}\""
+			rm ${farsiteBuildExecutable}
+			if [ $success != 0 ]; then
+				echo "!!! error running rm command !!!"
+				return 1
+			fi
+		fi
+	fi
+	
+	if [ $boost_shouldMakeClean != 0 ]; then
+		if [ -d "${bzipDir}" ]; then
+			echo "deleting bzipDir \"${bzipDir}\""
+			rm -rf ${bzipDir}
+			success=$?
+			if [ $success != 0 ]; then
+				echo "!!! error running rm -rf command !!!"
+				return 1
+			fi
+		fi
+	fi
+
+	
+	### if it gets to this point, it worked nicely
+	return 0
+
+}
+
+downloadAndUnpackLib_tar()		### this function downloads and unzips a given 3rd party lib, then if the name is not what is wanted, renames the unpacked the directory to what is wanted
 {
 	if [ "$#" != 7 ]; then
 		echo "" # want a nice clean line
-		echo "!!!Incorrect Number of parameters for downloadAndUnpackLib!!!"
+		echo "!!! Incorrect Number of parameters for downloadAndUnpackLib_tar() !!!"
 		echo "need 7 parameters: \"extraLibsDir\" \"libLink\" \"tarFormat\" \"libTarDir\" \"libTarDirName\" \"libDir\" \"libBuildDir\""
 		echo "" # want a nice clean line
 		return 1
@@ -218,17 +401,17 @@ downloadAndUnpackLib()		### this function downloads and unzips a given 3rd party
 	
 
 	echo "" # want a nice clean line
-	echo "checking for "$libName
+	echo "checking for ${libName}"
 
 	if [ ! -f "${libTarDir}" ]; then
-		echo "entering "${extraLibsDir}" directory"
+		echo "entering ${extraLibsDir} directory"
 		cd $extraLibsDir
 		success=$?
 		if [ $success != 0 ]; then
 			echo "!!! error running cd command !!!"
 			return 1
 		fi
-		echo "downloading "${libTarDir}" from "$libLink
+		echo "downloading ${libTarDir} from ${libLink}"
 		wget ${libLink}
 		success=$?
 		if [ $success != 0 ]; then
@@ -236,18 +419,18 @@ downloadAndUnpackLib()		### this function downloads and unzips a given 3rd party
 			return 1
 		fi
 	else
-		echo $libTarDir" already exists so skipping tar download"
+		echo "${libTarDir} already exists so skipping tar download"
 	fi
 
 	if [ ! -d "${libDir}" ]; then
-		echo "entering "${extraLibsDir}" directory"
+		echo "entering ${extraLibsDir} directory"
 		cd $extraLibsDir
 		success=$?
 		if [ $success != 0 ]; then
 			echo "!!! error running cd command !!!"
 			return 1
 		fi
-		echo "unpacking "$libTarDir
+		echo "unpacking ${libTarDir}"
 		tar $tarFormat $libTarDir
 		success=$?
 		if [ $success != 0 ]; then
@@ -255,7 +438,7 @@ downloadAndUnpackLib()		### this function downloads and unzips a given 3rd party
 			return 1
 		fi
 		if [ "${libTarDirName}" != "${libDir}" ]; then
-			echo "renaming tar directory "${libTarDirName}" to "${libDir}
+			echo "renaming tar directory ${libTarDirName} to ${libDir}"
 			mv $libTarDirName $libDir
 			success=$?
 			if [ $success != 0 ]; then
@@ -264,10 +447,118 @@ downloadAndUnpackLib()		### this function downloads and unzips a given 3rd party
 			fi
 		fi
 	else
-		echo $libDir" already exists so skipping tar unpacking"
+		echo "${libDir} already exists so skipping tar unpacking"
 	fi
 
-	echo "finished setup for "$libName
+	echo "finished setup for ${libName}"
+	echo "" # add a nice clean line
+
+	return 0;
+
+}
+
+
+downloadAndUnpackLib_Bzip2()		### this function downloads and unzips a given 3rd party lib, then if the name is not what is wanted, renames the unpacked the directory to what is wanted
+{
+	if [ "$#" != 9 ]; then
+		echo "" # want a nice clean line
+		echo "!!! Incorrect Number of parameters for downloadAndUnpackLib_Bzip2() !!!"
+		echo "need 9 parameters: \"extraLibsDir\" \"libLink\" \"Bzip2Format\" \"Bzip2Dir\" \"tarFormat\" \"libTarDir\" \"libTarDirName\" \"libDir\" \"libBuildDir\""
+		echo "" # want a nice clean line
+		return 1
+	fi
+
+	local extraLibsDir="${1}"
+	local libLink="${2}"
+	local Bzip2Format="${3}"
+	local Bzip2Dir="${4}"
+	local tarFormat="${5}"
+	local libTarDir="${6}"
+	local libTarDirName="${7}"
+	local libDir="${8}"
+	local libBuildDir="${9}"
+	
+	
+	### make some intermediate variables that used to be passed in, but technically come from these input variables
+	###currentDir=$(pwd)
+	###currentDirName=$(echo "${currentDir}" | sed 's/.*\///')		# find name of current directory (removes path so grabs last folder name in path)
+	###currentDirParent=$(dirname $currentDir)		# find parent directory (pulls off last folder name from path)
+	###currentDirParentName=$(echo "${currentDirParent}" | sed 's/.*\///')		# find name of parent directory (removes path so grabs last folder name in path)
+	local libName=$(echo "${libDir}" | sed 's/.*\///')	# take the directory off of libDir
+	
+
+	echo "" # want a nice clean line
+	echo "checking for ${libName}"
+
+	if [ ! -f "${Bzip2Dir}" ]; then
+		echo "entering ${extraLibsDir} directory"
+		cd $extraLibsDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cd command !!!"
+			return 1
+		fi
+		echo "downloading ${Bzip2Dir} from ${libLink}"
+		wget ${libLink}
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running wget command !!!"
+			return 1
+		fi
+	else
+		echo "${Bzip2Dir} already exists so skipping tar download"
+	fi
+
+
+	if [ ! -f "${libTarDir}" ]; then
+		echo "entering ${extraLibsDir} directory"
+		cd $extraLibsDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cd command !!!"
+			return 1
+		fi
+		echo "unpacking ${Bzip2Dir}"
+		bzip2 $Bzip2Format $Bzip2Dir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running Bzip2 command with Bzip2Format \"${Bzip2Format}\" !!!"
+			return 1
+		fi
+	else
+		echo "${libTarDir} already exists so skipping Bzip2 unpacking"
+	fi
+	
+
+	if [ ! -d "${libDir}" ]; then
+		echo "entering ${extraLibsDir} directory"
+		cd $extraLibsDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cd command !!!"
+			return 1
+		fi
+		echo "unpacking ${libTarDir}"
+		tar $tarFormat $libTarDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running tar command with tarFormat \"${tarFormat}\" !!!"
+			return 1
+		fi
+		if [ "${libTarDirName}" != "${libDir}" ]; then
+			echo "renaming tar directory ${libTarDirName} to ${libDir}"
+			mv $libTarDirName $libDir
+			success=$?
+			if [ $success != 0 ]; then
+				echo "!!! error running mv command !!!"
+				return 1
+			fi
+		fi
+	else
+		echo "${libDir} already exists so skipping tar unpacking"
+	fi
+
+	echo "finished setup for ${libName}"
 	echo "" # add a nice clean line
 
 	return 0;
@@ -277,10 +568,10 @@ downloadAndUnpackLib()		### this function downloads and unzips a given 3rd party
 
 buildLib()		### this function is to be run on libs after they've been downloaded and unpacked, basically just builds the lib
 {
-	if [ "$#" != 11 ]; then
+	if [ "$#" != 7 ]; then
 		echo "" # want a nice clean line
-		echo "!!!Incorrect Number of parameters for buildLib!!!"
-		echo "need 10 parameters: \"extraLibsDir\" \"nCores\" \"libDir\" \"libBuildDir\" \"libCPPFLAGS\" \"libLDFLAGS\" \"libConfigure\" \"shouldMakeClean\" \"tarFormat\" \"libTarDir\" \"libTarDirName\""
+		echo "!!! Incorrect Number of parameters for buildLib() !!!"
+		echo "need 7 parameters: \"extraLibsDir\" \"nCores\" \"libDir\" \"libBuildDir\" \"libCPPFLAGS\" \"libLDFLAGS\" \"libConfigure\""
 		echo "" # want a nice clean line
 		return 1
 	fi
@@ -292,10 +583,6 @@ buildLib()		### this function is to be run on libs after they've been downloaded
 	local libCPPFLAGS="${5}"
 	local libLDFLAGS="${6}"
 	local libConfigure="${7}"
-	local shouldMakeClean="${8}"
-	local tarFormat="${9}"
-	local libTarDir="${10}"
-	local libTarDirName="${11}"
 
 
 	### make some intermediate variables that used to be passed in, but technically come from these input variables
@@ -307,26 +594,7 @@ buildLib()		### this function is to be run on libs after they've been downloaded
 	
 
 	echo "" # want a nice clean line
-	echo "checking if "$libName" needs to be built"
-
-
-
-	if [[ $shouldMakeClean == 1 && -d "${libBuildDir}" ]]; then
-		echo "shouldMakeClean is \"${shouldMakeClean}\" so deleting old ${libDir} directory for a clean build"
-		rm -r ${libDir}
-		success=$?
-		if [ $success != 0 ]; then
-			echo "!!! error running rm -r command !!!"
-			return 1
-		fi
-		echo "running the download and unpacking function again, should ignore the downloading part"
-		downloadAndUnpackLib "${extraLibsDir}" "null" "${tarFormat}" "${libTarDir}" "${libTarDirName}" "${libDir}" "${libBuildDir}"		### notice the link won't matter cause it will detect that the tar dir exists
-		success=$? # result of last action, 0 if good, 1 if failed
-		if [ $success != 0 ]; then
-			echo "!!! error running downloadAndUnpackLib function !!!"
-			return 1
-		fi
-	fi
+	echo "checking if ${libName} needs to be built"
 
 
 	if [ ! -d "${libBuildDir}" ]; then
@@ -337,7 +605,7 @@ buildLib()		### this function is to be run on libs after they've been downloaded
 			echo "!!! error running cd command !!!"
 			return 1
 		fi
-		echo "running configure "$libConfigure
+		echo "running configure ${libConfigure}"
 		export CPPFLAGS=$libCPPFLAGS
 		export LDFLAGS=$libLDFLAGS
 		${libConfigure}  # run the passed in configure command
@@ -346,7 +614,7 @@ buildLib()		### this function is to be run on libs after they've been downloaded
 			echo "!!! error running configure command !!!"
 			return 1
 		fi
-		echo "building "$libDirName
+		echo "building ${libDirName}"
 		make -j$nCores
 		success=$?
 		if [ $success != 0 ]; then
@@ -367,17 +635,117 @@ buildLib()		### this function is to be run on libs after they've been downloaded
 			return 1
 		fi
 	else
-		echo "${libBuildDir} already exists and shouldMakeClean is set to ${shouldMakeClean} so skipping build process"
+		echo "${libBuildDir} already exists so skipping build process"
 	fi
 
 	
-	echo "finished building "$libName
+	echo "finished building ${libName}"
 	echo "" # add a nice clean line
 
 	return 0;
 }
 
+buildBoost()		### boost is built differently so going to have its own function
+{
+	if [ "$#" != 6 ]; then
+		echo "" # want a nice clean line
+		echo "!!! Incorrect Number of parameters for buildLib() !!!"
+		echo "need 6 parameters: \"extraLibsDir\" \"nCores\" \"bzipDir\" \"bzipBuildDir\" \"boostDir\" \"boostBuildDir\""
+		echo "" # want a nice clean line
+		return 1
+	fi
 
+	local extraLibsDir="${1}"
+	local nCores="${2}"
+	local bzipDir="${3}"
+	local bzipBuildDir="${4}"
+	local boostDir="${5}"
+	local boostBuildDir="${6}"
+
+
+	echo "" # want a nice clean line
+	echo "checking if boost needs to be built"
+
+
+	if [ ! -d "${bzipBuildDir}" ]; then
+		echo "entering ${bzipDir} directory"
+		cd $bzipDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cd command !!!"
+			return 1
+		fi
+		echo "running make command"
+		make -f Makefile-libbz2_so
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running make command !!!"
+			return 1
+		fi
+		echo "running make install with prefix command"
+		make install PREFIX=$bzipBuildDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running make install command !!!"
+			return 1
+		fi
+		echo "copying resulting libbz2.so.* libraries to bzip build dir"
+		cp -ar libbz2.so.* $bzipBuildDir/lib
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cp command !!!"
+			return 1
+		fi
+		echo "returning to ${extraLibsDir} directory"
+		cd $extraLibsDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cd command !!!"
+			return 1
+		fi
+	else
+		echo "${bzipBuildDir} already exists so skipping build process"
+	fi
+
+	if [ ! -d "${boostBuildDir}" ]; then
+		echo "entering ${boostDir} directory"		
+		cd $boostDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cd command !!!"
+			return 1
+		fi
+		echo "running ./bootstrap.sh command"
+		./bootstrap.sh
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running ./bootstrap.sh command !!!"
+			return 1
+		fi
+		echo "running ./b2 install --prefix=${boostBuildDir} command"
+		./b2 -j$nCores toolset=gcc cxxflags="-std=c++11" install --prefix=$boostBuildDir -sBZIP2_INCLUDE=$bzipBuildDir/include -sBZIP2_LIBPATH=$bzipBuildDir/lib
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running ./b2 install --prefix=${boostBuildDir} command !!!"
+			return 1
+		fi
+		echo "returning to ${extraLibsDir} directory"
+		cd $extraLibsDir
+		success=$?
+		if [ $success != 0 ]; then
+			echo "!!! error running cd command !!!"
+			return 1
+		fi
+	else
+		echo "${boostBuildDir} already exists so skipping build process"
+	fi
+
+	
+	echo "finished building boost"
+	echo "" # add a nice clean line
+
+	return 0;
+}
 ############# end defining functions to be used by all the other processes ################
 
 
@@ -395,7 +763,7 @@ fi
 
 # it is assumed the user should already have installed git and already done "sudo apt update" and "sudo apt upgrade". Apparently apt is bad for scripts, apt-get is good for scripts.
 if [ $success == 0 ]; then
-	echo "before doing anything else, \"sudo apt-get install\" will be run so you will need to supply your password and accept installations of the following packages: \""$aptgetInstallString
+	echo "before doing anything else, \"sudo apt-get install\" will be run so you will need to supply your password and accept installations of the following packages: \"${aptgetInstallString}\""
 	echo ""  # want a nice clean line
 	echo "this script assumes you have already installed git and run \"sudo apt update\" and \"sudo apt upgrade\". Expect the script to ask for password again when the script reaches the WindNinja installation step, as WindNinja runs \"sudo apt install\" for some more packages."
 	echo ""  # want a nice clean line
@@ -403,7 +771,7 @@ fi
 
 
 if [ $success == 0 ]; then
-	echo "running \"sudo apt-get install "$aptgetInstallString"\""
+	echo "running \"sudo apt-get install ${aptgetInstallString}\""
 	sudo apt-get install $aptgetInstallString
 	success=$?
 	if [ $success != 0 ]; then
@@ -415,11 +783,17 @@ fi
 
 ######### first create all the required source directories and build directories ##########
 
+##### actually, first process which stuff needs redone so creating source and build directories can go into a clean spot for remakes ######
+if [ $success == 0 ]; then
+	processMakeCleanRequests "${finalScript_shouldMakeClean}" "${finalBuildDir}" "${finalBuildExecutable}" "${windNinja_shouldMakeClean}" "${windNinjaBuildDir}" "${farsite_shouldMakeClean}" "${farsiteBuildExecutable}" "${boost_shouldMakeClean}" "${boostDir}" "${bzipDir}" "${gdal_shouldMakeClean}" "${gdalDir}" "${jasper_shouldMakeClean}" "${jasperDir}" "${netcdf_cxx_shouldMakeClean}" "${netcdf_cxxDir}" "${netcdf_c_shouldMakeClean}" "${netcdf_cDir}" "${hdf5_shouldMakeClean}" "${hdf5Dir}" "${curl_shouldMakeClean}" "${curlDir}" "${szlib_shouldMakeClean}" "${szlibDir}" "${zlib_shouldMakeClean}" "${zlibDir}"
+	success=$? 	# result of last action, 0 if good, 1 if failed
+fi
+
 ### create the final build directory for later use
 if [ $success == 0 ]; then
     echo "" # add extra line
     if [ ! -d "${finalBuildDir}" ]; then
-        echo "creating finalBuildDir \""$finalBuildDir"\""
+        echo "creating finalBuildDir \"${finalBuildDir}\""
         mkdir $finalBuildDir
         success=$?
         if [ $success != 0 ]; then
@@ -427,7 +801,7 @@ if [ $success == 0 ]; then
             success=1
         fi
     else
-        echo "finalBuildDir \""$finalBuildDir"\" already exists. Skipping finalBuildDir creation step"
+        echo "finalBuildDir \"${finalBuildDir}\" already exists. Skipping finalBuildDir creation step"
     fi
 fi
 
@@ -435,7 +809,7 @@ fi
 if [ $success == 0 ]; then
 	echo "" # add extra line
 	if [ ! -d "${extraAppsDir}" ]; then
-		echo "creating extraAppsDir \""$extraAppsDir"\""
+		echo "creating extraAppsDir \"${extraAppsDir}\""
 		mkdir $extraAppsDir
 		success=$?
 		if [ $success != 0 ]; then
@@ -443,7 +817,7 @@ if [ $success == 0 ]; then
 			success=1
 		fi
 	else
-		echo "extraAppsDir \""$extraAppsDir"\" already exists. Skipping extraAppsDir creation step"
+		echo "extraAppsDir \"${extraAppsDir}\" already exists. Skipping extraAppsDir creation step"
 	fi
 fi
 
@@ -451,7 +825,7 @@ fi
 if [ $success == 0 ]; then
 	echo "" # add extra line
 	if [ ! -d "${extraLibsDir}" ]; then
-		echo "creating extraLibsDir \""$extraLibsDir"\""
+		echo "creating extraLibsDir \"${extraLibsDir}\""
 		mkdir $extraLibsDir
 		success=$?
 		if [ $success != 0 ]; then
@@ -459,7 +833,7 @@ if [ $success == 0 ]; then
 			success=1
 		fi
 	else
-		echo "extraLibsDir \""$extraLibsDir"\" already exists. Skipping extraLibsDir creation step"
+		echo "extraLibsDir \"${extraLibsDir}\" already exists. Skipping extraLibsDir creation step"
 	fi
 fi
 
@@ -467,14 +841,14 @@ fi
 if [ $success == 0 ]; then
 	echo "" # add extra line
 	if [ ! -d "${windNinjaDir}" ]; then
-		echo "entering \""$extraAppsDir"\""
+		echo "entering \"${extraAppsDir}\""
 		cd $extraAppsDir
 		success=$?
 		if [ $success != 0 ]; then
 			echo "!!! error running cd command !!!"
 			success=1
 		else
-			echo "running git clone on WindNinja \""$windNinjaLink"\""
+			echo "running git clone on WindNinja \"${windNinjaLink}\""
 			git clone $windNinjaLink
 			success=$?
 			if [ $success != 0 ]; then
@@ -488,7 +862,7 @@ if [ $success == 0 ]; then
 					echo "!!! error running cd command !!!"
 					success=1
 				else
-					echo "changing WindNinja branch to hopefully stable "$windNinjaBranch" branch"
+					echo "changing WindNinja branch to hopefully stable ${windNinjaBranch} branch"
 					git checkout $windNinjaBranch
 					success=$?
 					if [ $success != 0 ]; then
@@ -499,7 +873,7 @@ if [ $success == 0 ]; then
 			fi
 		fi
 	else
-		echo "windNinjaDir \""$windNinjaDir"\" already exists. Skipping repo cloning step for WindNinja"
+		echo "windNinjaDir \"${windNinjaDir}\" already exists. Skipping repo cloning step for WindNinja"
 	fi
 fi
 
@@ -507,7 +881,7 @@ fi
 if [ $success == 0 ]; then
 	echo "" # add extra line
 	if [ ! -d "${windNinjaBuildDir}" ]; then
-		echo "creating windNinjaBuildDir \""$windNinjaBuildDir"\""
+		echo "creating windNinjaBuildDir \"${windNinjaBuildDir}\""
 		mkdir $windNinjaBuildDir
 		success=$?
 		if [ $success != 0 ]; then
@@ -515,7 +889,7 @@ if [ $success == 0 ]; then
 			success=1
 		fi
 	else
-		echo "windNinjaBuildDir \""$windNinjaBuildDir"\" already exists. Skipping windNinjaBuildDir creation step"
+		echo "windNinjaBuildDir \"${windNinjaBuildDir}\" already exists. Skipping windNinjaBuildDir creation step"
 	fi
 fi
 
@@ -523,14 +897,14 @@ fi
 if [ $success == 0 ]; then
 	echo "" # add extra line
 	if [ ! -d "${farsiteDir}" ]; then
-		echo "entering \""$extraAppsDir"\""
+		echo "entering \"${extraAppsDir}\""
 		cd $extraAppsDir
 		success=$?
 		if [ $success != 0 ]; then
 			echo "!!! error running cd command !!!"
 			success=1
 		else
-			echo "running git clone on Farsite \""$farsiteLink"\""
+			echo "running git clone on Farsite \"${farsiteLink}\""
 			git clone $farsiteLink
 			success=$?
 			if [ $success != 0 ]; then
@@ -539,49 +913,60 @@ if [ $success == 0 ]; then
 			fi
 		fi
 	else
-		echo "farsiteDir \""$farsiteDir"\" already exists. Skipping repo cloning step for farsite"
+		echo "farsiteDir \"${farsiteDir}\" already exists. Skipping repo cloning step for farsite"
 	fi
 fi
+
 
 ######## download via "wget" and unpack with "tar" each of the third party packages required for the overall script ###########
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${zlibLink}" "${zlibTarFormat}" "${zlibTarDir}" "${zlibTarDirName}" "${zlibDir}" "${zlibBuildDir}"
+	downloadAndUnpackLib_tar "${extraLibsDir}" "${zlibLink}" "${zlibTarFormat}" "${zlibTarDir}" "${zlibTarDirName}" "${zlibDir}" "${zlibBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${szlibLink}" "${szlibTarFormat}" "${szlibTarDir}" "${szlibTarDirName}" "${szlibDir}" "${szlibBuildDir}"
+	downloadAndUnpackLib_tar "${extraLibsDir}" "${szlibLink}" "${szlibTarFormat}" "${szlibTarDir}" "${szlibTarDirName}" "${szlibDir}" "${szlibBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${curlLink}" "${curlTarFormat}" "${curlTarDir}" "${curlTarDirName}" "${curlDir}" "${curlBuildDir}"
+	downloadAndUnpackLib_tar "${extraLibsDir}" "${curlLink}" "${curlTarFormat}" "${curlTarDir}" "${curlTarDirName}" "${curlDir}" "${curlBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${hdf5Link}" "${hdf5TarFormat}" "${hdf5TarDir}" "${hdf5TarDirName}" "${hdf5Dir}" "${hdf5BuildDir}"
+	downloadAndUnpackLib_tar "${extraLibsDir}" "${hdf5Link}" "${hdf5TarFormat}" "${hdf5TarDir}" "${hdf5TarDirName}" "${hdf5Dir}" "${hdf5BuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${netcdf_cLink}" "${netcdf_cTarFormat}" "${netcdf_cTarDir}" "${netcdf_cTarDirName}" "${netcdf_cDir}" "${netcdf_cBuildDir}"
+	downloadAndUnpackLib_tar "${extraLibsDir}" "${netcdf_cLink}" "${netcdf_cTarFormat}" "${netcdf_cTarDir}" "${netcdf_cTarDirName}" "${netcdf_cDir}" "${netcdf_cBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${netcdf_cxxLink}" "${netcdf_cxxTarFormat}" "${netcdf_cxxTarDir}" "${netcdf_cxxTarDirName}" "${netcdf_cxxDir}" "${netcdf_cxxBuildDir}"
+	downloadAndUnpackLib_tar "${extraLibsDir}" "${netcdf_cxxLink}" "${netcdf_cxxTarFormat}" "${netcdf_cxxTarDir}" "${netcdf_cxxTarDirName}" "${netcdf_cxxDir}" "${netcdf_cxxBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${jasperLink}" "${jasperTarFormat}" "${jasperTarDir}" "${jasperTarDirName}" "${jasperDir}" "${jasperBuildDir}"
+	downloadAndUnpackLib_tar "${extraLibsDir}" "${jasperLink}" "${jasperTarFormat}" "${jasperTarDir}" "${jasperTarDirName}" "${jasperDir}" "${jasperBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib "${extraLibsDir}" "${gdalLink}" "${gdalTarFormat}" "${gdalTarDir}" "${gdalTarDirName}" "${gdalDir}" "${gdalBuildDir}"
+	downloadAndUnpackLib_tar "${extraLibsDir}" "${gdalLink}" "${gdalTarFormat}" "${gdalTarDir}" "${gdalTarDirName}" "${gdalDir}" "${gdalBuildDir}"
+	success=$? # result of last action, 0 if good, 1 if failed
+fi
+
+if [ $success == 0 ]; then
+	downloadAndUnpackLib_tar "${extraLibsDir}" "${bzipLink}" "${bzipTarFormat}" "${bzipTarDir}" "${bzipTarDirName}" "${bzipDir}" "${bzipBuildDir}"
+	success=$? # result of last action, 0 if good, 1 if failed
+fi
+
+if [ $success == 0 ]; then
+	downloadAndUnpackLib_tar "${extraLibsDir}" "${boostLink}" "${boostTarFormat}" "${boostTarDir}" "${boostTarDirName}" "${boostDir}" "${boostBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
@@ -590,8 +975,8 @@ fi
 ######## download and install via "sudo apt install" as well as download via "wget" and unpack with "tar" each of the third party packages required specifically for WindNinja, all by running WindNinja's "build_deps.sh" script ############
 
 if [ $success == 0 ]; then
-	echo "entering windninja scripts dir ${windninjaScriptsDir}"
-	cd $windninjaScriptsDir
+	echo "entering windninja scripts dir ${windNinjaScriptsDir}"
+	cd $windNinjaScriptsDir
 	success=$?
 	if [ $success != 0 ]; then
 		echo "!!! error running cd command !!!"
@@ -611,22 +996,22 @@ fi
 ############### now need to find and update all paths in the combo script repo to match the current base directory ##############
 ### this should eventually be moved into a separate utility script, named something like "keywordReplacer", which will then need to be called here.
 if [ $success == 0 ]; then
-	echo "entering baseDir "$baseDir
-	cd $baseDir
+	editingDir="${baseDir}"
+	echo "" # want a nice clean line
+	echo "entering editingDir ${editingDir}"
+	cd "${editingDir}"
 	success=$?
 	if [ $success != 0 ]; then
 		echo "!!! could not execute cd command !!!"
 		success=1
 	else
 		aboveBaseDir=$(dirname $baseDir)
-		echo "aboveBaseDir = "$aboveBaseDir
-		echo "" # want a nice clean line
-		echo "finding all files with \""$varToReplace"\" in them to replace with the above current base directory \""$aboveBaseDir"\""
-		preppedVarToReplace=$(sed 's/\//\\\//g' <<<"$varToReplace")
-		preppedAboveBaseDir=$(sed 's/\//\\\//g' <<<"$aboveBaseDir")
-		#preppedAboveBaseDir="\/home/latwood/src"
-		#preppedAboveBaseDir="\$scriptRoot"
-		grep -rl $preppedVarToReplace $baseDir --exclude-dir=.git --exclude-dir=include --exclude=readme | xargs sed -i 's/'$preppedVarToReplace'/'$preppedAboveBaseDir'/g'
+		desiredTextToReplace="${varToReplace}"
+		desiredReplacementText="${aboveBaseDir}"
+		echo "finding all cases of \"${desiredTextToReplace}\" in ${editingDir} and replacing them with \"${desiredReplacementText}\""
+		preppedTextToReplace=$(sed 's/\//\\\//g' <<<"$desiredTextToReplace")
+		preppedReplacementText=$(sed 's/\//\\\//g' <<<"$desiredReplacementText")
+		grep -rl "${preppedTextToReplace}" "${editingDir}" --exclude-dir=.git --exclude-dir=include --exclude=readme | xargs sed -i 's/'"${preppedTextToReplace}"'/'"${preppedReplacementText}"'/g'
 		success=$?
 		if [ $success != 0 ]; then
 			if [ $success == 123 ]; then
@@ -654,7 +1039,7 @@ if [ $success == 0 ]; then
 		echo "!!! error running cd command !!!"
 		success=1
 	else
-		echo "running \"git update-index --assume-unchanged\" on files changed by replacing \""$varToReplace\"
+		echo "running \"git update-index --assume-unchanged\" on files changed by replacing \"${varToReplace}\""
 		git update-index --assume-unchanged src/getFarsitePath.cpp src/getWindNinjaPath.cpp config/default.cmake
 		success=$?
 		if [ $success != 0 ]; then
@@ -683,42 +1068,48 @@ fi
 ########## now need to compile all the third party libraries and packages for the overall script ###########
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${zlibDir}" "${zlibBuildDir}" "${zlibCPPFLAGS}" "${zlibLDFLAGS}" "${zlibConfigure}" "${zlib_shouldMakeClean}" "${zlibTarFormat}" "${zlibTarDir}" "${zlibTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${zlibDir}" "${zlibBuildDir}" "${zlibCPPFLAGS}" "${zlibLDFLAGS}" "${zlibConfigure}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${szlibDir}" "${szlibBuildDir}" "${szlibCPPFLAGS}" "${szlibLDFLAGS}" "${szlibConfigure}" "${szlib_shouldMakeClean}" "${szlibTarFormat}" "${szlibTarDir}" "${szlibTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${szlibDir}" "${szlibBuildDir}" "${szlibCPPFLAGS}" "${szlibLDFLAGS}" "${szlibConfigure}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${curlDir}" "${curlBuildDir}" "${curlCPPFLAGS}" "${curlLDFLAGS}" "${curlConfigure}" "${curl_shouldMakeClean}" "${curlTarFormat}" "${curlTarDir}" "${curlTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${curlDir}" "${curlBuildDir}" "${curlCPPFLAGS}" "${curlLDFLAGS}" "${curlConfigure}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${hdf5Dir}" "${hdf5BuildDir}" "${hdf5CPPFLAGS}" "${hdf5LDFLAGS}" "${hdf5Configure}" "${hdf5_shouldMakeClean}" "${hdf5TarFormat}" "${hdf5TarDir}" "${hdf5TarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${hdf5Dir}" "${hdf5BuildDir}" "${hdf5CPPFLAGS}" "${hdf5LDFLAGS}" "${hdf5Configure}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${netcdf_cDir}" "${netcdf_cBuildDir}" "${netcdf_cCPPFLAGS}" "${netcdf_cLDFLAGS}" "${netcdf_cConfigure}" "${netcdf_c_shouldMakeClean}" "${netcdf_cTarFormat}" "${netcdf_cTarDir}" "${netcdf_cTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${netcdf_cDir}" "${netcdf_cBuildDir}" "${netcdf_cCPPFLAGS}" "${netcdf_cLDFLAGS}" "${netcdf_cConfigure}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${netcdf_cxxDir}" "${netcdf_cxxBuildDir}" "${netcdf_cxxCPPFLAGS}" "${netcdf_cxxLDFLAGS}" "${netcdf_cxxConfigure}" "${netcdf_cxx_shouldMakeClean}" "${netcdf_cxxTarFormat}" "${netcdf_cxxTarDir}" "${netcdf_cxxTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${netcdf_cxxDir}" "${netcdf_cxxBuildDir}" "${netcdf_cxxCPPFLAGS}" "${netcdf_cxxLDFLAGS}" "${netcdf_cxxConfigure}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${jasperDir}" "${jasperBuildDir}" "${jasperCPPFLAGS}" "${jasperLDFLAGS}" "${jasperConfigure}" "${jasper_shouldMakeClean}" "${jasperTarFormat}" "${jasperTarDir}" "${jasperTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${jasperDir}" "${jasperBuildDir}" "${jasperCPPFLAGS}" "${jasperLDFLAGS}" "${jasperConfigure}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${gdalDir}" "${gdalBuildDir}" "${gdalCPPFLAGS}" "${gdalLDFLAGS}" "${gdalConfigure}" "${gdal_shouldMakeClean}" "${gdalTarFormat}" "${gdalTarDir}" "${gdalTarDirName}"
+	buildLib "${extraLibsDir}" "${nCores}" "${gdalDir}" "${gdalBuildDir}" "${gdalCPPFLAGS}" "${gdalLDFLAGS}" "${gdalConfigure}"
+	success=$? # result of last action, 0 if good, 1 if failed
+fi
+
+## boost is built differently
+if [ $success == 0 ]; then
+	buildBoost "${extraLibsDir}" "${nCores}" "${bzipDir}" "${bzipBuildDir}" "${boostDir}" "${boostBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
@@ -730,7 +1121,7 @@ fi
 ### now attempt to build Farsite
 if [ $success == 0 ]; then
 	echo "" # add extra line
-	if [ ! -f "${farsiteSrcDir}/TestFARSITE" ]; then
+	if [ ! -f "${farsiteBuildExecutable}" ]; then
 		echo "entering farsite directory ${farsiteSrcDir}"
 		cd $farsiteSrcDir
 		success=$?
@@ -793,7 +1184,7 @@ fi
 ### now attempt to build the final overall script
 if [ $success == 0 ]; then
 	echo "" # add extra line
-	if [ ! -f "${baseDir}/bin/WRF-WindNinja-FarsiteScript" ]; then
+	if [ ! -f "${finalBuildExecutable}" ]; then
 		echo "entering finalBuildDir ${finalBuildDir}"
 		cd $finalBuildDir
 		success=$?
