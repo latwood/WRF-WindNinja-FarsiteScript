@@ -40,12 +40,12 @@ fi
 ############   set required variables for everything being done in the script   ############
 
 # it is assumed the user should already have installed git and already done "sudo apt update" and "sudo apt upgrade".
-aptgetInstallString="gcc g++ cmake m4"	# this has everything that will be run at the begginning, finishing "sudo apt-get install ".
+aptgetInstallString="gcc g++ cmake m4 python-dev"	# this has everything that will be run at the begginning, finishing "sudo apt-get install ".
 
 ## some stuff is assumed to already be on the computer, but these are the things installed by WindNinja's buildDeps.sh script that are not built from scratch in the packages since they were found to already be on Aeolus.
 ## problem with libfontconfig1-dev is that apparently pkg-config is installed, but fontconfig is not a new enough version, which needs a new enough version of freefont2
 ## building boost requires python header files not in a current python installation. Fortunately can module load python on aeolus, so this is allowable to install in order to get boost to work
-minAptInstallString="libfontconfig1-dev python-dev libcurl4-gnutls-dev"
+minAptInstallString="libfontconfig1-dev libcurl4-gnutls-dev"
 
 nCores="8"  # this is the attempted number of cores when running any make process (except WindNinja which got mad when I tried using more than 4 cores during one of my builds). Could potentially change this value as a user to maybe get some speedup building gdal and netcdf libraries. Definitely important to somewhat get that annoying insert password trick to actually SOMEWHAT work.
 

@@ -40,7 +40,7 @@ fi
 ############   set required variables for everything being done in the script   ############
 
 # it is assumed the user should already have installed git and already done "sudo apt update" and "sudo apt upgrade".
-aptgetInstallString="gcc g++ cmake m4"	# this has everything that will be run at the begginning, finishing "sudo apt-get install ".
+aptgetInstallString="gcc g++ cmake m4 python-dev"	# this has everything that will be run at the begginning, finishing "sudo apt-get install ".
 
 nCores="8"  # this is the attempted number of cores when running any make process (except WindNinja which got mad when I tried using more than 4 cores during one of my builds). Could potentially change this value as a user to maybe get some speedup building gdal and netcdf libraries. Definitely important to somewhat get that annoying insert password trick to actually SOMEWHAT work.
 
