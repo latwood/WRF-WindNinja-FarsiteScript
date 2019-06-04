@@ -2,17 +2,17 @@
 
 #################  Project General Overview  #################
 
-This project is still under work, but at least at this point the code can run with simple inputs on Ubuntu 16.04 and Ubuntu 18.04 machines. The WRF-WindNinja-FarsiteScript code is designed to run Farsite and WindNinja automatically using a single input file and a number of inputs, including WRF weather output netcdf files, a landscape .lcp file, and ignition shape files. They haven't been linked in yet, but the optional barrier files used in Farsite could also be provided.
+This project is still under work, but at least at this point the code can run with simple inputs on Ubuntu 16.04 and Ubuntu 18.04 machines and Aeolus. The WRF-WindNinja-FarsiteScript code is designed to run Farsite and WindNinja automatically using a single input file and a number of inputs, including WRF weather output netcdf files, a landscape .lcp file, and ignition shape files. They haven't been linked in yet, but the optional barrier files used in Farsite could also be provided.
 
-The end goal for the AIRPACT-Fire project was for the user to provide WRF files, provide the .lcp file or have it automatically download, provide the ignition shape files or ignition point locations or download GeoMAC fire perimeters for use as ignitions. While WindNinja can run in many more modes than just providing WRF files, the WRF-WindNinja-FarsiteScript currently limits the WindNinja functionality to only be the WRF weather file inputs. This functionality may be added in at some time, but hasn't been focused on yet, since the focus has been on the needs of the AIRPACT-Fire project. To add this functionality, in theory would just be doing a little more work that playing around with the inputs to the WRF-WindNinja-FarsiteScript, but in practice might mean much more work, as it would basically mean having each and every WindNinja input repeated as inputs to the WRF-WindNinja-FarsiteScript.
+The end goal for the AIRPACT-Fire project was for the user to provide WRF files, provide the .lcp file or have it automatically download, provide the ignition shape files or ignition point locations or downloaded GeoMAC fire perimeters for use as ignitions. While WindNinja can run in many more modes than just providing WRF files, the WRF-WindNinja-FarsiteScript currently limits the WindNinja functionality to only be the WRF weather file inputs. This functionality may be added in at some time, but hasn't been focused on yet, since the focus has been on the needs of the AIRPACT-Fire project. To add this functionality, in theory would just be doing little more work than playing around with the inputs to the WRF-WindNinja-FarsiteScript, but in practice might mean much more work, as it would basically mean having each and every WindNinja input repeated as inputs to the WRF-WindNinja-FarsiteScript.
 
-The WRF-WindNinja-FarsiteScript code also runs Farsite in a more limited mode as well. Basically the number of inputs that are required to this script are less than those required by WindNinja and Farsite, as the other inputs are chosen automatically by the WRF-WindNinja-Farsite script. The inputs to this script should be decently documented, and there is an example in the repo that shows the inputs at each stage of the process. WindNinja also has nicely documented inputs. Farsite's inputs are not well documented, I spent two months trying to piece together what they were at the start of the project, and I never quite got to a good clear way of explaining them. But you should be able to see what inputs for Farsite are expected from the user vs the actual inputs for Farsite used by the script by comparing inputs at each stage of the process.
+The WRF-WindNinja-FarsiteScript code also runs Farsite in a more limited mode as well. Basically the number of inputs that are required to this script are less than those required by WindNinja and Farsite, as the other inputs are chosen automatically by the WRF-WindNinja-Farsite script. The inputs to this script should be decently documented, and there is an example in the repo that shows the inputs at each stage of the process. WindNinja also has nicely documented inputs. Farsite's inputs are not well documented inside Farsite itself, I spent two months trying to piece together what they were at the start of the project, and I never quite got to a good clear way of explaining them. But you should be able to see what inputs for Farsite are expected from the user vs the actual inputs for Farsite used by the script by comparing inputs at each stage of the process.
 
-One last thing, Loren Atwood is still pretty much the only one working on this script, but since the end of summer 2018, the work to advance this script has been limited to 5 hours every two weeks. Come summer 2019, I will probably go back to 20 hrs a week on this script. This means that for users of the script that want to use the script outside the scope of the AIRPACT-Fire project, if the script is still far away from what you need, I may not be able to help get the script to where you need it till around Summertime.
+One last thing, Loren Atwood is still pretty much the only one working on this script, but since the end of summer 2018, the work to advance this script has been limited to 5 hours every two weeks. In the summer of summer 2019, Loren had a small window to do more work, but after June 5th, Loren Atwood isn't planning on working much on the script till after May 2020 when he graduates from grad school. This means that for users of the script that want to use the script outside the scope of the AIRPACT-Fire project, if the script is still far away from what you need, it may be difficult to get the actual developers of the script to make changes for you, instead you may just be given information and ideas that you can work on for yourself.
 
 
 
-#################  General Overview of Code Flow in WRF-WindNinja-FarsiteScript  #################
+#################  Planned General Overview of Code Flow in WRF-WindNinja-FarsiteScript  #################
 
 1) main.cpp calls constructors for the input loading, lcp downloading, ignitions processing, WindNinja processessng and running, weather processing and running, and Farsite processing and running classes. Most of these classes do not do much during construction, but the inputs class does a lot during construction, including setting up a general list of all available and possible inputs.
 2) command line inputs are processed to determine if they are valid, and if they are not, the inputs information is printed
@@ -31,7 +31,7 @@ The basic idea of this script is that running /include/buildEverything.sh downlo
 
 If there is anything wrong with the inputs, the input parser should catch the problem and warn if input data is off or more is required. The script also has error checking to stop at any point that it runs into trouble, so if you have problems without getting understandable errors, somehow you've caused an edge case where the programmers need to add some more error checking.
 
-If there is anything wrong with running buildEverything.sh, it should stop and warn where in the process an error has occured so you can go into the file and edit the download source links or any other required unpacked filenames that might have changed. Running buildEverything.sh multiple times should warn if different files are already found so it avoids redoing steps in the process unless you delete files. You should delete the last file or folder that was being worked on before resuming the script if the script is interrupted in the process during a make or cmake ./configure or build step.
+If there is anything wrong with running buildEverything.sh, it should stop and warn where in the process an error has occured so you can go into the file and edit the download source links or any other required unpacked filenames that might have changed. Running buildEverything.sh multiple times should warn if different files are already found so it avoids redoing steps in the process unless you delete files. Instead of manually deleting files, there are individual "shouldMakeClean" boolean values you can set for a given package where the script will handle deleting old build files for you for a clean build.
 
 The example input files should now run after buildEverything.sh runs properly, as this script also takes the keyword "$scriptRoot" and replaces it with the correct path to home for the user. Note that only one of the example config files is meant to run to completion because only one of these files uses enough wrf files and the correct start and end farsite simulation times to get farsite to process anything.
 
@@ -39,7 +39,7 @@ Of the current examples, the expected behavior for firstRunCougarCreekFire.txt i
 
 For other current examples, the code will stop at farsite, as there are not enough wind files for said cases, but they will show output resulting empty folders as it attempts to run multiple separate fires for different ignition files on a single set of wind data. Just there are not enough wind files (min of 1 day's worth before the fire) for farsite to actually run with the inputs provided by the outputs of everything else (not enough wrf files as input to the entire script).
 
-A quick clarification, there is a buildEverything_Ubuntu.sh script and soon to be a buildEverything_Aeolus.sh script. The script for Aeolus might be interesting, as it is for a centos system that does module loading of the packages, so it might not even be important to run a buildEverything.sh script, just load modules. An alternative might be to use the Aeolus package singularity (docker) which could have an image of Ubuntu where the buildEverything_Ubuntu.sh script could be used.
+A quick clarification, the buildEverything_Ubuntu.sh uses "sudo ldconfig", "sudo make install", and "sudo apt-get install" to get all the packages, buildEverything_UbuntuAlternative.sh does enough of the same thing without these commands by building custom directories for everything even WindNinja, and buildEverything_Aeolus.sh is similar to buildEverything_UbuntuAlternative.sh in that no sudo is allowed on Aeolus. If you have any trouble with packages built to custom directories, it may be helpful to look at old versions of these files for ideas, as curl with gnutls is the only package really not built completely from scratch that may cause trouble in the future.
 
 
 If you have any trouble using this script or have any suggestions, email the original developer, Loren Atwood, at pianotocador@gmail.com
@@ -59,7 +59,8 @@ The finalOutput folder contains files generated by WRF-WindNinja-FarsiteScript r
 #################  Step by Step Guide for Building and Running the Script  #################
 
 
-The following worked on fresh installations of Ubuntu 16.04 and 18.04:
+The following worked on fresh installations of Ubuntu 16.04 and 18.04 on a virtual machine or Windows Subsystem of Ubuntu:
+
 sudo apt update
 sudo apt upgrade
 sudo apt install git
@@ -67,8 +68,7 @@ git clone https://github.com/latwood/WRF-WindNinja-FarsiteScript.git
 cd WRF-WindNinja-FarsiteScript/include
 ./buildEverything_Ubuntu.sh 2>&1 | tee buildEverything.log
 
-Used to be that you needed to run "sudo make install" and "sudo ldconfig" in order to have at least one fully installed version of WindNinja in order for the current pipeline call of WindNinja to work properly. This is not true anymore, though the buildEverything_Ubuntu.sh script still runs "sudo ldconfig". But it is still true that the user's .bashrc file needs modified with a version of "export WINDNINJA_DATA=~/src/wind/windninja/data". If you already have multiple versions of WindNinja, you probably can skip this step
-
+Used to be that you needed to run "sudo make install" and "sudo ldconfig" in order to have at least one fully installed version of WindNinja in order for the current pipeline call of WindNinja to work properly. This is not true anymore, though the buildEverything_Ubuntu.sh script still runs "sudo ldconfig". But it is still true that the user's .bashrc file needs modified with a version of "export WINDNINJA_DATA=~/src/wind/windninja/data". If you already have multiple versions of WindNinja, you probably can skip this step. You can also use buildEverything_UbuntuAlternative.sh with no problems.
 
 now add the a modified version of this to your .bashrc file (found in $HOME):
 export WINDNINJA_DATA=/PATHTOSCRIPTREPO/WRF-WindNinja-FarsiteScript/include/extraApps/windninja/data
@@ -93,68 +93,43 @@ After the file loads, right click the section of the box labeled "Visible Theme"
 In the menu search for "view/View Vector File". Change the extensions it is looking for to ".shp", then you can view the "cougarCreekFire_Perimeters.shp" fire perimeters and "cougarCreekFire_Spots.shp" probabilistic spot location files. Need to select the boxes labeled "2D" to get the files to actually show the pictures, left click the lines or dots to choose colors, right click to choose the sizes.
 Note that you can see other files as well, but might need to hunt down their specific types using either "vector" or "raster" input from the "view" menu.
 
+These above instructions are exactly the same with buildEverything_UbuntuAlternative.sh, just replace buildEverything_Ubuntu.sh with buildEverything_UbuntuAlternative.sh
 
 
-#################  Close to Step by Step description of buildEverything.sh  #################
+To build on Aeolus, you will need to make some slight modifications to the buildEverything_Aeolus.sh. You will probably also need to download said file to another location where you can push it up to Aeolus when you are ready to run this compilation script:
 
-Description of buildEverything.sh
---Runs "sudo apt-get install" to install the following packages: "gcc g++ cmake m4"
---Runs "mkdir" to create the /include/extraApps and /include/extraLibs folders if they do not exist
---Downloads 3rd party libs using "wget" with a link specified in all the variables at the start of the script
---Unzips downloaded compressed folder with "tar -xzf"
---Runs "./configure" on the 3rd party lib package, using CPP and LD flags and other parameters as specified in all the variables at the start of the script
---Runs "make -j$nCores && make install" to build the 3rd party library
-** 3rd party libraries are built in this order: zlib, szlib, curl, hdf5, netcdf_c, netcdf_cxx, jasper, gdal. See the parameteres specified at the start of the script for version numbers and downloadable link locations. A lot of the extra variables are just trying to manipulate the folder and filenames in a manageable way that is slightly specific to each package so the process works without messing with the process, just some variables at the start of the script. Note might not need all these packages, was what I always started with originally as stuff I thought normally went with gdal.
---Downloads WindNinja using "git clone"
---Switches branches to the branch specified in the "$WindNinjaBranch" variable, usually the latest stable release, but user can change if issues with current branch selection
---Builds WindNinja's 3rd party libraries by running "windninja/scripts/build_deps.sh" which uses "sudo apt-get install" for installing a bunch of stuff, "wget, tar, ./configure, make and sudo make install" for installing some other 3rd party libs from source. Since this script is managed by the WindNinja people, can't easily edit the number of cores used for this process, unfortunately. Note the gdal is the same as what was downloaded before, but builds with different dependencies, and can diverge from the gdal needed by this overall script, so need both downloads.
---Runs "sudo ldconfig" to make sure WindNinja can find the paths to some of it's libraries correctly.
---Configures WindNinja using "cmake"
---Builds WindNinja by just doing "make -j4". Note that you have to manually do the "sudo make install" since I didn't want to override anyone's current version of WindNinja on accident.
-** farsite
---Downloads farsite using "git clone" (note this is not the most up to date version, even the firelab.org version is not the most up to date version)
---Runs "make -j$nCores" to build farsite
-** find and replace text in examples, cmake.default, getFarsitePath.cpp, and getWindNinjaPath.cpp files
---uses "sed" to process input strings so they will work correctly in other utilities for this process
---uses "grep" to get the files needed, excluding the include and .git directories and the readme file, uses pipeline "|", "xargs", and "sed" to modify the files with the newly updated paths
-** update local git ignore stuff so that files with paths changed by the script that still need tracked (like the example files) can still be ignored, so it is less easy to accidentally make changes to them
---uses "git update-index --assume-unchanged" on src/getFarsitePath.cpp, src/getWindNinjaPath.cpp, and config/default.cmake to avoid modifications of these files by buildEverything_Ubuntu.sh causing unnecessary "git status" showing all these files modified
---uses "git ls-files -- $examplesDir | xargs -l git update-index --assume-unchanged" to also ignore all files found in the examples directory that are modified by buildEverything_Ubuntu.sh
-** final script is build using "cmake" and "make -j$nCores".
+scp buildEverything_Aeolus.sh <username>@aeolus.wsu.edu:/home/<username>/buildEverything_Aeolus.sh
+ssh <username>@aeolus.wsu.edu
 
-Note that if you want to modify files that have been setup to be ignored during "git status", you need to run the command "git update-index --no-assume-unchanged <file>" for each file. This should make it easier to ignore changes to these files but still track them, so less accidental modifications of these files happen when pushing to the repo.
+Important things to modify are (outputDir) will be where the WRF-WindNinja-FarsiteScript repo will be downloaded to and is specific to your system, (overallScriptOutputDir) is where the script expects you to copy the resulting examples directory before running the runComboScriptExample.sh required to run the WRF-WindNinja-FarsiteScript after compilation. It is probably also wise to change the email and any other user specific stuff to run the script that is in the first section before any of the normal variables.
+The following worked on Aeolus, which is a CentOS system where all uses of "sudo" are not allowed:
+
+qsub -I
+qsub buildEverything_Aeolus.sh
+qstat -u <username>    (useful to know how the compilation run is going)
+
+if it builds successfully, you need to do the following once before running the script
+now add the a modified version of this to your .bashrc file (found in $HOME):
+export WINDNINJA_DATA=/PATHTOSCRIPTREPO/WRF-WindNinja-FarsiteScript/include/extraApps/windninja/data
+
+run the following to update .bashrc usage
+source $HOME/.bashrc
+
+After modifying your runComboScriptExample.sh, you need to copy the WRF-WindNinja-FarsiteScript/examples dir to whereever you set (overallScriptOutputDir) to. If you are not happy with said compile time location, you should use a version of the sed command in the examples dir to update where the expected inputs and outputs should be found or where they should be run from.
+qsub -I
+mkdir /(overallScriptOutputDir location)/WRF-WindNinja-FarsiteScript
+cp -r /PATHTOSCRIPTREPO/WRF-WindNinja-FarsiteScript/examples /(overallScriptOutputDir location)/WRF-WindNinja-FarsiteScript/
+qsub runComboScriptExample.sh
+qstat -u <username>   (useful to know how the compilation run is going)
 
 
+Currently this is working on Aeolus, but apparently the cpus on Aeolus are crazy slow compared to my regular computer. The same runs that took 14 or so minutes on my regular computer take over 40 minutes on Aeolus with similar resources. It may be necessary to change the input files to WRF-WindNinja-FarsiteScript manually to increase the number of threads to use in WindNinja runs, as I've tracked down the slowdown to be that WindNinja runs take 8 seconds on my regular computer, but 30 seconds on Aeolus with similar resources. At around 80 WRF files to process, 80*8 seconds ~ 10 minutes, while 80*30 seconds ~ 40 minutes. There may also be rules saying you need to write to fastscratch or scratch only, not your local login node location, though I've had trouble getting scratch to let me use it.
 
-#################  General Dependency List  #################
 
-Specific Dependency Listing for buildEverything.sh (not sure how to count stuff grabbed by the "sudo apt install" step)
---GNU bash, version 4.3.48(1)-release 
---gcc version 5.4.0
---cmake version 2.8.12.1
---git version 2.7.4
---GNU Make version 4.1
+#################  Close to Step by Step description of buildEverything.sh    and     General Dependency List      #################
 
---GNU Wget version 1.17.1
---tar (GNU tar) version 1.28
---sed (GNU sed) version 4.2.2
---grep (GNU grep) version 2.25
---xargs (GNU findutils) version 4.7.0-git
+This is too complicated to go into in detail, though it existed before, see old git commits to find this info before changes were made to build on Aeolus. The buildEverything.sh scripts should be pretty clear on what dependencies and order of operations are just by reading the scripts.
 
-Dependencies Currently Downloaded by buildEverything.sh
---zlib version 1.2.11
---szip version 2.1
---curl version 7.61.1
---hdf5 version 1.10.2
---netcdf-c version 4.6.1
---netcdf-cxx version 4.3.0
---jasper version 1.900.1 (not used, probably will remove in future work)
---gdal version 2.0.3
-
-Dependencies Currently Downloaded by WindNinja's buildDepsh.sh (could change, is independent of this repo)
---poppler version 0.23.4
---proj version 4.8.0
---gdal version 2.0.3 (built differently than buildEverything.sh version)
 
 
 
@@ -171,5 +146,21 @@ Note that if the newly trimmed file location would be overwriting a file with th
 
 
 
+###############  Future todos, order doesn't necessarily matter  ###############
+
+Severe todos first
+1) take the track but in the moment git ignore and $scriptRoot updater function stuff from buildEverything.sh and make them into separate callable utility_scripts functions.
+2) make sure all input variable names and descriptions make sense and that all default variables and whether the booleans warning if they are currently in use by functions yet have been set properly.
+3) make sure all units are being processed correctly, track down why farsite keeps warning of some kind of unreal moisture problem that it seems to think is caused by a bad combination of weather inputs.
+4) the developer scripts needs input example ignition files organized so they can be used to test preprocessing of ignition files for farsite. The idea is that this test processing will later be incorporated into WRF-WindNinja-FarsiteScript.
+
+Future hoped for work
+1) update the input lists to include all WindNinja mass only inputs so a choice to use domain avg runs or weather downloads or any normal mass only stuff with farsite instead of just wrf files.
+2) update the input lists to include all farsite variables, this would also finally be a chance to set explanations that make sense for what the heck farsite even wants as inputs.
+3) try to eliminate the info vs variables storage classes being separate by combining them using pointer functions to the input variables classes. This may or may not be easy, but should hopefully stop the problem in the input class where when a developer wants to add a new input, where to modify is all over the place.
+4) try to automate lcp file downloads, ignition downloads, other downloads. For now, AIRPACT will handle the downloads on their end, but might be nice long long long term.
+5) change WindNinja API to actually use WindNinja directly as an API. Maybe also modify farsite a bunch more to turn it into a library as well to avoid all system calls. Currently pipeline calls are done not system calls, but doing calls via library is way more C++ standardlike.
+6) update farsite to fit more with what is being done in Windows Farsite and Assembla Farsite. This would be a ton of work, and should be avoided at all costs till very last.
+7) Figure out a smarter way to know how to deal with lcp vs fire perimeter input stuff.
 
 

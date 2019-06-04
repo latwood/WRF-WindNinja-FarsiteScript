@@ -82,44 +82,6 @@ finalScript_shouldMakeClean=0			# set to 1 if you want the unzipped folder delet
 
 ### third party lib variables
 
-zlibLink="http://www.zlib.net/zlib-1.2.11.tar.gz"
-zlibTarFormat="-xzf"
-zlibTarDir="${extraLibsDir}/zlib-1.2.11.tar.gz"
-zlibTarDirName="${extraLibsDir}/zlib-1.2.11"
-zlibDir="${extraLibsDir}/zlib-1.2.11"
-zlibBuildDir="${zlibDir}/build_zlib-1.2.11"
-
-zlibCPPFLAGS=""
-zlibLDFLAGS=""
-zlibConfigure="./configure --prefix=${zlibBuildDir}"
-zlib_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
-
-
-szlibLink="ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4/szip-2.1.tar.gz"
-szlibTarFormat="-xzf"
-szlibTarDir="${extraLibsDir}/szip-2.1.tar.gz"
-szlibTarDirName="${extraLibsDir}/szip-2.1"
-szlibDir="${extraLibsDir}/szip-2.1"
-szlibBuildDir="${szlibDir}/build_szip-2.1"
-
-szlibCPPFLAGS=""
-szlibLDFLAGS=""
-szlibConfigure="./configure --prefix=${szlibBuildDir}"
-szlib_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
-
-
-curlLink="https://curl.haxx.se/download/curl-7.61.1.tar.gz"
-curlTarFormat="-xzf"
-curlTarDir="${extraLibsDir}/curl-7.61.1.tar.gz"
-curlTarDirName="${extraLibsDir}/curl-7.61.1"
-curlDir="${extraLibsDir}/curl-7.61.1"
-curlBuildDir="${curlDir}/build_curl-7.61.1"
-
-curlCPPFLAGS=""
-curlLDFLAGS=""
-curlConfigure="./configure --prefix=${curlBuildDir} --with-zlib=${zlibBuildDir}"
-curl_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
-
 
 hdf5Link="https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.2/src/hdf5-1.10.2.tar.gz"
 hdf5TarFormat="-xzf"
@@ -130,7 +92,7 @@ hdf5BuildDir="${hdf5Dir}/build_hdf5-1.10.2"
 
 hdf5CPPFLAGS=""
 hdf5LDFLAGS=""
-hdf5Configure="./configure --prefix=${hdf5BuildDir} --enable-hl --with-szlib=${szlibBuildDir} --with-zlib=${zlibBuildDir}"
+hdf5Configure="./configure --prefix=${hdf5BuildDir} --enable-hl"
 hdf5_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
@@ -141,38 +103,10 @@ netcdf_cTarDirName="${extraLibsDir}/netcdf-c-4.6.1"
 netcdf_cDir="${extraLibsDir}/netcdf-c-4.6.1"
 netcdf_cBuildDir="${netcdf_cDir}/build_netcdf-c-4.6.1"
 
-###netcdf_cCPPFLAGS="-I${zlibBuildDir}/include -I${curlBuildDir}/include -I${hdf5BuildDir}/include"
-###netcdf_cLDFLAGS="-L${zlibBuildDir}/lib -L${curlBuildDir}/lib -L${hdf5BuildDir}/lib"
-netcdf_cCPPFLAGS="-I${zlibBuildDir}/include -I${hdf5BuildDir}/include"
-netcdf_cLDFLAGS="-L${zlibBuildDir}/lib -L${hdf5BuildDir}/lib"
+netcdf_cCPPFLAGS="-I${hdf5BuildDir}/include"
+netcdf_cLDFLAGS="-L${hdf5BuildDir}/lib"
 netcdf_cConfigure="./configure --prefix=${netcdf_cBuildDir}"
 netcdf_c_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
-
-
-netcdf_cxxLink="https://github.com/Unidata/netcdf-cxx4/archive/v4.3.0.tar.gz"
-netcdf_cxxTarFormat="-xzf"
-netcdf_cxxTarDir="${extraLibsDir}/v4.3.0.tar.gz"
-netcdf_cxxTarDirName="${extraLibsDir}/netcdf-cxx4-4.3.0"
-netcdf_cxxDir="${extraLibsDir}/netcdf-cxx-4.3.0"
-netcdf_cxxBuildDir="${netcdf_cxxDir}/build_netcdf-cxx-4.3.0"
-
-netcdf_cxxCPPFLAGS="-I${hdf5BuildDir}/include -I${netcdf_cBuildDir}/include"
-netcdf_cxxLDFLAGS="-L${hdf5BuildDir}/lib -L${netcdf_cBuildDir}/lib"
-netcdf_cxxConfigure="./configure --prefix=${netcdf_cxxBuildDir}"
-netcdf_cxx_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
-
-
-jasperLink="https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/jasper/1.900.1-14ubuntu3/jasper_1.900.1.orig.tar.gz"
-jasperTarFormat="-xzf"
-jasperTarDir="${extraLibsDir}/jasper_1.900.1.orig.tar.gz"
-jasperTarDirName="${extraLibsDir}/jasper-1.900.1"
-jasperDir="${extraLibsDir}/jasper-1.900.1"
-jasperBuildDir="${jasperDir}/build_jasper-1.900.1"
-
-jasperCPPFLAGS=""
-jasperLDFLAGS=""
-jasperConfigure="./configure --prefix=${jasperBuildDir} --enable-shared"
-jasper_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
 popplerLink="http://poppler.freedesktop.org/poppler-0.23.4.tar.xz"
@@ -225,8 +159,7 @@ gdalBuildDir="${gdalDir}/build_gdal-2.0.3"
 
 gdalCPPFLAGS=""
 gdalLDFLAGS=""
-gdalConfigure="./configure --prefix=${gdalBuildDir} --with-jasper=${jasperBuildDir} --with-netcdf=${netcdf_cBuildDir} --with-hdf5=${hdf5BuildDir} --with-libz=${zlibBuildDir} --with-static-proj4=${projBuildDir} --with-poppler=${popplerBuildDir} --with-geos=${geosBuildDir}/bin/geos-config"
-##" --with-curl=${curlBuildDir}/bin/curl-config"
+gdalConfigure="./configure --prefix=${gdalBuildDir} --with-netcdf=${netcdf_cBuildDir} --with-hdf5=${hdf5BuildDir} --with-static-proj4=${projBuildDir} --with-poppler=${popplerBuildDir} --with-geos=${geosBuildDir}/bin/geos-config"
 gdal_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 ## boost is different from other 3rd party libs cause it doesn't use configure, but it is still similar
@@ -284,10 +217,10 @@ success=0
 ############# define functions used by all the other processes ##############
 processMakeCleanRequests()		### this function takes as input each and every shouldMakeClean and the corresponding buildDirs and deletes all buildDirs after the first shouldMakeClean so you get a clean build from the first set to true shouldMakeClean that is found
 {
-	if [ "$#" != 32 ]; then
+	if [ "$#" != 22 ]; then
 		echo "" # want a nice clean line
 		echo "!!! Incorrect Number of parameters for processMakeCleanRequests() !!!"
-		echo "need 32 parameters: \"finalScript_shouldMakeClean\" \"finalBuildDir\" \"finalBuildExecutable\"  \"windNinja_shouldMakeClean\" \"windNinjaBuildDir\"  \"farsite_shouldMakeClean\" \"farsiteBuildExecutable\"  \"boost_shouldMakeClean\" \"boostDir\" \"bzipDir\"  \"gdal_shouldMakeClean\" \"gdalDir\"  \"geos_shouldMakeClean\" \"geosDir\"  \"proj_shouldMakeClean\" \"projDir\"  \"poppler_shouldMakeClean\" \"popplerDir\"  \"jasper_shouldMakeClean\" \"jasperDir\"  \"netcdf_cxx_shouldMakeClean\" \"netcdf_cxxDir\"  \"netcdf_c_shouldMakeClean\" \"netcdf_cDir\"  \"hdf5_shouldMakeClean\" \"hdf5Dir\"  \"curl_shouldMakeClean\" \"curlDir\"  \"szlib_shouldMakeClean\" \"szlibDir\"  \"zlib_shouldMakeClean\" \"zlibDir\""
+		echo "need 22 parameters: \"finalScript_shouldMakeClean\" \"finalBuildDir\" \"finalBuildExecutable\"  \"windNinja_shouldMakeClean\" \"windNinjaBuildDir\"  \"farsite_shouldMakeClean\" \"farsiteBuildExecutable\"  \"boost_shouldMakeClean\" \"boostDir\" \"bzipDir\"  \"gdal_shouldMakeClean\" \"gdalDir\"  \"geos_shouldMakeClean\" \"geosDir\"  \"proj_shouldMakeClean\" \"projDir\"  \"poppler_shouldMakeClean\" \"popplerDir\"  \"netcdf_c_shouldMakeClean\" \"netcdf_cDir\"  \"hdf5_shouldMakeClean\" \"hdf5Dir\""
 		echo "this also expects that the .configure prefix (the build directory) for third party libs is within the folder generated from unzipping"
 		echo "" # want a nice clean line
 		return 1
@@ -311,61 +244,22 @@ processMakeCleanRequests()		### this function takes as input each and every shou
 	local projDir="${16}"
 	local poppler_shouldMakeClean="${17}"
 	local popplerDir="${18}"
-	local jasper_shouldMakeClean="${19}"
-	local jasperDir="${20}"
-	local netcdf_cxx_shouldMakeClean="${21}"
-	local netcdf_cxxDir="${22}"
-	local netcdf_c_shouldMakeClean="${23}"
-	local netcdf_cDir="${24}"
-	local hdf5_shouldMakeClean="${25}"
-	local hdf5Dir="${26}"
-	local curl_shouldMakeClean="${27}"
-	local curlDir="${28}"
-	local szlib_shouldMakeClean="${29}"
-	local szlibDir="${30}"
-	local zlib_shouldMakeClean="${31}"
-	local zlibDir="${32}"
-
+	local netcdf_c_shouldMakeClean="${19}"
+	local netcdf_cDir="${20}"
+	local hdf5_shouldMakeClean="${21}"
+	local hdf5Dir="${22}"
+	
 	echo ""		## want some extra space
 	echo "finding earliest shouldMakeClean variable and deleting all later build directories for a clean build from that point on"
 	
 	### first reset all shouldMakeClean depending on inputs
-	if [ $zlib_shouldMakeClean != 0 ]; then
-		curl_shouldMakeClean=1
-		hdf5_shouldMakeClean=1
-		netcdf_c_shouldMakeClean=1
-		gdal_shouldMakeClean=1
-		windNinja_shouldMakeClean=1
-		finalScript_shouldMakeClean=1
-	fi
-	if [ $szlib_shouldMakeClean != 0 ]; then
-		hdf5_shouldMakeClean=1
-		windNinja_shouldMakeClean=1
-		finalScript_shouldMakeClean=1
-	fi
-	if [ $curl_shouldMakeClean != 0 ]; then
-		netcdf_c_shouldMakeClean=1
-		gdal_shouldMakeClean=1
-		windNinja_shouldMakeClean=1
-		finalScript_shouldMakeClean=1
-	fi
 	if [ $hdf5_shouldMakeClean != 0 ]; then
 		netcdf_c_shouldMakeClean=1
-		netcdf_cxx_shouldMakeClean=1
 		gdal_shouldMakeClean=1
 		windNinja_shouldMakeClean=1
 		finalScript_shouldMakeClean=1
 	fi
 	if [ $netcdf_c_shouldMakeClean != 0 ]; then
-		gdal_shouldMakeClean=1
-		windNinja_shouldMakeClean=1
-		finalScript_shouldMakeClean=1
-	fi
-	if [ $netcdf_cxx_shouldMakeClean != 0 ]; then
-		windNinja_shouldMakeClean=1
-		finalScript_shouldMakeClean=1
-	fi
-	if [ $jasper_shouldMakeClean != 0 ]; then
 		gdal_shouldMakeClean=1
 		windNinja_shouldMakeClean=1
 		finalScript_shouldMakeClean=1
@@ -405,8 +299,8 @@ processMakeCleanRequests()		### this function takes as input each and every shou
 	## now go through each shouldMakeClean to decide which files and folders should be deleted and delete them
 	### first set two arrays, one for the booleans and one for the folder names
 	### don't include farsite since it doesn't have a folder to delete, also need to do exceptions for Bzip2 with boost and for finalScriptDir
-	local shouldMakeClean_array=( ${finalScript_shouldMakeClean} ${windNinja_shouldMakeClean} ${boost_shouldMakeClean} ${gdal_shouldMakeClean} ${geos_shouldMakeClean} ${proj_shouldMakeClean}  ${poppler_shouldMakeClean} ${jasper_shouldMakeClean} ${netcdf_cxx_shouldMakeClean} ${netcdf_c_shouldMakeClean} ${hdf5_shouldMakeClean} ${curl_shouldMakeClean} ${szlib_shouldMakeClean}  ${zlib_shouldMakeClean} )
-	local folderPaths_array=( ${finalBuildDir} ${windNinjaBuildDir} ${boostDir} ${gdalDir} ${geosDir} ${projDir} ${popplerDir} ${jasperDir} ${netcdf_cxxDir} ${netcdf_cDir} ${hdf5Dir} ${curlDir}  ${szlibDir} ${zlibDir} )
+	local shouldMakeClean_array=( ${finalScript_shouldMakeClean} ${windNinja_shouldMakeClean} ${boost_shouldMakeClean} ${gdal_shouldMakeClean} ${geos_shouldMakeClean} ${proj_shouldMakeClean}  ${poppler_shouldMakeClean} ${netcdf_c_shouldMakeClean} ${hdf5_shouldMakeClean} )
+	local folderPaths_array=( ${finalBuildDir} ${windNinjaBuildDir} ${boostDir} ${gdalDir} ${geosDir} ${projDir} ${popplerDir} ${netcdf_cDir} ${hdf5Dir} )
 
 	for idx in $(seq 0 $((${#shouldMakeClean_array[@]} - 1)))
 	do
@@ -874,7 +768,7 @@ fi
 
 ##### now process which stuff needs redone so creating source and build directories can go into a clean spot for remakes ######
 if [ $success == 0 ]; then
-	processMakeCleanRequests "${finalScript_shouldMakeClean}" "${finalBuildDir}" "${finalBuildExecutable}" "${windNinja_shouldMakeClean}" "${windNinjaBuildDir}" "${farsite_shouldMakeClean}" "${farsiteBuildExecutable}" "${boost_shouldMakeClean}" "${boostDir}" "${bzipDir}" "${gdal_shouldMakeClean}" "${gdalDir}" "${geos_shouldMakeClean}" "${geosDir}" "${proj_shouldMakeClean}" "${projDir}" "${poppler_shouldMakeClean}" "${popplerDir}" "${jasper_shouldMakeClean}" "${jasperDir}" "${netcdf_cxx_shouldMakeClean}" "${netcdf_cxxDir}" "${netcdf_c_shouldMakeClean}" "${netcdf_cDir}" "${hdf5_shouldMakeClean}" "${hdf5Dir}" "${curl_shouldMakeClean}" "${curlDir}" "${szlib_shouldMakeClean}" "${szlibDir}" "${zlib_shouldMakeClean}" "${zlibDir}"
+	processMakeCleanRequests "${finalScript_shouldMakeClean}" "${finalBuildDir}" "${finalBuildExecutable}" "${windNinja_shouldMakeClean}" "${windNinjaBuildDir}" "${farsite_shouldMakeClean}" "${farsiteBuildExecutable}" "${boost_shouldMakeClean}" "${boostDir}" "${bzipDir}" "${gdal_shouldMakeClean}" "${gdalDir}" "${geos_shouldMakeClean}" "${geosDir}" "${proj_shouldMakeClean}" "${projDir}" "${poppler_shouldMakeClean}" "${popplerDir}" "${netcdf_c_shouldMakeClean}" "${netcdf_cDir}" "${hdf5_shouldMakeClean}" "${hdf5Dir}"
 	success=$? 	# result of last action, 0 if good, 1 if failed
 fi
 
@@ -1010,37 +904,12 @@ fi
 ######## download via "wget" and unpack with "tar" each of the third party packages required for the overall script ###########
 
 if [ $success == 0 ]; then
-	downloadAndUnpackLib_tar "${extraLibsDir}" "${zlibLink}" "${zlibTarFormat}" "${zlibTarDir}" "${zlibTarDirName}" "${zlibDir}" "${zlibBuildDir}"
-	success=$? # result of last action, 0 if good, 1 if failed
-fi
-
-if [ $success == 0 ]; then
-	downloadAndUnpackLib_tar "${extraLibsDir}" "${szlibLink}" "${szlibTarFormat}" "${szlibTarDir}" "${szlibTarDirName}" "${szlibDir}" "${szlibBuildDir}"
-	success=$? # result of last action, 0 if good, 1 if failed
-fi
-
-if [ $success == 0 ]; then
-	downloadAndUnpackLib_tar "${extraLibsDir}" "${curlLink}" "${curlTarFormat}" "${curlTarDir}" "${curlTarDirName}" "${curlDir}" "${curlBuildDir}"
-	success=$? # result of last action, 0 if good, 1 if failed
-fi
-
-if [ $success == 0 ]; then
 	downloadAndUnpackLib_tar "${extraLibsDir}" "${hdf5Link}" "${hdf5TarFormat}" "${hdf5TarDir}" "${hdf5TarDirName}" "${hdf5Dir}" "${hdf5BuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
 	downloadAndUnpackLib_tar "${extraLibsDir}" "${netcdf_cLink}" "${netcdf_cTarFormat}" "${netcdf_cTarDir}" "${netcdf_cTarDirName}" "${netcdf_cDir}" "${netcdf_cBuildDir}"
-	success=$? # result of last action, 0 if good, 1 if failed
-fi
-
-if [ $success == 0 ]; then
-	downloadAndUnpackLib_tar "${extraLibsDir}" "${netcdf_cxxLink}" "${netcdf_cxxTarFormat}" "${netcdf_cxxTarDir}" "${netcdf_cxxTarDirName}" "${netcdf_cxxDir}" "${netcdf_cxxBuildDir}"
-	success=$? # result of last action, 0 if good, 1 if failed
-fi
-
-if [ $success == 0 ]; then
-	downloadAndUnpackLib_tar "${extraLibsDir}" "${jasperLink}" "${jasperTarFormat}" "${jasperTarDir}" "${jasperTarDirName}" "${jasperDir}" "${jasperBuildDir}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
@@ -1196,37 +1065,12 @@ fi
 ########## now need to compile all the third party libraries and packages for the overall script ###########
 
 if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${zlibDir}" "${zlibBuildDir}" "${zlibCPPFLAGS}" "${zlibLDFLAGS}" "${zlibConfigure}"
-	success=$? # result of last action, 0 if good, 1 if failed
-fi
-
-if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${szlibDir}" "${szlibBuildDir}" "${szlibCPPFLAGS}" "${szlibLDFLAGS}" "${szlibConfigure}"
-	success=$? # result of last action, 0 if good, 1 if failed
-fi
-
-if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${curlDir}" "${curlBuildDir}" "${curlCPPFLAGS}" "${curlLDFLAGS}" "${curlConfigure}"
-	success=$? # result of last action, 0 if good, 1 if failed
-fi
-
-if [ $success == 0 ]; then
 	buildLib "${extraLibsDir}" "${nCores}" "${hdf5Dir}" "${hdf5BuildDir}" "${hdf5CPPFLAGS}" "${hdf5LDFLAGS}" "${hdf5Configure}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
 if [ $success == 0 ]; then
 	buildLib "${extraLibsDir}" "${nCores}" "${netcdf_cDir}" "${netcdf_cBuildDir}" "${netcdf_cCPPFLAGS}" "${netcdf_cLDFLAGS}" "${netcdf_cConfigure}"
-	success=$? # result of last action, 0 if good, 1 if failed
-fi
-
-if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${netcdf_cxxDir}" "${netcdf_cxxBuildDir}" "${netcdf_cxxCPPFLAGS}" "${netcdf_cxxLDFLAGS}" "${netcdf_cxxConfigure}"
-	success=$? # result of last action, 0 if good, 1 if failed
-fi
-
-if [ $success == 0 ]; then
-	buildLib "${extraLibsDir}" "${nCores}" "${jasperDir}" "${jasperBuildDir}" "${jasperCPPFLAGS}" "${jasperLDFLAGS}" "${jasperConfigure}"
 	success=$? # result of last action, 0 if good, 1 if failed
 fi
 
