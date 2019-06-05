@@ -77,6 +77,7 @@ extraAppsDir="${includeDir}/extraApps"				# this is defining the location inside
 extraLibsDir="${includeDir}/extraLibs"				# this is defining the location inside the overall script directory for placing the third party libraries and packages
 finalBuildDir="${baseDir}/build"						# this is defining the location of the overall script build directory, for when running "make" on the overall script
 finalBuildExecutable="${baseDir}/bin/WRF-WindNinja-FarsiteScript"	# this is the expected executable that is built by make on the final build script
+utilityScriptDir="${baseDir}/utility_scripts"			# this is the folder holding utility scripts like the text replacer used during the build process
 finalScript_shouldMakeClean=0			# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
@@ -945,69 +946,33 @@ fi
 
 
 
-##### It is expected that the examples get copied to a spot with faster read and write access (fastscratch probably), so the $scriptRoot needs updated in the examples separate than other directories
+##### It is expected that the examples get copied to a spot with faster read and write access (fastscratch probably), so the $scriptRoot needs updated in the examples separate than other directories, and also first of all other directories
+### call the utility script
 if [ $success == 0 ]; then
-	editingDir="${baseDir}/examples"
-	echo "" # want a nice clean line
-	echo "entering editingDir ${editingDir}"
-	cd "${editingDir}"
+	${utilityScriptDir}/keywordReplacer.sh replaceKeyword "${baseDir}/examples" "${varToReplace}" "${overallScriptOutputDir}"
 	success=$?
 	if [ $success != 0 ]; then
-		echo "!!! could not execute cd command !!!"
+		echo "!!! could not execute keywordReplacer.sh replaceKeyword function !!!"
 		success=1
-	else
-		desiredTextToReplace="${varToReplace}"
-		desiredReplacementText="${overallScriptOutputDir}"
-		echo "finding all cases of \"${desiredTextToReplace}\" in ${editingDir} and replacing them with \"${desiredReplacementText}\""
-		preppedTextToReplace=$(sed 's/\//\\\//g' <<<"$desiredTextToReplace")
-		preppedReplacementText=$(sed 's/\//\\\//g' <<<"$desiredReplacementText")
-		grep -rl "${preppedTextToReplace}" "${editingDir}" --exclude-dir=.git --exclude-dir=include --exclude=readme | xargs sed -i 's/'"${preppedTextToReplace}"'/'"${preppedReplacementText}"'/g'
-		success=$?
-		if [ $success != 0 ]; then
-			if [ $success == 123 ]; then
-				echo "!warning, no stuff to replace!"
-				success=0
-			else
-				echo "!!! failed during replace path text process !!!"
-				success=1
-			fi
-		else
-			echo "finished replacing text"
-		fi
 	fi
 fi
 
 
 ############### now need to find and update all paths in the combo script repo to match the current base directory ##############
-### this should eventually be moved into a separate utility script, named something like "keywordReplacer", which will then need to be called here.
+### call the utility script
 if [ $success == 0 ]; then
-	editingDir="${baseDir}"
-	echo "" # want a nice clean line
-	echo "entering editingDir ${editingDir}"
-	cd "${editingDir}"
+	aboveBaseDir=$(dirname $baseDir)
+	${utilityScriptDir}/keywordReplacer.sh replaceKeyword "${baseDir}/src" "${varToReplace}" "${aboveBaseDir}"
 	success=$?
 	if [ $success != 0 ]; then
-		echo "!!! could not execute cd command !!!"
+		echo "!!! could not execute keywordReplacer.sh replaceKeyword function !!!"
 		success=1
 	else
-		aboveBaseDir=$(dirname $baseDir)
-		desiredTextToReplace="${varToReplace}"
-		desiredReplacementText="${aboveBaseDir}"
-		echo "finding all cases of \"${desiredTextToReplace}\" in ${editingDir} and replacing them with \"${desiredReplacementText}\""
-		preppedTextToReplace=$(sed 's/\//\\\//g' <<<"$desiredTextToReplace")
-		preppedReplacementText=$(sed 's/\//\\\//g' <<<"$desiredReplacementText")
-		grep -rl "${preppedTextToReplace}" "${editingDir}" --exclude-dir=.git --exclude-dir=include --exclude=readme | xargs sed -i 's/'"${preppedTextToReplace}"'/'"${preppedReplacementText}"'/g'
+		${utilityScriptDir}/keywordReplacer.sh replaceKeyword "${baseDir}/config" "${varToReplace}" "${aboveBaseDir}"
 		success=$?
 		if [ $success != 0 ]; then
-			if [ $success == 123 ]; then
-				echo "!warning, no stuff to replace!"
-				success=0
-			else
-				echo "!!! failed during replace path text process !!!"
-				success=1
-			fi
-		else
-			echo "finished replacing text"
+			echo "!!! could not execute keywordReplacer.sh replaceKeyword function !!!"
+			success=1
 		fi
 	fi
 fi

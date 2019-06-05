@@ -126,6 +126,9 @@ qstat -u <username>   (useful to know how the compilation run is going)
 Currently this is working on Aeolus, but apparently the cpus on Aeolus are crazy slow compared to my regular computer. The same runs that took 14 or so minutes on my regular computer take over 40 minutes on Aeolus with similar resources. It may be necessary to change the input files to WRF-WindNinja-FarsiteScript manually to increase the number of threads to use in WindNinja runs, as I've tracked down the slowdown to be that WindNinja runs take 8 seconds on my regular computer, but 30 seconds on Aeolus with similar resources. At around 80 WRF files to process, 80*8 seconds ~ 10 minutes, while 80*30 seconds ~ 40 minutes. There may also be rules saying you need to write to fastscratch or scratch only, not your local login node location, though I've had trouble getting scratch to let me use it.
 
 
+Note for all builds, but especially Aeolus builds. While it is still necessary to call "git update-index --assume-unchanged <file of interest>" manually from the command line to retrack example, config, and other files untracked during compile time, updating variables using the sed command has been moved to a useful utility script called keywordReplacer.sh. This file lets you only use sed to replace variables in specific locations, but does it to all files in the directory, so it could be helpful for quick changes of files with sed. Just open the keywordReplacer.sh file to get an idea of how to use it, or look for uses of it in buildEverything.sh scripts.
+
+
 #################  Close to Step by Step description of buildEverything.sh    and     General Dependency List      #################
 
 This is too complicated to go into in detail, though it existed before, see old git commits to find this info before changes were made to build on Aeolus. The buildEverything.sh scripts should be pretty clear on what dependencies and order of operations are just by reading the scripts.
@@ -149,7 +152,6 @@ Note that if the newly trimmed file location would be overwriting a file with th
 ###############  Future todos, order doesn't necessarily matter  ###############
 
 Severe todos first
-1) take the track but in the moment git ignore and $scriptRoot updater function stuff from buildEverything.sh and make them into separate callable utility_scripts functions.
 2) make sure all input variable names and descriptions make sense and that all default variables and whether the booleans warning if they are currently in use by functions yet have been set properly.
 3) make sure all units are being processed correctly, track down why farsite keeps warning of some kind of unreal moisture problem that it seems to think is caused by a bad combination of weather inputs.
 4) the developer scripts needs input example ignition files organized so they can be used to test preprocessing of ignition files for farsite. The idea is that this test processing will later be incorporated into WRF-WindNinja-FarsiteScript.
