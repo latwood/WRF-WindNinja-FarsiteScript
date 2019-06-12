@@ -1,0 +1,37 @@
+#################  Project General Overview  #################
+
+The idea of this developer script was to understand how to interact with wrf netcdf files using gdal. It started out as basically trying to follow the regular GDAL Raster API tutorial, but since WRF files had strange formatting stuff, I ended up leaving the script as just the GDAL tutorial and skipped directly to implementing the WindNinja methods to create the wrfGetWeather stuff directly in the WRF-WindNinja-FarsiteScript. Which means that this script has been left at the simple GDAL Raster API tutorial stage and if someone wants to use this script to practice manipulating WRF files, they will need to borrow stuff from the WRF-WindNinja-FarsiteScript instead of just following the tutorials.
+
+The gdal maintainers have updated their website since this script was started and the old website doesn't exist anymore, so the tutorial might have changed. Here is the current website: https://gdal.org/tutorials/raster_api_tut.html.
+
+
+
+#################  General Overview for Building and Running the Script  #################
+
+Currently the script does not take in inputs, but has the input WRF file path coded directly into the script, with the keyword $scriptRoot there ready to be replaced using the keywordReplacer.sh script found in the utilities dir. This script expects some form of buildEverything.sh to already be run, as the idea is to run keywordReplacer.sh in this directory to change $scriptRoot in the forWrfGetWeather script as well as the config/default.cmake needed for this script and the $scriptRoot found in any examples. After running the keyword replacer, simply make a build directory, and do cmake to the location of cmake lists.
+
+cd <pathToRepo>/WRF-WindNinja-FarsiteScript/developer_scripts/forWrfGetWeather
+../../utility_scripts/keywordReplacer.sh replaceKeyword . "\$scriptRoot" "<pathToRepo>"
+mkdir build
+cd build
+cmake ..
+cd ../bin
+./forWrfGetWeather
+
+
+At some point in time it may be wise to make the hard coded input become a command line input, including another command line input to set the created WRF file output.
+
+
+#################  Input File Description  #################
+
+wrfout_d3.2015080912.f12.0000
+This is one of the standard wrf netcdf input files. There is an issue with the way to read it that needs to follow windninja tricks. I think it has to do with the sublayers as well as the geolocation problems. Supposedly they are differing sized stuff and that messes up with the way it interprets geolocation so it thinks that there aren't any bands when I try to read it. This is a trimmed version of the file since the original was too big to fit on github.
+wrfout_d3.2015080912.f12.0000-gdalinfo
+Maybe the reason the tutorial for netcdf files fails with bands is because instead of bands this file has subdatasets. Turns out that the size of each subdataset is NOT the same and does NOT match the size given by the output. It also reports no geolocation though there is a metadata variable for lat and long so technically it does have some kind of projection info. So it might be having problems because the data doesn't have a single size for everything, and there is no direct normal geolocation as is the normal format. Looks like the output is basically the same for the extraLibs/gdalinfo. From now on going to use extraLibs version since that is what should be reading it, plus ogrinfo complains otherwise. Added -listmdd to gdalinfo, doesn't do much but seems to show that it has subdatasets instead of bands.
+This is the gdalinfo for the nontrimmed file
+wrfout_d3.2015080912.f12.0000-trimmed-gdalinfo
+This is the gdal info file for the trimmed version of the wrf file, notice it is much shorter
+
+
+To get the gdalinfo files, the following command was run: gdalinfo <filename>. It was the same even for gdalinfo -listmdd <filename>.
+

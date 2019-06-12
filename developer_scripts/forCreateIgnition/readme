@@ -1,0 +1,259 @@
+#################  Project General Overview  #################
+
+The idea of this developer script was to understand how to get all kinds of different types of ignition shapefiles to work in farsite. So basically this script is for playing around to figure out how to tell whether an ignition shapefile will work in farsite or not, and to make the required changes to write a new one that has been modified to work in farsite.
+
+There are three different versions of farsite. The Windows one you can get off of firelab.org and the linux one used in the WRF-WindNinja-FarsiteScript are the two described in this readme, just know the third one is codeable like Linux farsite, but farther ahead than Linux farsite, but only runs on Windows, and is held in an Assembla repository. Basically the firelab.org farsite has a bunch more capabilities than the linux farsite, but the linux farsite is what we have to work with. But even the firelab.org farsite has trouble processing some ignition shapefiles that will be used as normal input in linux farsite by WRF-WindNinja-FarsiteScript.
+
+There are four main types of ignition shapefiles anticipated to be used by farsite: created from lat/long point, GeoMac fire perimeter, created guess/found fire shapefile, and old farsite run fire perimeters as input ignition shapefiles.
+
+Inciweb is a nice place to find information about fires as they occur, as well as lat/long ignition point estimates for where the fire started. WRF-WindNinja-FarsiteScript will need to take these sets of lat/long points and generate an ignition shapefile or the user needs to try there best to get the right point in creating an ignition shapefile using firelab.org farsite. There is a problem where point ignition sources take so long to start that the fire never occurs unless it is chosen to be a small polygon instead of a point ignition source. This doesn't occur on firelab.org farsite, but definitely does on Linux farsite.
+
+GeoMAC is a database of fire perimeters updated daily during a given fire, where the fire perimeters honestly probably need some kind of processor separate from this script since one day an area might be assumed burnt, the next day not, the day after it could be shown burnt, so there is plenty of uncertainty in these fire perimeters, but they are probably the best source for now of live fire perimeters. These fire perimeters do not work in neither Linux farsite nor firelab.org farsite. Using ogrinfo you can see that there is fire perimeter information, but it is probably missing the right fire flag to know how to process the file, or the projection does not match the input lcp file projections correctly.
+
+created fire perimeters can be done by opening an lcp file in firelab.org farsite, drawing a fire ignition, then saving the ignition. Probably can also make ignition shapefiles using any GIS software, but need to figure out what is required to know if the input shapefile is good for an ignition or no. The firelab.org farsite created ignition shapefiles do work, though it feels like guessing that you have the right positions in the field, so there is uncertainty in setting the lat/long coordinates of fire perimeter points. Using a single point also doesn't work correctly in Linux farsite though it does for firelab.org farsite. You could almost say that all other types of ignition shapefile inputs to WRF-WindNinja-FarsiteScript are essentially converted into some form of this type of ignition file.
+
+Firelab.org farsite is happy to use old fire perimeter output files from old farsite runs as input ignition shapefiles, but Linux farsite is not. I think the problem has to do with the format, it should be as simple as copying the sets of fire perimeter information from the last time and setting these sets of fire perimeters as input fires (yes there can be more than one fire at a given time somehow).
+
+Honestly, I've partially wondered if it would be smarter to try to modify the Linux farsite to just handle all these problems on its own, but it would be nasty to figure out where to make the modifications, and in the end you would kind of need to do this work separately anyways to figure out what to change, so this forCreateIgnition script is great for trying to mess with all these types of ignition shapefiles.
+
+
+Currently the forCreateIgnition script is just following the GDAL (OGR in this case) Vector API tutorial. The website has changed and the old site that I used to generate this script is gone now, but the current website for this tutorial is as follows: https://gdal.org/tutorials/vector_api_tut.html. Work still needs to be done to figure out how to mess with and change ignition shapefiles in C/C++. It might be most helpful to review the gdal tutorials, then to look directly at the gdal code, specifically at ogrinfo and all required scripts to run ogrinfo. I kind of get the idea that you will need to replicate stuff done in ogrinfo or in some other ogr utility script.
+
+
+
+#################  General Overview for Building and Running the Script  #################
+
+Currently the script does not take in inputs, but has the path to the input ignition shapefile coded directly into the script, with the keyword $scriptRoot there ready to be replaced using the keywordReplacer.sh script found in the utility_scripts dir. This script expects some form of buildEverything.sh to already be run, as the idea is to run keywordReplacer.sh in this directory to change $scriptRoot in the forWrfGetWeather script as well as the config/default.cmake needed for this script and the $scriptRoot found in any examples. After running the keyword replacer, simply make a build directory, and do cmake to the location of cmake lists.
+
+cd <pathToRepo>/WRF-WindNinja-FarsiteScript/developer_scripts/forCreateIgnition
+../../utility_scripts/keywordReplacer.sh replaceKeyword "$(pwd)" "\$scriptRoot" "<pathToRepo>"
+mkdir build
+cd build
+cmake ..
+cd ../bin
+./forCreateIgnition
+
+
+In the future, probably need to add in stuff to autodetect all the sets of shapefiles as inputs, since the projection info may be needed. I guess this depends on how well ogr/gdal does at handling said info with just one of the shapefiles as inputs, since technically shapefiles are groups of files that count as a single file (wikipedia of shapefile is helpful on this). It may also be helpful to change the hard coded input ignition shapefile path to become a command line input, and add a command line input for the output created ignition shapefiles.
+
+To test the created or original shapefiles, you need to use them in a farsite run. This can be done even without building the forCreateIgnition script. In each of the <pathToRepo>/WRF-WindNinja-FarsiteScript/developer_scripts/forCreateIgnition/farsiteInputFiles/<different test cases> folders, you will find all files required for farsite, not just the input ignition files, though they are organized into multiple separate files as described in a later section of this readme. <pathToRepo>/WRF-WindNinja-FarsiteScript/developer_scripts/forCreateIgnition/farsiteRunFiles/ contains the farsite command line input files that have all the required paths to run each input file case. These farsite command line input files can be named anything, but usually has run_<casename>.txt for the names. Here is how to run a given farsite command line input file with farsite.
+
+cd <pathToRepo>/WRF-WindNinja-FarsiteScript/include/extraApps/farsite/src
+./TestFARSITE <pathToRepo>/WRF-WindNinja-FarsiteScript/developer_scripts/forCreateIgnition/farsiteInputFiles/<single or multi run folder>/run_<casename>.txt
+
+
+The appropriate output folders should be generated already, but you may need to generate the appropriate output files directories before the farsite run. For any created ignition files created by the forCreateIgnition script (as opposed to the original ones), you may need to copy and paste additional farsite files that are not the created ignition files from the original case to the created ignition file case.
+
+
+
+
+################  Ignition shapefile case descriptions  ################
+
+
+Normally it is easiest to organize files for use in Farsite by having an overall folder for a given case name that holds a farsite inputs folder and a farsite outputs folder. Then all the input files for a single case are grouped into a single input folder. This is usually because, for a given set of cases, the sets of wind, weather, and ignition files are all varying. But for these particular cases, the same wind and weather inputs will be used for each different ignition file and the .lcp files will be reused by given sets of ignition files. Because of this, the top level folders will still be farsiteInputs/ and farsiteOutputs/, but while the next level of the farsiteOutputs/ folder will still just be the different case names, the next level of the farsiteInputs/ folder will actually be /a_originalIgnitions/, /b_createdIgnitions/, /c_lcpFiles/, /d_otherInputs/. At the topmost level, there will be a folder of /farsiteRunFiles/ that holds files input to farsite at the command line call to initiate each of the /a_originalIgnitions/ and /b_createdIgnitions/ farsite run cases. Each ignition in the /a_originalIgnitions/ and /b_createdIgnitions/ folders will represent a single case in the /farsiteOutputs/ and /farsiteRunFiles/ files and will use whatever combination of files necessary in the /c_lcpFiles/ and /d_otherInputs/ folders.
+
+In addition, while ignition and lcp files are the same for both Linux and Firelab.org farsite, the format of the wind and weather and other input files change, so the /d_otherInputs/ and each of the case folders in /farsiteOutputs/ will contain another folder separator level called /Linux/ and /Windows/ representing whether the files are needed for Linux or Firelab.org farsite (which runs on Windows). Note that the /farsiteRunFiles/ are only needed for running Linux farsite, in firelab.org farsite you are essentially enacting the run files by hand by choosing farsite inputs in the farsite gui and pressing run.
+
+The ignition files (so all the separate cases) are organized by whether they need processing to work in Linux farsite, or if they work as they are. The ones that need processing are organized by point ignition, GeoMAC fire perimeters, and old farsite run fire perimeters. At a folder level these are: /farsiteInputs/a_originalIgnitions/WorkAsIs/, /farsiteInputs/a_originalIgnitions/NeedProcessing/pointIgnition/, /farsiteInputs/a_originalIgnitions/NeedProcessing/GeoMacFirePerimeters/, and /farsiteInputs/a_originalIgnitions/NeedProcessing/pastFarsiteRunAsInput/.
+
+
+The point of separating input ignitions as /a_originalIgnitions/ and /b_createdIgnitions/ is because forCreateIgnitions is expected to read in the /a_originalIgnitions/ ignition files and their corresponding .lcp files, figure out how they need processed to run in farsite, then write processed versions of the /a_originalIgnitions/ files out to the /b_createdIgnitions/ folder. So then you can run farsite on the original files and the processed files to see what is going on and whether the processing is working. Note that if the input ignition files are not in the correct format, Linux farsite will run with an error or the output will be blank fire perimeter files (files exist and may have information but viewing them in firelab.org farsite looks like nothing was opened).
+
+
+
+The following will explain each of the /a_originalIgnitions/ cases in the order of the overall type. Notice that the ignition shapefiles and lcp files each have an extra file that is not farsite input, a text file with the same basename as the case, but with an -ogrinfo or -gdalinfo on the end. These files show the contents of the ignition shapefiles and lcp files, so they are handy to figure out how the files need worked with in forCreateIgnition.
+The -ogrinfo files for the shapefiles were generated by using:
+ogrinfo -al <filename> &> <filename-ogrinfo>
+Note that you can also use the -listmdd tage to get a little more information, but for some odd reason this also gets rid of other information that shows up when not using this tag.
+These ogrinfo files will be super important for figuring out how to process shapefiles in the forCreateIgnition script!!!
+
+The -gdalinfo files for the lcp files were generated by using:
+gdalinfo <filename> $> <filename-gdalinfo>
+Note that the result was usually the same (but not always) if using the additional -listmdd tag to this command line command.
+
+
+
+This is a guide to know what each ignition is, how it was generated, how it was used, and if that was successful. Someone will have to figure out how to use forCreateIgnition to process these files to make sure ones that already work still work when the processor checks are used on them, and to make sure the processed files now work as expected. So this will be the starting point for doing any required farsite ignition conversion.
+
+Notice that the names of these cases are usually broken up into underscore separated sections. The first part of the name is the lcp file the ignition shapefile should run on and the second part of the name is the ignition used on that lcp file. If there are no other parts of the name, or it is a GeoMac fire perimeter file (which has a different naming scheme), this means that the ignition shapefile is considered only as the first ever input into farsite. If the name is followed by more underscore separated sections with WindowsPerimeters or LinuxPerimeters, this means that the ignition shapefile is the result of a given farsite run done by firelab.org farsite or Linux farsite. This means that the name of the case/ignition file represents where the file came from whether it is the first input or whether it was generated by a Linux or firelab.org farsite run. The description for the case/ignition shapefile with LinuxPerimeters or WindowsPerimeters in the name can be completely separate from where the file came from as for these cases the description describes what happens if you use said file as input to Linux or firelab.org farsite. This means that when a case has multiple WindowsPerimeters or LinuxPerimeters, the file was used as input to farsite multiple times, but is still considered an output that is yet to be determined how it functions as an input (depending on what is in the description).
+
+For example: cougarCreek_polygonIgnit is the original input to farsite with a description of what happens when it is used in Linux or in firelab.org farsite, where cougarCreek is the lcp file and polygonIgnit is the original input ignition to farsite.
+cougarCreek_polygonIgnit_WindowsPerimeters would be the resulting fire perimeter of using cougarCreek_polygonIgnit as input to firelab.org farsite, and has a description saying what would happen if it were used as input to firelab.org or Linux farsite.
+cougarCreek_polygonIgnit_LinuxPerimeters would be the resulting fire perimeter of using cougarCreek_polygonIgnit as input to Linux farsite, and has a description saying what would happen if it were used as input to firelab.org or Linux farsite.
+cougarCreek_polygonIgnit_WindowsPerimeters_WindowsPerimeters would be the resulting fire perimeter of using cougarCreek_polygonIgnit_WindowsPerimeters as input to firelab.org farsite, and has a description saying what would happen if it were used as input to firelab.org or Linux farsite.
+cougarCreek_polygonIgnit_LinuxPerimeters_LinuxPerimeters would be the resulting fire perimeter of using cougarCreek_polygonIgnit_LinuxPerimeters as input to Linux farsite, and has a description saying what would happen if it were used as input to firelab.org or Linux farsite.
+
+
+#######   /farsiteInputs/a_originalIgnitions/WorkAsIs/ ignition cases   #######
+
+test1177973_NTFBIgnition
+Uses /farsiteInputs/c_lcpFiles/test1177973.lcp for its lcp file and NTFBIgnition.shp as the ignition file. Notice that an additional fire barrier shapefile exists where you find the lcp file for this case.
+This is the working ignition file used in the 1177973 panther case. So it will work when used as input to linux farsite. Also works as input to firelab.org farsite.
+test1177973_NTFBIgnition-ogrinfo
+Looks pretty normal to me, though it has multipolygon instead of polygon in it, and the extent now has negative values. Maybe there is something off with the way farsite handles coordinate systems since it seems to only care about lat, so that is why it has the strange negative values for extent? Need to make, read, and understand way more of the shapefiles.
+
+
+flatland_centerIgnit
+Uses /farsiteInputs/c_lcpFiles/flatland.lcp for its lcp file and centerIgnit.shp as the ignition file.
+This is the working ignition file used in the flatland case for linux farsite. So it will work when used as input to linux farsite. Also works as input to firelab.org farsite.
+flatland_centerIgnit-ogrinfo
+Notice that this has almost no metadata or any other information compared to everything else. Seems to have the smallest and cleanest of all ignition inputs, and it does work so why is the question.
+
+
+cougarCreek_polygonIgnit
+Uses /farsiteInputs/c_lcpFiles/cougarCreek.lcp for its lcp file and polygonIgnit as the ignition file.
+In firelab.org farsite, I opened the cougarCreek.lcp and created a guess location of the fire as a polygon (a few left clicks then right click where was probably closest to where the real fire occurred). This worked as input to both linux and firelab.org farsite, though I felt I needed to create another case with a few more ignition locations to compare. I wanted to see if farsite would still work with more ignition polygons and how the files were different.
+cougarCreek_polygonIgnit-ogrinfo
+I see literally no difference between this one and the cougarCreek-pointIgnit-ogrinfo other than that the extent is bigger and there are more points in the polygon section. That appears to be the ONLY difference! So it is literally that points don't start fire fast enough and that is it?
+Turns out it was because points take so long to start as a fire that a fire with point ignitions never starts. Firelab.org farsite takes point ignitions and converts them to sets of polygons to widen the ignition so the fire can start up, but it does this internally. Linux farsite does not have this capability so the fire never starts.
+
+
+cougarCreek_3polygonIgnit
+Uses /farsiteInputs/c_lcpFiles/cougarCreek.lcp for its lcp file and 3polygonIgnit as the ignition file.
+Same thing basically as the cougarCreek-polygonIgnit shape file, but with three polygon ignitions instead of one, to see if farsite would still work and to understand how farsite works. It still worked as input to both firelab.org farsie and linux farsite.
+cougarCreek_3polygonIgnit-ogrinfo
+Not really that much difference. I'm thinking at this point I need to go into the code and see what actually goes on to see why the geomac has trouble, as well as simply manipulate by hand the point one to see if I can improve the fire stuff.
+
+
+#######   /farsiteInputs/a_originalIgnitions/NeedProcessing/pointIgnition/ ignition cases   #######
+
+cougarCreek_pointIgnit
+Uses /farsiteInputs/c_lcpFiles/cougarCreek.lcp for its lcp file and pointIgnit as the ignition file.
+I created a guess point location for the cougarCreek lcp location (single point then right click on the point without moving). Turns out that the firelab.org farsite can handle it as input (probably by turning it into a polygon ignit), but the linux farsite thinks something is there but does nothing with ignition locations. Turning it into a polygon ignit works though, so there is something off with how Linux farsite handles point ignitions. So I want to run ogrinfo to see what is wrong with this one compared to the polygon ignit and need to make another one or two multipoint locations just to see if farsite still works and how the files are different.
+cougarCreek_pointIgnit-ogrinfo
+This one has even less info than flatland_centerIgnit. Need to compare this one with the polygon to really learn what is going on.
+
+
+cougarCreek_3pointIgnit
+Uses /farsiteInputs/c_lcpFiles/cougarCreek.lcp for its lcp file and 3pointIgnit as the ignition file.
+Same thing basically as the cougarCreek-_pointIgnit shape file, but with three point ignitions instead of one. It still worked as input to firelab.org farsite and still did not work as input to linux farsite.
+cougarCreek_3pointIgnit-ogrinfo
+Seems the same as cougarCreek_pointIgnit but now there are three points.
+
+
+#######   /farsiteInputs/a_originalIgnitions/NeedProcessing/GeoMacFirePerimeters/ ignition cases   #######
+
+wa_cougar_creek_20150811_2300_dd83
+Uses /farsiteInputs/c_lcpFiles/cougarCreek.lcp for its lcp file.
+This is one of the early geomac fire perimeters. Doesn't work currently as input for either farsite. Idea is need to figure out from the other cases how to translate this file into what is actually needed as an ignition file.
+wa_cougar_creek_20150811_2300_dd83-ogrinfo
+ogrinfo is happy to read the shp, shx, or dbf file and gives the same result. Doesn't seem to care or even want (gets mad at) any of these other files that are brought down, including .prj files, are what is read. Info is super simple, it just says it is a polygon and that is it, so maybe there is more it is missing? Okay so the fix was to add the -al to the commands to actually print info for all sections. Can add the -rl just in case they are put inside in strange order to see if that might be the problem between ignition types, but only in future versions of gdal.
+Looks pretty normal to me at first glance, has a ton of what seems like extra/excess metadata.
+
+
+wa_cougar_creek_20150819_0155_dd83
+Uses /farsiteInputs/c_lcpFiles/cougarCreek.lcp for its lcp file.
+This is just a later day (day 14 if I remember correctly instead of day 1) of the same geomac fire perimeters as wa_cougar_creek-20150811_2300_dd83.
+wa_cougar_creek_20150819_0155_dd83-ogrinfo
+Also looks fine, so not sure why even firelab.org farsite can't read these geomac shape files as fire inputs. Way more points to this polygon so it is high resolution, maybe too high for farsite? Is the projection information matching, do we need to transform the points to a new coordinate system? Does it simply need another tag to the polygon saying it is a fire?
+
+
+#######   /farsiteInputs/a_originalIgnitions/NeedProcessing/pastFarsiteRunAsInput/ ignition cases   #######
+
+test1177973_NTFBIgnition_LinuxPerimeters
+Uses /farsiteInputs/c_lcpFiles/test1177973.lcp for its lcp file, and is the resulting fire perimeters of a Linux run with test1177973_NTFBIgnition as input.
+Doesn't work currently as input for linux farsite though it works as input for firelab.org farsite. Idea is need to figure out from the other cases how to translate this file into what is actually needed as an ignition file for Linux farsite.
+test1177973_NTFBIgnition_LinuxPerimeters-ogrinfo
+Looks like a gajillion line strings instead of polygons, ones at multiple times. So probably it just needs to grab the last set of them, but also maybe convert them into a polygon. Farsite probably writes lines or polygon output, need to be careful to only work with polygons cause even when lines work, they go way way slower.
+
+
+flatland_centerIgnit_LinuxPerimeters
+Uses /farsiteInputs/c_lcpFiles/flatland.lcp for its lcp file, and is the resulting fire perimeters of a Linux run with flatland_centerIgnit as input.
+Is output linux fire perimeters from centerIgnit, for the flatland case of RAWS-3mph180deg7hr. Doesn't work currently as input for linux farsite though it does work as input to firelab.org farsite.
+flatland_centerIgnit_LinuxPerimeters-ogrinfo
+Similar to test1177973_NTFBIgnition_LinuxPerimeters, in that it is a linestring instead of a polygon for every hour, just this time there is only a single feature for every hour. So the complex terrain must make the fires split up and break down in the other case. Again my guess is it is needing to grab the last day of information, as well as maybe it needs polygon instead of linestring input.
+
+
+
+cougarCreek_pointIgnit_WindowsPerimeters
+Uses /farsiteInputs/c_lcpFiles/cougarCreek.lcp for its lcp file, and is the resulting fire perimeters of a firelab.org run with cougarCreek_pointIgnit as input.
+Only works as input to firelab.org farsite.
+cougarCreek_pointIgnit_WindowsPerimeters-ogrinfo
+Similar to flatland_centerIgnit_LinuxPerimeters and the other perimeters, except now they are polygons and there were no splitups for multiple times. So it seems to me like polygons are the much cleaner way to go to not need to represent near so many fire merging situations.
+
+
+cougarCreek_3pointIgnit_WindowsPerimeters
+Uses /farsiteInputs/c_lcpFiles/cougarCreek.lcp for its lcp file, and is the resulting fire perimeters of a firelab.org run with cougarCreek_3pointIgnit as input.
+Only works as input to firelab.org farsite.
+cougarCreek_3pointIgnit_WindowsPerimeters-ogrinfo
+Similar to cougarCreek_pointIgnit_WindowsPerimeters except now there are three fires at a given time. They always stay as expanding fires so that is good.
+
+
+
+cougarCreek_pointIgnit_WindowsPerimeters_WindowsPerimeters
+Uses /farsiteInputs/c_lcpFiles/cougarCreek.lcp for its lcp file, and is the resulting fire perimeters of a firelab.org run of cougarCreek_pointIgnit_WindowsPerimeters as an input ignition.
+So firelab.org farsite can use past fire perimeters as input, but linux farsite cannot.
+cougarCreek_pointIgnit_WindowsPerimeters_WindowsPerimeters-ogrinfo
+Similar thing to cougarCreek_pointIgnit_WindowsPerimeters except now it has split up into a ton more fire perimeters at each time. So farsite will likely always run a ton slower when trying to use fire areas instead of a single location, or trying to run off of past fire areas. Or maybe it has to do with specifying whether the area has burnt or not, so it thinks parts of the inside have not burnt yet so it tries again, making it have to start out split? Looks like at the second timestep the other fires have turned from expanding to enclave fire and are now smaller, but they are still repeated so I guess no merging has occurred.
+
+
+cougarCreek_3pointIgnit_WindowsPerimeters_WindowsPerimeters
+Uses /farsiteInputs/c_lcpFiles/cougarCreek.lcp for its lcp file, and is the resulting fire perimeters of a firelab.org run of cougarCreek_3pointIgnit_WindowsPerimeters as an input ignition.
+So firelab.org farsite can use past fire perimeters as input, but linux farsite cannot.
+cougarCreek_3pointIgnit_WindowsPerimeters_WindowsPerimeters-ogrinfo
+Similar to cougarCreek_3pointIgnit_WindowsPerimeters except now there are a gajillion split fires, I think a ton for each of the three fires. By the end they have all become enclave fires except for three of them, so maybe the problem is fires are linestrings in the code and not polygons, so it splits them into multiple locations at each place? Or maybe the code to handle point ignitions by turning them into polygons is run on all input fires, splitting any fire into multiple parts when it shouldn't?
+
+
+
+cougarCreek_polygonIgnit_LinuxPerimeters
+Uses /farsiteInputs/c_lcpFiles/cougarCreek.lcp for its lcp file, and is the resulting fire perimeters of a Linux run with cougarCreek_polygonIgnit as input.
+It doesn't work as input for Linux farsite though it does work as input for firelab.org farsite. It just runs way way slower as input to firelab.org farsite than cougarCreek_polygonIgnit_WindowsPerimeters.
+cougarCreek_polygonIgnit_LinuxPerimeters-ogrinfo
+Looks pretty similar to flatland_centerIgnit_LinuxPerimeters, but this time it starts to do some splitting and merging of the fire. You can see the effect of the burn periods making it jump to a new day. Doesn't look like anything is out of order, which is good. Maybe there's a keyword that farsite is looking for to do stuff with ignitions vs fire perimeters?
+
+
+cougarCreek_polygonIgnit_LinuxPerimeters_WindowsPerimeters
+Uses /farsiteInputs/c_lcpFiles/cougarCreek.lcp for its lcp file, and is the resulting fire perimeters of a firelab.org run of cougarCreek_polygonIgnit_LinuxPerimeters as an input ignition.
+This fire took forever to run, but it did run. Didn't seem too different from the start either, except filling in a bunch of areas as fires. Using it as an input for another fire only works on firelab.org farsite.
+cougarCreek_polygonIgnit_LinuxPerimeters_WindowsPerimeters-ogrinfo
+This is the first set of fire perimeters from firelab.org farsite vs linux farsite. Looks similar to all the other fire perimeters, except this time they are polygons instead of linestrings, which makes sense cause it gives the option of choosing which type of output you want. There are a ton of splits, but who knows if that has something to do with going between representation types of polygon to linestring, which has more splits per day or even if just switching types introduces more splits per day? That would explain why this ran a bunch slower, it thinks there are a ton more fires! Does this mean that Linux farsite needs modified to only do polygon output instead of linestring output, and output from firelab.org farsite should be carefully chosen to be polygon output not line output?
+
+
+cougarCreek_polygonIgnit_WindowsPerimeters
+Uses /farsiteInputs/c_lcpFiles/cougarCreek.lcp for its lcp file, and is the resulting fire perimeters of a firelab.org run of cougarCreek_polygonIgnit as an input ignition.
+runs faster as input to firelab.org farsite than cougarCreek_polygonIgnit_LinuxPerimeters.
+cougarCreek_polygonIgnit_WindowsPerimeters
+Starts out with a single fire that is expanding, and at one point it splits up into a bunch of enclave fires with the main fire. But some of the enclave fires disappear so there is some kind of merging or crossover action going on?
+
+
+cougarCreek_polygonIgnit_WindowsPerimeters_WindowsPerimeters
+Uses /farsiteInputs/c_lcpFiles/cougarCreek.lcp for its lcp file, and is the resulting fire perimeters of a firelab.org run of cougarCreek_polygonIgnit_WindowsPerimeters as an input ignition.
+So firelab.org farsite can use past fire perimeters as input, but linux farsite cannot.
+cougarCreek_polygonIgnit_WindowsPerimeters_WindowsPerimeters-ogrinfo
+Similar to cougarCreek_polygonIgnit_WindowsPerimeters except that a bunch more starting fires. So I guess polygon to polygon it still split up one fire into multiple polygons. Worse, it seems to have done that with the enclave fires as there are extra starting fires compared to some of the other cases. So I wonder if trying to do everything in linefires would improve it or if it would get even slower, depends on what is the better representation. Definitely looks like it has something that converts a single ignition into multiple points if it is trying to work with later fire perimeters. Doesn't quite do that with a single starting ignition location.
+
+
+cougarCreek_3polygonIgnit_WindowsPerimeters
+Uses /farsiteInputs/c_lcpFiles/cougarCreek.lcp for its lcp file, and is the resulting fire perimeters of a firelab.org run of cougarCreek_3polygonIgnit as an input ignition.
+So firelab.org farsite can use past fire perimeters as input, but linux farsite cannot.
+cougarCreek_3polygonIgnit_WindowsPerimeters-ogrinfo
+Similar to others, just three fires that are tracked now.
+
+
+cougarCreek_3polygonIgnit_WindowsPerimeters_WindowsPerimeters
+Uses /farsiteInputs/c_lcpFiles/cougarCreek.lcp for its lcp file, and is the resulting fire perimeters of a firelab.org run of cougarCreek_3polygonIgnit_WindowsPerimeters as an input ignition.
+So firelab.org farsite can use past fire perimeters as input, but linux farsite cannot.
+cougarCreek_3polygonIgnit_WindowsPerimeters_WindowsPerimeters-ogrinfo
+Probably the most expanding starting fires I have ever seen out of all of these cases. Seems to have merged most of them by the end cause there are quite a bit fewer by the end.
+
+
+
+
+
+
+#################  Linux Farsite Input File Description  #################
+
+
+Linux Farsite is run using a command line argument to a command line inputs file, usually called run_<casename>.txt. The run_<casename>.txt files each have as command line commands first the input .lcp file, second the farsite input file that defines locations of weather and wind files plus other input information, third the ignition shapefile, fourth an optional barrier shapefile or a 0 if no barrier shapefile, fifth the output directory for the farsite run, and sixth a value of 0 if you want both ascii and flammap binary grid output or 1 if just ascii or 2 if just binary, all on a single line separated by spaces. You can have multiple runs if you have each line except the last with these same input file paths for a given farsite run.
+
+The farsite input file specified in this run_<casename>.txt file has a ton more inputs to farsite, all of which are hard to describe as there is no exact list of the inputs. 
+
+
+
+################# Firelab.org Farsite Input File Description  ############
+
+Firelab.org farsite is technically doing the same thing as Linux farsite, but has a bunch of extra options that can be done as well. See the tutorial in Firelab.org farsite to understand how to use these input files, the important thing is that some of the files are similar to Linux farsite, but have a different format. Here is a description of the minimum firelab.org farsite input files needed for a firelab.org farsite run.
+
+
+
+

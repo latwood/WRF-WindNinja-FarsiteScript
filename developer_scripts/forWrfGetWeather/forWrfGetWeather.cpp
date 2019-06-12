@@ -12,7 +12,7 @@ int main()
     printf("starting raster dataset, netcdf file stuff\n");
 
     /* open raster file */
-    const char* pszFilename1 = "/home/atw09001/src/WRF-WindNinja-FarsiteScript/developer_scripts/gdalTestInputFiles/1a-wrfout_d3.2015080912.f12.0000";
+    const char* pszFilename1 = "$scriptRoot/WRF-WindNinja-FarsiteScript/developer_scripts/forWrfGetWeather/wrfGetWeatherInputFiles/wrfout_d3.2015080912.f12.0000";
     GDALDataset  *poDataset;
     GDALAllRegister();
     poDataset = (GDALDataset *) GDALOpen( pszFilename1, GA_ReadOnly );

@@ -6,39 +6,39 @@
 
 #IncludeRegexTransform: 
 
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/developer_scripts/forWrfGetWeather/forWrfGetWeather.cpp
+$scriptRoot/WRF-WindNinja-FarsiteScript/developer_scripts/forWrfGetWeather/forWrfGetWeather.cpp
 iostream
 -
 gdal_priv.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/developer_scripts/forWrfGetWeather/gdal_priv.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/developer_scripts/forWrfGetWeather/gdal_priv.h
 cpl_conv.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/developer_scripts/forWrfGetWeather/cpl_conv.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/developer_scripts/forWrfGetWeather/cpl_conv.h
 
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_config.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_config.h
 
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_conv.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_conv.h
 cpl_port.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
 cpl_vsi.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_vsi.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_vsi.h
 cpl_error.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_error.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_error.h
 
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_error.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_error.h
 cpl_port.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
 
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_minixml.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_minixml.h
 cpl_port.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
 
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_multiproc.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_multiproc.h
 cpl_port.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
 
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
 cpl_config.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_config.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_config.h
 stdio.h
 -
 stdlib.h
@@ -74,29 +74,29 @@ dmalloc.h
 float.h
 -
 
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_progress.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_progress.h
 cpl_port.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
 
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_string.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_string.h
 cpl_vsi.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_vsi.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_vsi.h
 cpl_error.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_error.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_error.h
 cpl_conv.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_conv.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_conv.h
 string
 -
 
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_virtualmem.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_virtualmem.h
 cpl_port.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
 cpl_vsi.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_vsi.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_vsi.h
 
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_vsi.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_vsi.h
 cpl_port.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
 unistd.h
 -
 sys/stat.h
@@ -104,63 +104,63 @@ sys/stat.h
 wce_stat.h
 -
 cpl_error.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_error.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_error.h
 
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/gdal.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/gdal.h
 gdal_version.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/gdal_version.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/gdal_version.h
 cpl_port.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
 cpl_error.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_error.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_error.h
 cpl_progress.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_progress.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_progress.h
 cpl_virtualmem.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_virtualmem.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_virtualmem.h
 cpl_minixml.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_minixml.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_minixml.h
 ogr_api.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/ogr_api.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/ogr_api.h
 
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/gdal_frmts.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/gdal_frmts.h
 cpl_port.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
 
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/gdal_priv.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/gdal_priv.h
 gdal.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/gdal.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/gdal.h
 gdal_frmts.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/gdal_frmts.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/gdal_frmts.h
 cpl_vsi.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_vsi.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_vsi.h
 cpl_conv.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_conv.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_conv.h
 cpl_string.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_string.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_string.h
 cpl_minixml.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_minixml.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_minixml.h
 cpl_multiproc.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_multiproc.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_multiproc.h
 vector
 -
 map
 -
 ogr_core.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/ogr_core.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/ogr_core.h
 
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/gdal_version.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/gdal_version.h
 
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/ogr_api.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/ogr_api.h
 cpl_progress.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_progress.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_progress.h
 cpl_minixml.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_minixml.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_minixml.h
 ogr_core.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/ogr_core.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/ogr_core.h
 
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/ogr_core.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/ogr_core.h
 cpl_port.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/cpl_port.h
 gdal_version.h
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/gdal_version.h
+$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/gdal_version.h
 

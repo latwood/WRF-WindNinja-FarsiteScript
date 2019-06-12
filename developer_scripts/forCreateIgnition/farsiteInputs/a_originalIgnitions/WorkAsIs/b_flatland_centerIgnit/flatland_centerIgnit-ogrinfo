@@ -1,0 +1,29 @@
+INFO: Open of `flatland_centerIgnit.shp'
+      using driver `ESRI Shapefile' successful.
+
+Layer name: flatland_centerIgnit
+Geometry: Polygon
+Feature Count: 1
+Extent: (21362.604088, 21376.230129) - (21587.433762, 21676.003028)
+Layer SRS WKT:
+PROJCS["WFDSS_Custom_Albers_Projection",
+    GEOGCS["GCS_North_American_1983",
+        DATUM["North_American_Datum_1983",
+            SPHEROID["GRS_1980",6378137.0,298.257222101]],
+        PRIMEM["Greenwich",0.0],
+        UNIT["Degree",0.017453292519943295]],
+    PROJECTION["Albers_Conic_Equal_Area"],
+    PARAMETER["False_Easting",0.0],
+    PARAMETER["False_Northing",0.0],
+    PARAMETER["longitude_of_center",-120.56655],
+    PARAMETER["Standard_Parallel_1",48.1775],
+    PARAMETER["Standard_Parallel_2",48.5055],
+    PARAMETER["latitude_of_center",48.3415],
+    UNIT["Meter",1.0]]
+ENTITY: Real (20.0)
+VALUE: Real (20.4)
+OGRFeature(flatland_centerIgnit):0
+  ENTITY (Real) = 0
+  VALUE (Real) = 0.0000
+  POLYGON ((21362.604087812262151 21530.65859197577447,21485.238455715367309 21376.230128690385754,21587.433762301287061 21530.65859197577447,21457.986373959123739 21676.003028009083209,21362.604087812262151 21530.65859197577447))
+

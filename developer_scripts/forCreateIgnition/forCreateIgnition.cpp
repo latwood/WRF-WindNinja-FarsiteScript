@@ -6,14 +6,14 @@
 using namespace std;
 
 // use this to run the output in farsite as the ignition file: 
-// /home/atw09001/src/WRF-WindNinja-FarsiteScript/include/extraApps/farsite/src/TestFARSITE /home/atw09001/src/WRF-WindNinja-FarsiteScript/developer_scripts/forCreateIgnition/farsiteInputFiles/a_run_allOriginalIgnitions.txt 2>&1 | tee farsiteRun_allOriginalIgnitions.log
+// $scriptRoot/WRF-WindNinja-FarsiteScript/include/extraApps/farsite/src/TestFARSITE $scriptRoot/WRF-WindNinja-FarsiteScript/developer_scripts/forCreateIgnition/farsiteRunFiles/singleruns/a_originalIgnitions/5_run_cougarCreek_pointIgnit.txt 2>&1 | tee farsiteRun_allOriginalIgnitions.log
 
 int main()
 {
     /* vector file stuff, so shape files */
     printf("starting vector dataset, shape file stuff\n");
 
-    const char* pszFilename2 = "/home/atw09001/src/WRF-WindNinja-FarsiteScript/developer_scripts/gdalTestInputFiles/5a-cougarCreek-pointIgnit.shp";
+    const char* pszFilename2 = "$scriptRoot/WRF-WindNinja-FarsiteScript/developer_scripts/forCreateIgnition/farsiteInputs/a_originalIgnitions/NeedProcessing/a_pointIgnition/a_cougarCreek_pointIgnit/cougarCreek_pointIgnit.shp";
     GDALDataset       *poDS;
     GDALAllRegister();
     poDS = (GDALDataset*) GDALOpenEx( pszFilename2, GDAL_OF_VECTOR, NULL, NULL, NULL );

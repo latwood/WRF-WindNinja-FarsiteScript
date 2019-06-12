@@ -1,0 +1,103 @@
+Driver: LCP/FARSITE v.4 Landscape File (.lcp)
+Files: cougarCreek.lcp
+       cougarCreek.prj
+Size is 1040, 1000
+Coordinate System is:
+PROJCS["WGS_1984_UTM_Zone_10N",
+    GEOGCS["GCS_WGS_1984",
+        DATUM["WGS_1984",
+            SPHEROID["WGS_84",6378137.0,298.257223563]],
+        PRIMEM["Greenwich",0.0],
+        UNIT["Degree",0.0174532925199433]],
+    PROJECTION["Transverse_Mercator"],
+    PARAMETER["False_Easting",500000.0],
+    PARAMETER["False_Northing",0.0],
+    PARAMETER["Central_Meridian",-123.0],
+    PARAMETER["Scale_Factor",0.9996],
+    PARAMETER["Latitude_Of_Origin",0.0],
+    UNIT["Meter",1.0]]
+Origin = (610065.000000000000000,5125217.000000000000000)
+Pixel Size = (30.000000000000000,-30.000000000000000)
+Metadata:
+  DESCRIPTION=
+  LATITUDE=46
+  LINEAR_UNIT=Meters
+Corner Coordinates:
+Upper Left  (  610065.000, 5125217.000) (121d34'17.59"W, 46d16'17.78"N)
+Lower Left  (  610065.000, 5095217.000) (121d34'42.66"W, 46d 0' 6.07"N)
+Upper Right (  641265.000, 5125217.000) (121d10' 0.55"W, 46d15'56.99"N)
+Lower Right (  641265.000, 5095217.000) (121d10'32.72"W, 45d59'45.47"N)
+Center      (  625665.000, 5110217.000) (121d22'23.38"W, 46d 8' 2.23"N)
+Band 1 Block=1040x1 Type=Int16, ColorInterp=Undefined
+  Description = Elevation
+  Metadata:
+    ELEVATION_FILE=D:\scratch\dist\lf43942996\us_110lcp40\output\rastert_elevation_1.txt
+    ELEVATION_MAX=3746
+    ELEVATION_MIN=361
+    ELEVATION_NUM_CLASSES=-1
+    ELEVATION_UNIT=0
+    ELEVATION_UNIT_NAME=Meters
+Band 2 Block=1040x1 Type=Int16, ColorInterp=Undefined
+  Description = Slope
+  Metadata:
+    SLOPE_FILE=D:\scratch\dist\lf43942996\us_110lcp40\output\rastert_slope_1.txt
+    SLOPE_MAX=69
+    SLOPE_MIN=0
+    SLOPE_NUM_CLASSES=69
+    SLOPE_UNIT=0
+    SLOPE_UNIT_NAME=Degrees
+Band 3 Block=1040x1 Type=Int16, ColorInterp=Undefined
+  Description = Aspect
+  Metadata:
+    ASPECT_FILE=D:\scratch\dist\lf43942996\us_110lcp40\output\rastert_aspect_1.txt
+    ASPECT_MAX=359
+    ASPECT_MIN=0
+    ASPECT_NUM_CLASSES=-1
+    ASPECT_UNIT=2
+    ASPECT_UNIT_NAME=Azimuth degrees
+Band 4 Block=1040x1 Type=Int16, ColorInterp=Undefined
+  Description = Fuel models
+  Metadata:
+    FUEL_MODEL_FILE=D:\scratch\dist\lf43942996\us_110lcp40\output\rastert_fuel1.txt
+    FUEL_MODEL_MAX=188
+    FUEL_MODEL_MIN=91
+    FUEL_MODEL_NUM_CLASSES=21
+    FUEL_MODEL_OPTION=0
+    FUEL_MODEL_OPTION_DESC=no custom models AND no conversion file needed
+    FUEL_MODEL_VALUES=91,93,98,99,101,102,107,121,122,142,161,162,165,181,182,183,184,185,186,187,188
+Band 5 Block=1040x1 Type=Int16, ColorInterp=Undefined
+  Description = Canopy cover
+  Metadata:
+    CANOPY_COV_FILE=D:\scratch\dist\lf43942996\us_110lcp40\output\rastert_canopy1.txt
+    CANOPY_COV_MAX=95
+    CANOPY_COV_MIN=0
+    CANOPY_COV_NUM_CLASSES=10
+    CANOPY_COV_UNIT=1
+    CANOPY_COV_UNIT_NAME=Percent
+Band 6 Block=1040x1 Type=Int16, ColorInterp=Undefined
+  Description = Canopy height
+  Metadata:
+    CANOPY_HT_FILE=D:\scratch\dist\lf43942996\us_110lcp40\output\rastert_height_1.txt
+    CANOPY_HT_MAX=500
+    CANOPY_HT_MIN=0
+    CANOPY_HT_NUM_CLASSES=6
+    CANOPY_HT_UNIT=3
+    CANOPY_HT_UNIT_NAME=Meters x 10
+Band 7 Block=1040x1 Type=Int16, ColorInterp=Undefined
+  Description = Canopy base height
+  Metadata:
+    CBH_FILE=D:\scratch\dist\lf43942996\us_110lcp40\output\rastert_base_1.txt
+    CBH_MAX=100
+    CBH_MIN=0
+    CBH_NUM_CLASSES=80
+    CBH_UNIT=3
+    CBH_UNIT_NAME=Meters x 10
+Band 8 Block=1040x1 Type=Int16, ColorInterp=Undefined
+  Description = Canopy bulk density
+  Metadata:
+    CBD_FILE=D:\scratch\dist\lf43942996\us_110lcp40\output\rastert_density_1.txt
+    CBD_MAX=42
+    CBD_MIN=0
+    CBD_NUM_CLASSES=19
+    CBD_UNIT=3
+    CBD_UNIT_NAME=kg/m^3 x 100

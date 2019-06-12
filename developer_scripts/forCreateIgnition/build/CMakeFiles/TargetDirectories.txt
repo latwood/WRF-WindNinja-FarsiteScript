@@ -1,3 +1,1 @@
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/developer_scripts/forCreateIgnition/build/CMakeFiles/edit_cache.dir
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/developer_scripts/forCreateIgnition/build/CMakeFiles/rebuild_cache.dir
-/home/atw09001/src/WRF-WindNinja-FarsiteScript/developer_scripts/forCreateIgnition/build/CMakeFiles/forCreateIgnition.dir
+$scriptRoot/WRF-WindNinja-FarsiteScript/developer_scripts/forCreateIgnition/build/CMakeFiles/forCreateIgnition.dir

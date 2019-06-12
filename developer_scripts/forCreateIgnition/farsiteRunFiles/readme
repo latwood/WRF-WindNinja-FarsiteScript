@@ -1,0 +1,2 @@
+notice that the multiruns are just groupings of the single runs. But the reason both exist is cause farsite seems to choke if it has trouble with one of the multiruns, so if the multiruns don't work, try to get the individual runs to work. There are no multiruns for original ignitions unless they worked as is, cause all the need processing original ignitions will cause farsite to choke. forCreateIgnition has to finish making the createdIgnition cases, but these run files are setup for after when those files are created.
+

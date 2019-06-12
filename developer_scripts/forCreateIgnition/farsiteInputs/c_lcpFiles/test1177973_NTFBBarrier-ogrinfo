@@ -1,0 +1,58 @@
+FAILURE:
+Unable to open datasource `test1177973_NTFBBarrier' with the following drivers.
+  -> PCIDSK
+  -> JPEG2000
+  -> PDF
+  -> ESRI Shapefile
+  -> MapInfo File
+  -> UK .NTF
+  -> OGR_SDTS
+  -> S57
+  -> DGN
+  -> OGR_VRT
+  -> REC
+  -> Memory
+  -> BNA
+  -> CSV
+  -> GML
+  -> GPX
+  -> KML
+  -> GeoJSON
+  -> OGR_GMT
+  -> WAsP
+  -> OpenFileGDB
+  -> XPlane
+  -> DXF
+  -> Geoconcept
+  -> GeoRSS
+  -> GPSTrackMaker
+  -> PGDUMP
+  -> GPSBabel
+  -> SUA
+  -> OpenAir
+  -> OGR_PDS
+  -> WFS
+  -> HTF
+  -> AeronavFAA
+  -> EDIGEO
+  -> GFT
+  -> SVG
+  -> CouchDB
+  -> Cloudant
+  -> Idrisi
+  -> ARCGEN
+  -> SEGUKOOA
+  -> SEGY
+  -> ODS
+  -> XLSX
+  -> ElasticSearch
+  -> CartoDB
+  -> SXF
+  -> Selafin
+  -> JML
+  -> PLSCENES
+  -> CSW
+  -> TIGER
+  -> AVCBin
+  -> AVCE00
+  -> HTTP
