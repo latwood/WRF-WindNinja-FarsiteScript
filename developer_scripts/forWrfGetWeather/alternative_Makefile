@@ -1,0 +1,29 @@
+# can check to see if libraries are correct by doing something like:
+# ldd ~/myprogram
+# supposedly if this program doesn't find the right libraries because of custom paths, need to do this first: export LD_LIBRARY_PATH="~/myprogdir/lib/:$LD_LIBRARY_PATH". In fact, need to do this every time ahead of the program, or add to .bashrc and change when needed.
+
+CC=g++
+CFLAGS=-std=c++11 -g -Wall -DUNIX -Wno-deprecated
+#CFLAGS=-std=c++11 -g
+INCLUDES=-I$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/netcdf-c-4.6.1/build_netcdf-c-4.6.1/include/ -I$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/hdf5-1.10.2/build_hdf5-1.10.2/include/ -I$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/include/ -I$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/boost_1_55_0/build_boost_1_55_0/include/
+#INCLUDES=
+LDFLAGS=-L$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/netcdf-c-4.6.1/build_netcdf-c-4.6.1/lib/ -L$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/hdf5-1.10.2/build_hdf5-1.10.2/lib/ -L$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/gdal-2.0.3/build_gdal-2.0.3/lib/ -L$scriptRoot/WRF-WindNinja-FarsiteScript/include/extraLibs/boost_1_55_0/build_boost_1_55_0/lib/
+#LIBS=-lnetcdf -lnetcdf_c++4 -lhdf5 -lhdf5_hl -lsz -lz -lcurl -ljasper -lgdal -lm
+LIBS=-lnetcdf -lhdf5 -lhdf5_hl -lsz -lz -lcurl -lgdal -lm
+#LIBS=
+
+SOURCES=forWrfGetWeather.cpp
+
+OBJECTS=${SOURCES:.cpp=.o}
+EXECUTABLE=forWrfGetWeather
+
+all: ${SOURCES} ${EXECUTABLE}
+
+${EXECUTABLE}: ${OBJECTS}
+	${CC} ${CFLAGS} ${INCLUDES} ${LDFLAGS} -o $@ ${OBJECTS} ${LIBS}
+
+.cpp.o:
+	${CC} ${CFLAGS} ${INCLUDES} -c $<
+clean:
+	rm -f *.o $(EXECUTABLE)
+
