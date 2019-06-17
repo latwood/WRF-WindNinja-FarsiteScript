@@ -45,6 +45,8 @@ cd <pathToRepo>/WRF-WindNinja-FarsiteScript/include/extraApps/farsite/src
 The appropriate output folders should be generated already, but you may need to generate the appropriate output files directories before the farsite run. For any created ignition files created by the forCreateIgnition script (as opposed to the original ones), you may need to copy and paste additional farsite files that are not the created ignition files from the original case to the created ignition file case.
 
 
+Unfortunately when Loren first created these original ignition shapefiles, the farsite inputs that were used for each case were NOT the single set currently available for use. So the current farsite inputs in the forCreateIgnition test cases do NOT match the original inputs used to create the files. The idea was mainly just trying to get a fire to run or not run with whatever inputs possible, and just to get at least enough fire spread to know what was going on.
+
 
 
 ################  Ignition shapefile case descriptions  ################

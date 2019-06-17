@@ -22,7 +22,7 @@ FARSITE_BURN_PERIODS: 4
 FUEL_MOISTURES_DATA: 1
 0 3 4 6 70 100
 
-FARSITE_ATM_FILE: $scriptRoot/WRF-WindNinja-FarsiteScript/developer_scripts/forCreateIgnition/farsiteInputs/d_otherInputs/Linux/test1177973.atm
+#FARSITE_ATM_FILE: $scriptRoot/WRF-WindNinja-FarsiteScript/developer_scripts/forCreateIgnition/farsiteInputs/d_otherInputs/Linux/test1177973.atm
 
 #WIND_FILE: $scriptRoot/WRF-WindNinja-FarsiteScript/developer_scripts/forCreateIgnition/farsiteInputs/d_otherInputs/Linux/test1177973.wnd
 #WEATHER_FILE: $scriptRoot/WRF-WindNinja-FarsiteScript/developer_scripts/forCreateIgnition/farsiteInputs/d_otherInputs/Linux/test1177973.wtr

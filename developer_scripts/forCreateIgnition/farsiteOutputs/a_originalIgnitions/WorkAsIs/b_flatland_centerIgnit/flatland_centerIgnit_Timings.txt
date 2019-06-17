@@ -1,0 +1,50 @@
+Farsite BenchMark Results
+
+
+Simulation Info:
+	Landscape File: $scriptRoot/WRF-WindNinja-FarsiteScript/developer_scripts/forCreateIgnition/farsiteInputs/c_lcpFiles/flatland.lcp
+	Landscape Resolution: 30.0
+	Landscape Size: 100 x 100
+	Inputs File: $scriptRoot/WRF-WindNinja-FarsiteScript/developer_scripts/forCreateIgnition/farsiteInputs/d_otherInputs/Linux/flatland.input
+	Farsite Start Time: 04 26 1200
+	Farsite End Time:   04 26 1800
+	Total Sim Time:     360.000000
+	Ignition File:      $scriptRoot/WRF-WindNinja-FarsiteScript/developer_scripts/forCreateIgnition/farsiteInputs/a_originalIgnitions/WorkAsIs/b_flatland_centerIgnit/flatland_centerIgnit.shp
+	Barriers File:      None
+	Time Step:                  60.000000
+	Distance Resolution:        30.000000
+	Perimeter Resolution:       60.000000
+	Enable Spotting:            Yes
+	Spot Probability:           0.050000
+	Spot Ignition Delay:        0.000000
+	Spot Grid Resolution:        15
+	Spotting Seed:               253
+	Minimum Spotting Distance:  30.000000
+	Foliar Moisture:            100.0000
+	Enable Crowning:            Yes
+	Crown Fire Method:          Finney
+	                            Crown Density NOT LINKED to Crown Cover
+	Dist Check Method:          Fire Level
+	Acceleration:               On
+	Backing Spread:             Calculated from Elliptical Dimensions
+	Simulation Started:         4/26 12:00
+	Simulation Ended:           04/26  18:00
+	Elapsed Time:               00 06:00
+	Restore Ignitions:          No
+	Preserve Inactive Enclaves: Yes
+	Tree Species Number:        1
+	Conditoning Start:          0/0
+	Burn Periods:           0
+	Relative Burn Periods:      0
+	Internal Weather:            -20
+	Internal Winds:              8
+4 26 1200 3 180 25
+4 26 1300 3 180 25
+4 26 1400 3 180 25
+4 26 1500 3 180 25
+4 26 1600 3 180 25
+4 26 1700 3 180 25
+4 26 1800 3 180 25
+4 27 0 3 180 25
+
+	Total Farsite Run Time: 0.113 Seconds
