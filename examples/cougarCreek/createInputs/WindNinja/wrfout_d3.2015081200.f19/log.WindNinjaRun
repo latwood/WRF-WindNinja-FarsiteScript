@@ -1,0 +1,21 @@
+Run 0: Reading elevation file...
+Run 0: Simulation time is 2015-Aug-12 19:00:00 GMT
+Run 0: Run number 0 started with 8 threads.
+Run 0: Generating mesh...
+Run 0: Initializing flow...
+Run 0: Building equations...
+Run 0: Solving...
+Run 0 (solver): 11% complete
+Run 0 (solver): 24% complete
+Run 0 (solver): 49% complete
+Run 0 (solver): 78% complete
+Run 0 (solver): 95% complete
+Run 0 (solver): 100% complete
+Run 0: Writing output files...
+Run 0: Meshing time was 0.075376 seconds.
+Run 0: Initialization time was 1.043703 seconds.
+Run 0: Equation building time was 1.648827 seconds.
+Run 0: Solver time was 5.267967 seconds.
+Run 0: Output writing time was 0.020613 seconds.
+Run 0: Total simulation time was 8.857411 seconds.
+Run 0: Run number 0 done!
