@@ -1,10 +1,11 @@
-#include "inputVariables_infoStorage.h"
+#include "inputVariablesInitializer.h"
 
 /***** public functions *****/
 
 /*** constructor functions ***/
-inputVariables_infoStorage::inputVariables_infoStorage()
+inputVariablesInitializer::inputVariablesInitializer()
 {
+    printf("running inputVariablesInitializer constructor\n");
     bool success = true;
     // for description printing
     descriptionVariableNameColumnSize = 0;
@@ -41,12 +42,6 @@ inputVariables_infoStorage::inputVariables_infoStorage()
         success = false;
     }
 
-    if(success == false)
-    {
-        printf("exiting program\n");
-        exit(1);
-    }
-
     // now do description whitespace and line break calculations, which include setup error checks (but won't exit if fail, just warn programmer to mess with setup)
     if(calculateDescriptionWhiteSpace() == false)
     {
@@ -58,17 +53,31 @@ inputVariables_infoStorage::inputVariables_infoStorage()
     }
     calculate_maxVarNameColumnWhitespace();
 
+    // check to make sure input variable value classes kept the objects in existence
+    if(check_variableTypeClassObjectExistence() == false)
+    {
+        success = false;
+    }
+
+    if(success == false)
+    {
+        printf("exiting program\n");
+        exit(1);
+    }
+
+    printf("finished inputVariablesInitializer constructor\n");
+
 }
 /*** end constructor functions ***/
 
 
 /*** get value functions ***/
-std::vector<inputVariable_info> inputVariables_infoStorage::get_inputVariableInfo()
+std::vector<singleInputVariable> inputVariablesInitializer::get_inputVariableStorage()
 {
-    return inputVariables;
+    return inputVariableStorage;
 }
 
-std::string inputVariables_infoStorage::get_maxVarNameColumnWhitespace()
+std::string inputVariablesInitializer::get_maxVarNameColumnWhitespace()
 {
     return maxVarNameColumnWhitespace;
 }
@@ -81,7 +90,7 @@ std::string inputVariables_infoStorage::get_maxVarNameColumnWhitespace()
 
 
 /*** setup functions ***/
-void inputVariables_infoStorage::setupAvailableApplicationUseNames()
+void inputVariablesInitializer::setupAvailableApplicationUseNames()
 {
     // the idea is that each variable is used for different things, and when explaining uses, it is handy to show the applications they are for
     // other functions will verify that the setupAvailableVariables() function only used these types and that they were specified in order of application type, so in this order :)
@@ -95,7 +104,7 @@ void inputVariables_infoStorage::setupAvailableApplicationUseNames()
     allowedApplicationUseNames.push_back("optional WindNinja output settings");
 }
 
-void inputVariables_infoStorage::setupAvailableVariableCountTypes()
+void inputVariablesInitializer::setupAvailableVariableCountTypes()
 {
     // this is what will be used in the end, don't need to redefine the count types twice
     allowedVariableCountTypes.push_back("bool");
@@ -116,12 +125,115 @@ void inputVariables_infoStorage::setupAvailableVariableCountTypes()
     allowedVariableCountTypes.push_back("count");
 }
 
-void inputVariables_infoStorage::addVariable(std::string newVariableName,std::string newApplicationUseName,std::string newVariableCountType,std::string newVariableDescription)
+//void* inputVariablesInitializer::initializeVariableValueStorage(std::string variableName,std::string variableCountType)
+void inputVariablesInitializer::initializeVariableValueStorage(singleInputVariable &new_singleInputVariable)
 {
-    inputVariables.push_back(inputVariable_info(newVariableName,newApplicationUseName,newVariableCountType,newVariableDescription));
+    std::string variableName = new_singleInputVariable.get_variableName();
+    std::string variableCountType = new_singleInputVariable.get_variableCountType();
+
+    // create a temporary generic pointer for pulling out the value
+    void* variableTypeClass = new_singleInputVariable.get_variableTypeClass();
+
+    if(variableCountType == "bool")
+    {
+        boolValue new_valueStorage = boolValue(variableName);
+        variableTypeClass = &new_valueStorage;
+    } else if(variableCountType == "size_t")
+    {
+        size_tValue new_valueStorage = size_tValue(variableName);
+        variableTypeClass = &new_valueStorage;
+    } else if(variableCountType == "int")
+    {
+        intValue new_valueStorage = intValue(variableName);
+        variableTypeClass = &new_valueStorage;
+    } else if(variableCountType == "double")
+    {
+        doubleValue new_valueStorage = doubleValue(variableName);
+        variableTypeClass = &new_valueStorage;
+    } else if(variableCountType == "positive double")   // value is still a double, input function will make sure it is positive before allowing storage
+    {
+        doubleValue new_valueStorage = doubleValue(variableName);
+        variableTypeClass = &new_valueStorage;
+    } else if(variableCountType == "signless percent")  // value is still a double, input function will make sure it is signless before allowing storage
+    {
+        doubleValue new_valueStorage = doubleValue(variableName);
+        variableTypeClass = &new_valueStorage;
+    } else if(variableCountType == "string")
+    {
+        stringValue new_valueStorage = stringValue(variableName);
+        variableTypeClass = &new_valueStorage;
+    } else if(variableCountType == "pathname")
+    {
+        pathNameValue new_valueStorage = pathNameValue(variableName);
+        variableTypeClass = &new_valueStorage;
+    } else if(variableCountType == "lcp filename")  // value is still a filename, input function will make sure it is a valid lcp filename before allowing storage
+    {
+        lcpFileValue new_valueStorage = lcpFileValue(variableName);
+        variableTypeClass = &new_valueStorage;
+    } else if(variableCountType == "shape filename")    // value is still a filename, input function will make sure it is a valid shapefile filename before allowing storage
+    {
+        shapeFileValue new_valueStorage = shapeFileValue(variableName);
+        variableTypeClass = &new_valueStorage;
+    } else if(variableCountType == "wrf filename")    // value is still a filename, input function will make sure it is a valid shapefile filename before allowing storage
+    {
+        wrfFileValue new_valueStorage = wrfFileValue(variableName);
+        variableTypeClass = &new_valueStorage;
+    } else if(variableCountType == "lat_coord")
+    {
+        doubleValue new_valueStorage = doubleValue(variableName);  // value is still a double, input function will make sure it is between -90 and 90 before allowing storage
+        variableTypeClass = &new_valueStorage;
+    } else if(variableCountType == "long_coord")
+    {
+        doubleValue new_valueStorage = doubleValue(variableName);  // value is still a double, input function will make sure it is between -180 and 180 before allowing storage
+        variableTypeClass = &new_valueStorage;
+    } else if(variableCountType == "lat_long_point")
+    {
+        lat_longValue new_valueStorage = lat_longValue(variableName);
+        variableTypeClass = &new_valueStorage;
+    } else if(variableCountType == "date")
+    {
+        dateValue new_valueStorage = dateValue(variableName);
+        variableTypeClass = &new_valueStorage;
+    } else if(variableCountType == "hour_min")
+    {
+        hour_minValue new_valueStorage = hour_minValue(variableName);
+        variableTypeClass = &new_valueStorage;
+    } else if(variableCountType == "count")
+    {
+        size_tValue new_valueStorage = size_tValue(variableName);
+        variableTypeClass = &new_valueStorage;
+    } else
+    {
+        printf("count type \"%s\" for variable \"%s\" has not implemented in code yet!\n",variableCountType.c_str(),variableName.c_str());
+        exit(false);
+    }
+
+    new_singleInputVariable.set_variableTypeClass(variableTypeClass);
+
+    // delete the temporary pointer so no leaking memory. The input variable value pointer will still continue on
+    //delete variableTypeClass;
 }
 
-void inputVariables_infoStorage::setupAvailableVariables()
+void inputVariablesInitializer::addVariable(std::string new_variableName,std::string new_applicationUseName,std::string new_variableCountType,std::string new_variableDescription)
+{
+    // first create the new variable to be put in the vector of values
+    singleInputVariable new_singleInputVariable(new_variableName,new_applicationUseName,new_variableCountType,new_variableDescription);
+
+    // use the type string of the variable to figure out and create the required variable value storage, and a pointer to said storage
+    //void* new_variableTypeClass = initializeVariableValueStorage(new_variableName,new_variableCountType);
+    initializeVariableValueStorage(new_singleInputVariable);
+
+    // now make this pointer be the one used in the input variable to get its values
+    //new_singleInputVariable.set_variableTypeClass(new_variableTypeClass);
+
+    // now add the new input variable to the vector of input variables
+    inputVariableStorage.push_back(new_singleInputVariable);
+
+    // now delete the now unused pointer (the input variable has its own pointer that now holds the class type object for the variable)
+    //delete new_variableTypeClass;
+}
+
+void inputVariablesInitializer::setupAvailableVariables()
 {
     // add desired variables to be read from the config file. Set which will be optional or not through the verification in the checkSetVarNamesForConflictingOptions function in the inputVariablesHandler class.
     // whether all these variables are actually used by the program even though they are required; at least the names and counts are read by the input file,
@@ -370,16 +482,16 @@ void inputVariables_infoStorage::setupAvailableVariables()
 /*** end setup functions ***/
 
 /*** check setup functions ***/
-bool inputVariables_infoStorage::check_setupForDuplicateVariableNames()
+bool inputVariablesInitializer::check_setupForDuplicateVariableNames()
 {
     bool success = true;
-    for(size_t firstVarIdx = 0; firstVarIdx < inputVariables.size()-1; firstVarIdx++)
+    for(size_t firstVarIdx = 0; firstVarIdx < inputVariableStorage.size()-1; firstVarIdx++)
     {
-        for(size_t secondVarIdx = firstVarIdx+1; secondVarIdx < inputVariables.size(); secondVarIdx++)
+        for(size_t secondVarIdx = firstVarIdx+1; secondVarIdx < inputVariableStorage.size(); secondVarIdx++)
         {
-            if(inputVariables[firstVarIdx].get_variableName() == inputVariables[secondVarIdx].get_variableName())
+            if(inputVariableStorage[firstVarIdx].get_variableName() == inputVariableStorage[secondVarIdx].get_variableName())
             {
-                printf("found duplicate variable \"%s\"!\n",inputVariables[firstVarIdx].get_variableName().c_str());
+                printf("found duplicate variable \"%s\"!\n",inputVariableStorage[firstVarIdx].get_variableName().c_str());
                 success = false;
             }
         }
@@ -387,15 +499,15 @@ bool inputVariables_infoStorage::check_setupForDuplicateVariableNames()
     return success;
 }
 
-bool inputVariables_infoStorage::check_setupForValidApplicationUseNames()
+bool inputVariablesInitializer::check_setupForValidApplicationUseNames()
 {
     bool success = true;
-    for(size_t varIdx = 0; varIdx < inputVariables.size(); varIdx++)
+    for(size_t varIdx = 0; varIdx < inputVariableStorage.size(); varIdx++)
     {
         bool isValidUseName = false;
         for(size_t useNameIdx = 0; useNameIdx < allowedApplicationUseNames.size(); useNameIdx++)
         {
-            if(inputVariables[varIdx].get_applicationUseName() == allowedApplicationUseNames[useNameIdx])
+            if(inputVariableStorage[varIdx].get_applicationUseName() == allowedApplicationUseNames[useNameIdx])
             {
                 isValidUseName = true;
                 break;
@@ -403,29 +515,29 @@ bool inputVariables_infoStorage::check_setupForValidApplicationUseNames()
         }
         if(isValidUseName == false)
         {
-            printf("application use name \"%s\" for variable \"%s\" is not a valid application use name!\n",inputVariables[varIdx].get_applicationUseName().c_str(),inputVariables[varIdx].get_variableName().c_str());
+            printf("application use name \"%s\" for variable \"%s\" is not a valid application use name!\n",inputVariableStorage[varIdx].get_applicationUseName().c_str(),inputVariableStorage[varIdx].get_variableName().c_str());
             success = false;
         }
     }
     return success;
 }
 
-bool inputVariables_infoStorage::check_setupForValidOrderingByApplicationUseNames()
+bool inputVariablesInitializer::check_setupForValidOrderingByApplicationUseNames()
 {
     bool success = true;
 
     // make sure the variable order matches the application use names
     unsigned int applicationUseNameTypeCount = 0;
     bool foundValidApplicationUseName = false;
-    for(size_t varIdx = 0; varIdx < inputVariables.size(); varIdx++)
+    for(size_t varIdx = 0; varIdx < inputVariableStorage.size(); varIdx++)
     {
         if(applicationUseNameTypeCount >= allowedApplicationUseNames.size())
         {
-            printf("variables are not ordered by applicationUseName! Found at variable \"%s\"!\n",inputVariables[varIdx].get_variableName().c_str());
+            printf("variables are not ordered by applicationUseName! Found at variable \"%s\"!\n",inputVariableStorage[varIdx].get_variableName().c_str());
             success = false;
             break;
         }
-        if(inputVariables[varIdx].get_applicationUseName() == allowedApplicationUseNames[applicationUseNameTypeCount])
+        if(inputVariableStorage[varIdx].get_applicationUseName() == allowedApplicationUseNames[applicationUseNameTypeCount])
         {
             foundValidApplicationUseName = true;
         } else
@@ -435,7 +547,7 @@ bool inputVariables_infoStorage::check_setupForValidOrderingByApplicationUseName
                 applicationUseNameTypeCount = applicationUseNameTypeCount + 1;
             } else
             {
-                printf("variables are not ordered by applicationUseName! Found at variable \"%s\"!\n",inputVariables[varIdx].get_variableName().c_str());
+                printf("variables are not ordered by applicationUseName! Found at variable \"%s\"!\n",inputVariableStorage[varIdx].get_variableName().c_str());
                 success = false;
                 break;
             }
@@ -456,15 +568,15 @@ bool inputVariables_infoStorage::check_setupForValidOrderingByApplicationUseName
     return success;
 }
 
-bool inputVariables_infoStorage::check_setupForValidVariableCountTypes()
+bool inputVariablesInitializer::check_setupForValidVariableCountTypes()
 {
     bool success = true;
-    for(size_t varIdx = 0; varIdx < inputVariables.size(); varIdx++)
+    for(size_t varIdx = 0; varIdx < inputVariableStorage.size(); varIdx++)
     {
         bool isValidType = false;
         for(size_t countTypeIdx = 0; countTypeIdx < allowedVariableCountTypes.size(); countTypeIdx++)
         {
-            if(inputVariables[varIdx].get_variableCountType() == allowedVariableCountTypes[countTypeIdx])
+            if(inputVariableStorage[varIdx].get_variableCountType() == allowedVariableCountTypes[countTypeIdx])
             {
                 isValidType = true;
                 break;
@@ -472,23 +584,23 @@ bool inputVariables_infoStorage::check_setupForValidVariableCountTypes()
         }
         if(isValidType == false)
         {
-            printf("variable count type \"%s\" for variable \"%s\" is not a valid type!\n",inputVariables[varIdx].get_variableCountType().c_str(),inputVariables[varIdx].get_variableName().c_str());
+            printf("variable count type \"%s\" for variable \"%s\" is not a valid type!\n",inputVariableStorage[varIdx].get_variableCountType().c_str(),inputVariableStorage[varIdx].get_variableName().c_str());
             success = false;
         }
     }
     return success;
 }
 
-bool inputVariables_infoStorage::check_setupDescription()
+bool inputVariablesInitializer::check_setupDescription()
 {
     bool success = true;
 
     // first add up the number of starting characters that are whitespace. If there are any, it is an error so warn
     // and say how many extra characters and there should be no whitespace at the start of a description
-    for(size_t varIdx = 0; varIdx < inputVariables.size(); varIdx++)
+    for(size_t varIdx = 0; varIdx < inputVariableStorage.size(); varIdx++)
     {
         unsigned int whiteSpaceCount = 0;
-        std::string currentDescription = inputVariables[varIdx].get_variableDescription();
+        std::string currentDescription = inputVariableStorage[varIdx].get_variableDescription();
         for(size_t descriptionVarIdx = 0; descriptionVarIdx < currentDescription.length(); descriptionVarIdx++)
         {
             std::string currentChr = currentDescription.substr(descriptionVarIdx,1);
@@ -502,27 +614,134 @@ bool inputVariables_infoStorage::check_setupDescription()
         }
         if(whiteSpaceCount > 0)
         {
-            printf("variable \"%s\" description starts with %d white space characters. variable descriptions should not start with whitespace!\n",inputVariables[varIdx].get_variableName().c_str(),whiteSpaceCount);
+            printf("variable \"%s\" description starts with %d white space characters. variable descriptions should not start with whitespace!\n",inputVariableStorage[varIdx].get_variableName().c_str(),whiteSpaceCount);
             success = false;
         }
     }
 
     return success;
 }
+
+bool inputVariablesInitializer::check_variableTypeClassObjectExistence()
+{
+    printf("running check_variableTypeClassObjectExistence. If the program seg faults before next text, there are pointer related issues with variable value class initialization\n");
+    bool success = true;
+
+    // create a temporary generic pointer for pulling out the value
+    void* variableTypeClass;
+
+    for(size_t varIdx = 0; varIdx < inputVariableStorage.size(); varIdx++)
+    {
+        std::string variableCountType = inputVariableStorage[varIdx].get_variableCountType();
+        std::string variableName = inputVariableStorage[varIdx].get_variableName();
+        // set the generic pointer to the input variable value pointer
+        variableTypeClass = inputVariableStorage[varIdx].get_variableTypeClass();
+
+        try
+        {
+            if(variableCountType == "bool")
+            {
+                // use the pointer to get variable name in the value class of interest
+                ((boolValue*)variableTypeClass)->get_variableName();
+            } else if(variableCountType == "size_t")
+            {
+                // use the pointer to get variable name in the value class of interest
+                ((size_tValue*)variableTypeClass)->get_variableName();
+            } else if(variableCountType == "int")
+            {
+                // use the pointer to get variable name in the value class of interest
+                ((intValue*)variableTypeClass)->get_variableName();
+            } else if(variableCountType == "double")
+            {
+                // use the pointer to get variable name in the value class of interest
+                ((doubleValue*)variableTypeClass)->get_variableName();
+            } else if(variableCountType == "positive double")   // value is still a double, input function will make sure it is positive before allowing storage
+            {
+                // use the pointer to get variable name in the value class of interest
+                ((doubleValue*)variableTypeClass)->get_variableName();
+            } else if(variableCountType == "signless percent")  // value is still a double, input function will make sure it is signless before allowing storage
+            {
+                // use the pointer to get variable name in the value class of interest
+                ((doubleValue*)variableTypeClass)->get_variableName();
+            } else if(variableCountType == "string")
+            {
+                // use the pointer to get variable name in the value class of interest
+                ((stringValue*)variableTypeClass)->get_variableName();
+            } else if(variableCountType == "pathname")
+            {
+                // use the pointer to get variable name in the value class of interest
+                ((pathNameValue*)variableTypeClass)->get_variableName();
+            } else if(variableCountType == "lcp filename")  // value is still a filename, input function will make sure it is a valid lcp filename before allowing storage
+            {
+                // use the pointer to get variable name in the value class of interest
+                ((lcpFileValue*)variableTypeClass)->get_variableName();
+            } else if(variableCountType == "shape filename")    // value is still a filename, input function will make sure it is a valid shapefile filename before allowing storage
+            {
+                // use the pointer to get variable name in the value class of interest
+                ((shapeFileValue*)variableTypeClass)->get_variableName();
+            } else if(variableCountType == "wrf filename")    // value is still a filename, input function will make sure it is a valid shapefile filename before allowing storage
+            {
+                // use the pointer to get variable name in the value class of interest
+                ((wrfFileValue*)variableTypeClass)->get_variableName();
+            } else if(variableCountType == "lat_coord")
+            {
+                // use the pointer to get variable name in the value class of interest
+                ((doubleValue*)variableTypeClass)->get_variableName();
+            } else if(variableCountType == "long_coord")
+            {
+                // use the pointer to get variable name in the value class of interest
+                ((doubleValue*)variableTypeClass)->get_variableName();
+            } else if(variableCountType == "lat_long_point")
+            {
+                // use the pointer to get variable name in the value class of interest
+                ((lat_longValue*)variableTypeClass)->get_variableName();
+            } else if(variableCountType == "date")
+            {
+                // use the pointer to get variable name in the value class of interest
+                ((dateValue*)variableTypeClass)->get_variableName();
+            } else if(variableCountType == "hour_min")
+            {
+                // use the pointer to get variable name in the value class of interest
+                ((hour_minValue*)variableTypeClass)->get_variableName();
+            } else if(variableCountType == "count")
+            {
+                // use the pointer to get variable name in the value class of interest
+                ((size_tValue*)variableTypeClass)->get_variableName();
+            } else
+            {
+                printf("count type \"%s\" for variable \"%s\" has not implemented in code yet!\n",variableCountType.c_str(),variableName.c_str());
+                success = false;
+            }
+        } catch (...) {
+            printf("default exception, can't say what it actually was\n");
+            printf("the object for variableTypeClass \"%s\" for variableName \"%s\" was not kept in memory!!! Check pointer usage in initialization!!!\n",variableCountType.c_str(),variableName.c_str());
+            printf("exiting program!!!\n");
+            exit(1);
+        }
+
+    }
+
+    // delete the temporary pointer so no leaking memory. The input variable value pointer will still continue on
+    //delete variableTypeClass;
+
+    printf("finished running check_variableTypeClassObjectExistence\n");
+
+    return success;
+}
 /*** end check setup functions ***/
 
 /*** description whitespace and line break calculations, with error checking ***/
-bool inputVariables_infoStorage::calculateDescriptionWhiteSpace()
+bool inputVariablesInitializer::calculateDescriptionWhiteSpace()
 {
     bool success = true;
 
     // first calculate the biggest string for the variable names
     unsigned int biggestString = 0;
-    for(size_t varIdx = 0; varIdx < inputVariables.size(); varIdx++)
+    for(size_t varIdx = 0; varIdx < inputVariableStorage.size(); varIdx++)
     {
-        if(inputVariables[varIdx].get_variableName().size() > biggestString)
+        if(inputVariableStorage[varIdx].get_variableName().size() > biggestString)
         {
-            biggestString = inputVariables[varIdx].get_variableName().size();
+            biggestString = inputVariableStorage[varIdx].get_variableName().size();
         }
     }
     descriptionVariableNameColumnSize = biggestString + MIN_VARNAME_WHITESPACE;
@@ -530,30 +749,30 @@ bool inputVariables_infoStorage::calculateDescriptionWhiteSpace()
     // now calculate variable name whitespace for each variable
     unsigned int neededWhiteSpace = 0;
     std::string createdWhiteSpace = "";
-    for(size_t varIdx = 0; varIdx < inputVariables.size(); varIdx++)
+    for(size_t varIdx = 0; varIdx < inputVariableStorage.size(); varIdx++)
     {
-        neededWhiteSpace = descriptionVariableNameColumnSize - inputVariables[varIdx].get_variableName().size(); // defined in header file
+        neededWhiteSpace = descriptionVariableNameColumnSize - inputVariableStorage[varIdx].get_variableName().size(); // defined in header file
         createdWhiteSpace = "";
         for(size_t m = 0; m < neededWhiteSpace; m++)
         {
             createdWhiteSpace = createdWhiteSpace + " ";
         }
-        inputVariables[varIdx].set_variableNameWhiteSpace(createdWhiteSpace);
+        inputVariableStorage[varIdx].set_variableNameWhiteSpace(createdWhiteSpace);
     }
 
     return success;
 }
 
-bool inputVariables_infoStorage::calculateDescriptionLineBreaks()
+bool inputVariablesInitializer::calculateDescriptionLineBreaks()
 {
     bool success = true;
 
-    for(size_t varIdx = 0; varIdx < inputVariables.size(); varIdx++)
+    for(size_t varIdx = 0; varIdx < inputVariableStorage.size(); varIdx++)
     {
         std::vector<unsigned int> wordBreaks;
         // first find all whitespace locations in the description
         // notice there were checks which end the program if the description starts with whitespace, so we can assume all whitespace is after the first character of the description
-        std::string currentDescription = inputVariables[varIdx].get_variableDescription();
+        std::string currentDescription = inputVariableStorage[varIdx].get_variableDescription();
         bool isWord = true;
         for(size_t descriptionVarIdx = 0; descriptionVarIdx < currentDescription.length(); descriptionVarIdx++)
         {
@@ -574,21 +793,21 @@ bool inputVariables_infoStorage::calculateDescriptionLineBreaks()
         }
 
         // now find the closest whitespace location before the max column size and add that location to the description line breaks
-        inputVariables[varIdx].add_variableDescriptionLineBreaks(0);  // start out with the first break as 0, also avoids breaking problems later
+        inputVariableStorage[varIdx].add_variableDescriptionLineBreaks(0);  // start out with the first break as 0, also avoids breaking problems later
         unsigned int lineCount = 0;
         unsigned int lineWordCount = 0;
         unsigned int descriptionMaxSize = MAX_DESCRIPTION_LINESIZE - descriptionVariableNameColumnSize;
         for(size_t wordIdx = 0; wordIdx < wordBreaks.size(); wordIdx++)
         {
-            unsigned int currentLineSize = wordBreaks[wordIdx] - inputVariables[varIdx].get_variableDescriptionLineBreaks()[lineCount];
+            unsigned int currentLineSize = wordBreaks[wordIdx] - inputVariableStorage[varIdx].get_variableDescriptionLineBreaks()[lineCount];
             lineWordCount = lineWordCount + 1;
             if(currentLineSize >= descriptionMaxSize)
             {
                 if(currentLineSize > MAX_DESCRIPTION_LINESIZE)
                 {
-                    printf("found description word for variable \"%s\" bigger than MAX_DESCRIPTION_LINESIZE of %d! Need to have programmer revise description!\n This problem will kill program, so exiting program!\n",inputVariables[varIdx].get_variableDescription().c_str(),MAX_DESCRIPTION_LINESIZE);
+                    printf("found description word for variable \"%s\" bigger than MAX_DESCRIPTION_LINESIZE of %d! Need to have programmer revise description!\n This problem will kill program, so exiting program!\n",inputVariableStorage[varIdx].get_variableDescription().c_str(),MAX_DESCRIPTION_LINESIZE);
                 }
-                inputVariables[varIdx].add_variableDescriptionLineBreaks(wordBreaks[wordIdx-1]);
+                inputVariableStorage[varIdx].add_variableDescriptionLineBreaks(wordBreaks[wordIdx-1]);
                 if(lineWordCount < MIN_WORDS_PER_DESCRIPTION_LINE)
                 {
                     printf("added variableDescriptionLineBreak for description line with only \"%d\" words for lineCount \"%d\". MIN_WORDS_PER_DESCRIPTION_LINE is \"%d\"\n",lineWordCount,lineCount,MIN_WORDS_PER_DESCRIPTION_LINE);
@@ -597,7 +816,7 @@ bool inputVariables_infoStorage::calculateDescriptionLineBreaks()
                 lineWordCount = 0;
             } else if(wordIdx == wordBreaks.size()-1)
             {
-                inputVariables[varIdx].add_variableDescriptionLineBreaks(wordBreaks[wordIdx]);
+                inputVariableStorage[varIdx].add_variableDescriptionLineBreaks(wordBreaks[wordIdx]);
                 // don't care if fewer words per line than MIN_WORDS_PER_DESCRIPTION_LINE for the last line
             }
         }
@@ -606,7 +825,7 @@ bool inputVariables_infoStorage::calculateDescriptionLineBreaks()
     return success;
 }
 
-void inputVariables_infoStorage::calculate_maxVarNameColumnWhitespace()
+void inputVariablesInitializer::calculate_maxVarNameColumnWhitespace()
 {
     for(size_t whitespaceCount = 0; whitespaceCount < descriptionVariableNameColumnSize; whitespaceCount++)
     {

@@ -2,7 +2,7 @@
 #define INPUTVARIABLESHANDLER_H
 
 
-#include "inputVariables_valueStorage.h"
+#include "inputVariablesInitializer.h"
 
 #include "inputParser.h"
 
@@ -18,7 +18,7 @@ public:
 
     // data passer between inputVariablesHandler and inputParser functions
     // man I know there is a smarter way and it involves pointers and probably copy constructors, but I'm in a hurry
-    void transferVariableInfo();
+    void transferInputVariableStorage();
 
     // functions
     void explainInputReqs();
@@ -29,8 +29,6 @@ public:
     std::string get_actual_run_base_name();
     std::string get_actualLcpPath();
 
-    // will probably have to repeat the functions from the inputVariable_valueStorage class unfortunately.
-    // Difference is the values won't be stored in this class, just in the one referenced here
     // get variable value functions for single values
     boolValue get_boolValue(std::string varName);
     size_tValue get_size_tValue(std::string varName);
@@ -59,6 +57,8 @@ private:
 
     // functions
     bool reset();
+    bool resetSingleVar(singleInputVariable &inputVar);
+    bool setSpecializedDefaults();
     bool verifyFoundInputCombinations();
     bool findActualCreateInputsAndFinalOutputsPaths();
     bool findActualLcpPathAndBaseName();
@@ -74,10 +74,47 @@ private:
     void checkUsage_requiredIfCertainValueSet(std::string ifSetVarName, std::vector<std::string> checkVarNames, bool &InputCombinationSuccess);
     void checkUsage_chooseOnlyOneIfCertainValueSet(std::string ifSetVarName, std::vector<std::string> checkVarNames, bool &InputCombinationSuccess);
 
+    // set variable value functions
+    bool set_boolValue(std::string varName, bool newBoolValue);
+    bool set_size_tValue(std::string varName, size_t newSize_tValue);
+    bool set_intValue(std::string varName, int newIntValue);
+    bool set_doubleValue(std::string varName, double newDoubleValue, std::string doubleType);
+    bool set_stringValue(std::string varName, std::string newStringValue);
+    bool set_pathNameValue(std::string varName, std::string newPathNameValue);
+    bool set_lcpFileValue(std::string varName, std::string newLcpFileValue);
+    bool set_shapeFileValue(std::string varName, std::string newShapeFileValue);
+    bool set_wrfFileValue(std::string varName, std::string newWrfFileValue);
+    bool set_lat_longValue(std::string varName, double newLatValue, double newLongValue);
+    bool set_dateValue(std::string varName, int newYearValue, int newMonthValue, int newDayValue, int newHourValue, int newMinuteValue);
+    bool set_hour_minValue(std::string varName, int newHourValue, int newMinuteValue);
+
+    // load function stuff for count type variables
+    bool add_createIgnitionLatLongValue(double newLat_CoordValue, double newLong_CoordValue);
+    bool add_polygonIgnitShapeFile(std::string new_polygon_ignit_shape_file);
+    bool add_GeoMACfirePerimeterFile(std::string new_GeoMAC_fire_perimeter_file);
+    bool add_farsiteOutputFirePerimeterFile(std::string new_farsite_output_fire_perimeter_file);
+    bool add_wrfFile(std::string new_wrf_file);
+    bool add_additionalWindNinjaOutputs_googleValueSet(std::string new_wrf_file_name, bool new_write_wx_model_goog_output, bool new_write_goog_output, double new_goog_out_resolution,
+                                                       std::string new_units_goog_out_resolution, std::string new_goog_out_color_scheme, bool new_goog_out_vector_scaling);
+    bool add_additionalWindNinjaOutputs_shapefileValueSet(std::string new_wrf_file_name, bool new_write_wx_model_shapefile_output, bool new_write_shapefile_output,
+                                                          double new_shape_out_resolution, std::string new_units_shape_out_resolution);
+    bool add_additionalWindNinjaOutputs_pdfValueSet(std::string new_wrf_file_name, bool new_write_pdf_output, double new_pdf_out_resolution, std::string new_units_pdf_out_resolution,
+                                                        double new_pdf_linewidth, std::string new_pdf_basemap, double new_pdf_height, double new_pdf_width, std::string new_pdf_size);
+
     // class data members
-    std::vector<inputVariable_info> inputVariableInfo;
-    inputVariables_valueStorage inputVariableValues;
+    inputVariablesInitializer initialVariables;
+    std::vector<singleInputVariable> inputVariableStorage;
     inputParser theInputParser;
+
+    // variable value of type count data members
+    createIgnitionFromLatLongsStorage stored_create_ignition_from_latlongs;
+    polygonIgnitShapeFileStorage stored_polygon_ignit_shape_files;
+    GeoMACfirePerimeterFileStorage stored_GeoMAC_fire_perimeter_files;
+    farsiteOutputFirePerimeterFileStorage stored_farsite_output_fire_perimeter_files;
+    wrfFileStorage stored_wrf_files;
+    additionalWindNinjaOutputs_googleStorage stored_additional_WindNinja_Outputs_google;
+    additionalWindNinjaOutputs_shapefileStorage stored_additional_WindNinja_Outputs_shapefile;
+    additionalWindNinjaOutputs_pdfStorage stored_additional_WindNinja_Outputs_pdf;
 
     // important for file management
     std::string actualCreateInputs_path;

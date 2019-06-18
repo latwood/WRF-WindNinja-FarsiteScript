@@ -211,5 +211,10 @@ Pretty similar to adding a single line of input type variable, but now you don't
 Probably the biggest difference is that now you don't have to edit inputParser::loadCountValues(), because the type is "count" which is type "size_tValue". But now you need to mess with inputParser::loadLoaderFunctionData().
 
 
+######### work to simplify the annoying input class stuff by using pointers to classes ###########
+
+This is so close. I could at least get it to compile!!! But I'm having trouble cause the pointers aren't carrying over so data is initialized, but not kept. Honestly it almost looks like my whole style for the constructor stuff might need to be severely changed. Part of the trouble is that over half the programmers out there seem convinced that if you use a pointer to a class, that you are using "new" to make it a dynamic pointer instead of an automatic pointer, so while it seems the real problem is that I just need to add a copy constructor and assignment operator to some of the input classes (especially the singleInputVariable since it has a pointer to the variableValue classes), but all the help is for dynamic pointers instead of automatic pointers. Or they say "use static, huh huh". Then you throw in that I'm trying to deal with classes of classes or functions so I'm keeping my pointer "private" and finding the right help is tough. So I think a very in depth review of pointers to the level of reading a book on data structures needs to be done before any more work can be done on this.
+
+Here are a few websites that were the most useful during this process: http://www.cplusplus.com/doc/tutorial/pointers/, https://stackoverflow.com/questions/12241001/void-pointer-to-a-dynamically-allocated-class,https://stackoverflow.com/questions/2988273/c-pointer-to-objects, http://pages.cs.wisc.edu/~hasti/cs368/CppTutorial/NOTES/CLASSES-PTRS.html.  Useful but not exactly are these: https://www.geeksforgeeks.org/constructors-c/, https://stackoverflow.com/questions/4570210/c-pointer-scope, https://stackoverflow.com/questions/22146094/why-should-i-use-a-pointer-rather-than-the-object-itself.
 
 

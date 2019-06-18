@@ -36,19 +36,70 @@ void inputParser::reset()
 /*** end reinit functions ***/
 
 /*** variable class getter functions ***/
-void inputParser::loadVariableInfo(inputVariables_valueStorage* newInputVariables)
+void inputParser::loadInputVariableStorage(std::vector<singleInputVariable> &new_inputVariableStorage, createIgnitionFromLatLongsStorage &new_stored_create_ignition_from_latlongs,
+                                                polygonIgnitShapeFileStorage &new_stored_polygon_ignit_shape_files, GeoMACfirePerimeterFileStorage &new_stored_GeoMAC_fire_perimeter_files,
+                                                farsiteOutputFirePerimeterFileStorage &new_stored_farsite_output_fire_perimeter_files, wrfFileStorage &new_stored_wrf_files,
+                                                additionalWindNinjaOutputs_googleStorage &new_stored_additional_WindNinja_Outputs_google,
+                                                additionalWindNinjaOutputs_shapefileStorage &new_stored_additional_WindNinja_Outputs_shapefile,
+                                                additionalWindNinjaOutputs_pdfStorage &new_stored_additional_WindNinja_Outputs_pdf)
 {
-    inputVariableValueStorage = newInputVariables;  // is this the right thing to do with pointers?
-    inputVariablesInfo = inputVariableValueStorage->get_inputVariableInfo();
+    inputVariableStorage = new_inputVariableStorage;
+    stored_create_ignition_from_latlongs = new_stored_create_ignition_from_latlongs;
+    stored_polygon_ignit_shape_files = new_stored_polygon_ignit_shape_files;
+    stored_GeoMAC_fire_perimeter_files = new_stored_GeoMAC_fire_perimeter_files;
+    stored_farsite_output_fire_perimeter_files;
+    stored_wrf_files = new_stored_wrf_files;
+    stored_additional_WindNinja_Outputs_google = new_stored_additional_WindNinja_Outputs_google;
+    stored_additional_WindNinja_Outputs_shapefile = new_stored_additional_WindNinja_Outputs_shapefile;
+    stored_additional_WindNinja_Outputs_pdf = new_stored_additional_WindNinja_Outputs_pdf;
 }
 /*** end variable class getter functions ***/
 
-/*** data passer between inputVariablesHandler and inputParser functions ***/
-std::vector<inputVariable_info> inputParser::transferVariableInfo()
+/*** data passer between inputParser and inputParser functions ***/
+std::vector<singleInputVariable> inputParser::transfer_inputVariableStorage()
 {
-    return inputVariablesInfo;
+    return inputVariableStorage;
 }
-/*** end data passer between inputVariablesHandler and inputParser functions ***/
+
+createIgnitionFromLatLongsStorage inputParser::transfer_stored_create_ignition_from_latlongs()
+{
+    return stored_create_ignition_from_latlongs;
+}
+
+polygonIgnitShapeFileStorage inputParser::transfer_stored_polygon_ignit_shape_files()
+{
+    return stored_polygon_ignit_shape_files;
+}
+
+GeoMACfirePerimeterFileStorage inputParser::transfer_stored_GeoMAC_fire_perimeter_files()
+{
+    return stored_GeoMAC_fire_perimeter_files;
+}
+
+farsiteOutputFirePerimeterFileStorage inputParser::transfer_stored_farsite_output_fire_perimeter_files()
+{
+    return stored_farsite_output_fire_perimeter_files;
+}
+wrfFileStorage inputParser::transfer_stored_wrf_files()
+{
+    return stored_wrf_files;
+}
+
+additionalWindNinjaOutputs_googleStorage inputParser::transfer_stored_additional_WindNinja_Outputs_google()
+{
+    return stored_additional_WindNinja_Outputs_google;
+}
+
+additionalWindNinjaOutputs_shapefileStorage inputParser::transfer_stored_additional_WindNinja_Outputs_shapefile()
+{
+    return stored_additional_WindNinja_Outputs_shapefile;
+}
+
+additionalWindNinjaOutputs_pdfStorage inputParser::transfer_stored_additional_WindNinja_Outputs_pdf()
+{
+    return stored_additional_WindNinja_Outputs_pdf;
+}
+/*** end data passer between inputParser and inputParser functions ***/
 
 /*** main loader functions ***/
 bool inputParser::readInputFile(std::string inputFileName)
@@ -173,13 +224,13 @@ bool inputParser::readVarNamesAndCountValues()
             removeLeadingWhitespace(foundCountValue);   // just in case
             // now determine if it is a valid variable name, if so, store the values
             bool foundVar = false;
-            for(size_t varIdx = 0; varIdx < inputVariablesInfo.size(); varIdx++)
+            for(size_t varIdx = 0; varIdx < inputVariableStorage.size(); varIdx++)
             {
-                if(inputVariablesInfo[varIdx].get_variableName() == foundVarName)
+                if(inputVariableStorage[varIdx].get_variableName() == foundVarName)
                 {
                     foundVarNames.push_back(foundVarName);
                     foundVarNames_inputVariableInfoIndices.push_back(varIdx);
-                    inputVariablesInfo[varIdx].set_isFoundInInputFile(true,lineIdx);
+                    inputVariableStorage[varIdx].set_isFoundInInputFile(true,lineIdx);
                     foundVarCountStrings.push_back(foundCountValue);
                     foundVar = true;
                     break;
@@ -207,101 +258,101 @@ bool inputParser::loadCountValues()
         size_t currentInfoIdx = foundVarNames_inputVariableInfoIndices[varNameIdx];
         std::string currentVarName = foundVarNames[varNameIdx];
         std::string currentVarCountString = foundVarCountStrings[varNameIdx];
-        std::string currentCountType = inputVariablesInfo[currentInfoIdx].get_variableCountType();
+        std::string currentCountType = inputVariableStorage[currentInfoIdx].get_variableCountType();
         if(currentCountType == "bool")
         {
-            if(inputVariableValueStorage->set_boolValue_string(currentVarName,currentVarCountString) == false)
+            if(set_boolValue_string(currentVarName,currentVarCountString) == false)
             {
                 printf("couldn't set bool value \"%s\" to variable \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str());
                 success = false;
             }
         } else if(currentCountType == "size_t")
         {
-            if(inputVariableValueStorage->set_size_tValue_string(currentVarName,currentVarCountString) == false)
+            if(set_size_tValue_string(currentVarName,currentVarCountString) == false)
             {
                 printf("couldn't set size_t value \"%s\" to variable \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str());
             }
         } else if(currentCountType == "int")
         {
-            if(inputVariableValueStorage->set_intValue_string(currentVarName,currentVarCountString) == false)
+            if(set_intValue_string(currentVarName,currentVarCountString) == false)
             {
                 printf("couldn't set int value \"%s\" to variable \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str());
             }
         } else if(currentCountType == "double")
         {
-            if(inputVariableValueStorage->set_doubleValue_string(currentVarName,currentVarCountString,"regular") == false)
+            if(set_doubleValue_string(currentVarName,currentVarCountString,"regular") == false)
             {
                 printf("couldn't set double value \"%s\" to variable \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str());
             }
         } else if(currentCountType == "positive double")
         {
-            if(inputVariableValueStorage->set_doubleValue_string(currentVarName,currentVarCountString,"positive") == false)
+            if(set_doubleValue_string(currentVarName,currentVarCountString,"positive") == false)
             {
                 printf("couldn't set positive double value \"%s\" to variable \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str());
             }
         } else if(currentCountType == "signless percent")
         {
-            if(inputVariableValueStorage->set_doubleValue_string(currentVarName,currentVarCountString,"signless percent") == false)
+            if(set_doubleValue_string(currentVarName,currentVarCountString,"signless percent") == false)
             {
                 printf("couldn't set signless percent value \"%s\" to variable \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str());
             }
         } else if(currentCountType == "string")
         {
-            if(inputVariableValueStorage->set_stringValue(currentVarName,currentVarCountString) == false)
+            if(set_stringValue(currentVarName,currentVarCountString) == false)
             {
                 printf("couldn't set string \"%s\" to variable \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str());
             }
         } else if(currentCountType == "pathname")
         {
-            if(inputVariableValueStorage->set_pathNameValue(currentVarName,currentVarCountString) == false)
+            if(set_pathNameValue(currentVarName,currentVarCountString) == false)
             {
                 printf("couldn't set pathname \"%s\" to variable \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str());
             }
         } else if(currentCountType == "lcp filename")
         {
-            if(inputVariableValueStorage->set_lcpFileValue(currentVarName,currentVarCountString) == false)
+            if(set_lcpFileValue(currentVarName,currentVarCountString) == false)
             {
                 printf("couldn't set lcp filename \"%s\" to variable \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str());
             }
         } else if(currentCountType == "shape filename")
         {
-            if(inputVariableValueStorage->set_shapeFileValue(currentVarName,currentVarCountString) == false)
+            if(set_shapeFileValue(currentVarName,currentVarCountString) == false)
             {
                 printf("couldn't set shape filename \"%s\" to variable \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str());
             }
         } else if(currentCountType == "lat_coord")
         {
-            if(inputVariableValueStorage->set_doubleValue_string(currentVarName,currentVarCountString,"lat_coord") == false)
+            if(set_doubleValue_string(currentVarName,currentVarCountString,"lat_coord") == false)
             {
                 printf("couldn't set lat_coord value \"%s\" to variable \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str());
             }
         } else if(currentCountType == "long_coord")
         {
-            if(inputVariableValueStorage->set_doubleValue_string(currentVarName,currentVarCountString,"long_coord") == false)
+            if(set_doubleValue_string(currentVarName,currentVarCountString,"long_coord") == false)
             {
                 printf("couldn't set long_coord value \"%s\" to variable \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str());
             }
         } else if(currentCountType == "lat_long_point")
         {
-            if(inputVariableValueStorage->set_lat_longValue_string(currentVarName,currentVarCountString) == false)
+            if(set_lat_longValue_string(currentVarName,currentVarCountString) == false)
             {
                 printf("couldn't set lat_long_point value \"%s\" \"(lat long)\" to variable \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str());
             }
         } else if(currentCountType == "date")
         {
-            if(inputVariableValueStorage->set_dateValue_string(currentVarName,currentVarCountString) == false)
+            if(set_dateValue_string(currentVarName,currentVarCountString) == false)
             {
                 printf("couldn't set date value \"%s\" to variable \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str());
             }
         } else if(currentCountType == "hour_min")
         {
-            if(inputVariableValueStorage->set_hour_minValue_string(currentVarName,currentVarCountString) == false)
+            if(set_hour_minValue_string(currentVarName,currentVarCountString) == false)
             {
                 printf("couldn't set hour_min value \"%s\" to variable \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str());
             }
         } else if(currentCountType == "count")
         {
-            if(inputVariableValueStorage->set_size_tValue_string(currentVarName,currentVarCountString) == false)
+            if(set_size_tValue_string(currentVarName,currentVarCountString) == false)
             {
                 printf("couldn't set size_t count value \"%s\" to variable \"%s\"!\n",currentVarCountString.c_str(),currentVarName.c_str());
                 success = false;
@@ -339,7 +390,7 @@ bool inputParser::checkCountVsLinesOfData()
             // now see if it is the right number of lines for the current varName
             size_t currentInfoIdx = foundVarNames_inputVariableInfoIndices[varNameIdx];
             std::string currentVarName = foundVarNames[varNameIdx];
-            std::string currentCountType = inputVariablesInfo[currentInfoIdx].get_variableCountType();
+            std::string currentCountType = inputVariableStorage[currentInfoIdx].get_variableCountType();
             if(currentCountType != "count")
             {
                 if(dataCount != 0)
@@ -350,7 +401,7 @@ bool inputParser::checkCountVsLinesOfData()
                 }
             } else
             {
-                size_t currentVarCount = inputVariableValueStorage->get_size_tValue(currentVarName).get_storedSize_tValue();
+                size_t currentVarCount = get_size_tValue(currentVarName).get_storedSize_tValue();
                 if(dataCount != currentVarCount)
                 {
                     printf("found \"%zu\" lines of varData for varName \"%s\", should have found \"%zu\" lines of varData!\n",dataCount,currentVarName.c_str(),currentVarCount);
@@ -386,16 +437,16 @@ bool inputParser::loadLoaderFunctionData()
         {
             size_t currentInfoIdx = foundVarNames_inputVariableInfoIndices[varNameIdx];
             std::string currentVarName = foundVarNames[varNameIdx];
-            std::string currentCountType = inputVariablesInfo[currentInfoIdx].get_variableCountType();
+            std::string currentCountType = inputVariableStorage[currentInfoIdx].get_variableCountType();
             if(currentCountType == "count")
             {
-                size_t currentVarCount = inputVariableValueStorage->get_size_tValue(currentVarName).get_storedSize_tValue();
+                size_t currentVarCount = get_size_tValue(currentVarName).get_storedSize_tValue();
                 if(currentVarName == "create_ignition_from_latlongs")
                 {
                     for(size_t dataIdx = 0; dataIdx < currentVarCount; dataIdx++)
                     {
                         lineIdx = lineIdx + 1;  // already read one line, need to move to the data line
-                        if(inputVariableValueStorage->add_createIgnitionLatLongValue_Line(foundInputLines[lineIdx]) == false)
+                        if(add_createIgnitionLatLongValue_Line(foundInputLines[lineIdx]) == false)
                         {
                             printf("couldn't parse line \"%zu\" \"%s\" as a \"%s\" variable!\n",lineIdx+1,foundInputLines[lineIdx].c_str(),currentVarName.c_str());
                             success = false;
@@ -407,7 +458,7 @@ bool inputParser::loadLoaderFunctionData()
                     for(size_t dataIdx = 0; dataIdx < currentVarCount; dataIdx++)
                     {
                         lineIdx = lineIdx + 1;  // already read one line, need to move to the data line
-                        if(inputVariableValueStorage->add_polygonIgnitShapeFile_Line(foundInputLines[lineIdx]) == false)
+                        if(add_polygonIgnitShapeFile_Line(foundInputLines[lineIdx]) == false)
                         {
                             printf("couldn't parse line \"%zu\" \"%s\" as a \"%s\" variable!\n",lineIdx+1,foundInputLines[lineIdx].c_str(),currentVarName.c_str());
                             success = false;
@@ -419,7 +470,7 @@ bool inputParser::loadLoaderFunctionData()
                     for(size_t dataIdx = 0; dataIdx < currentVarCount; dataIdx++)
                     {
                         lineIdx = lineIdx + 1;  // already read one line, need to move to the data line
-                        if(inputVariableValueStorage->add_GeoMACfirePerimeterFile_Line(foundInputLines[lineIdx]) == false)
+                        if(add_GeoMACfirePerimeterFile_Line(foundInputLines[lineIdx]) == false)
                         {
                             printf("couldn't parse line \"%zu\" \"%s\" as a \"%s\" variable!\n",lineIdx+1,foundInputLines[lineIdx].c_str(),currentVarName.c_str());
                             success = false;
@@ -431,7 +482,7 @@ bool inputParser::loadLoaderFunctionData()
                     for(size_t dataIdx = 0; dataIdx < currentVarCount; dataIdx++)
                     {
                         lineIdx = lineIdx + 1;  // already read one line, need to move to the data line
-                        if(inputVariableValueStorage->add_farsiteOutputFirePerimeterFile_Line(foundInputLines[lineIdx]) == false)
+                        if(add_farsiteOutputFirePerimeterFile_Line(foundInputLines[lineIdx]) == false)
                         {
                             printf("couldn't parse line \"%zu\" \"%s\" as a \"%s\" variable!\n",lineIdx+1,foundInputLines[lineIdx].c_str(),currentVarName.c_str());
                             success = false;
@@ -444,7 +495,7 @@ bool inputParser::loadLoaderFunctionData()
                     for(size_t dataIdx = 0; dataIdx < currentVarCount; dataIdx++)
                     {
                         lineIdx = lineIdx + 1;  // already read one line, need to move to the data line
-                        if(inputVariableValueStorage->add_wrfFile_Line(foundInputLines[lineIdx]) == false)
+                        if(add_wrfFile_Line(foundInputLines[lineIdx]) == false)
                         {
                             printf("couldn't parse line \"%zu\" \"%s\" as a \"%s\" variable!\n",lineIdx+1,foundInputLines[lineIdx].c_str(),currentVarName.c_str());
                             success = false;
@@ -457,7 +508,7 @@ bool inputParser::loadLoaderFunctionData()
                     for(size_t dataIdx = 0; dataIdx < currentVarCount; dataIdx++)
                     {
                         lineIdx = lineIdx + 1;  // already read one line, need to move to the data line
-                        if(inputVariableValueStorage->add_additionalWindNinjaOutputs_googleValue_Line(foundInputLines[lineIdx]) == false)
+                        if(add_additionalWindNinjaOutputs_googleValue_Line(foundInputLines[lineIdx]) == false)
                         {
                             printf("couldn't parse line \"%zu\" \"%s\" as a \"%s\" variable!\n",lineIdx+1,foundInputLines[lineIdx].c_str(),currentVarName.c_str());
                             success = false;
@@ -469,7 +520,7 @@ bool inputParser::loadLoaderFunctionData()
                     for(size_t dataIdx = 0; dataIdx < currentVarCount; dataIdx++)
                     {
                         lineIdx = lineIdx + 1;  // already read one line, need to move to the data line
-                        if(inputVariableValueStorage->add_additionalWindNinjaOutputs_shapeValue_Line(foundInputLines[lineIdx]) == false)
+                        if(add_additionalWindNinjaOutputs_shapeValue_Line(foundInputLines[lineIdx]) == false)
                         {
                             printf("couldn't parse line \"%zu\" \"%s\" as a \"%s\" variable!\n",lineIdx+1,foundInputLines[lineIdx].c_str(),currentVarName.c_str());
                             success = false;
@@ -481,7 +532,7 @@ bool inputParser::loadLoaderFunctionData()
                     for(size_t dataIdx = 0; dataIdx < currentVarCount; dataIdx++)
                     {
                         lineIdx = lineIdx + 1;  // already read one line, need to move to the data line
-                        if(inputVariableValueStorage->add_additionalWindNinjaOutputs_pdfValue_Line(foundInputLines[lineIdx]) == false)
+                        if(add_additionalWindNinjaOutputs_pdfValue_Line(foundInputLines[lineIdx]) == false)
                         {
                             printf("couldn't parse line \"%zu\" \"%s\" as a \"%s\" variable!\n",lineIdx+1,foundInputLines[lineIdx].c_str(),currentVarName.c_str());
                             success = false;
@@ -590,3 +641,367 @@ void inputParser::removeSeparator(std::string inputString, std::string &varNameP
     }
 }
 /*** end parsing utility functions ***/
+
+/*** set variable value functions ***/
+bool inputParser::set_boolValue_string(std::string varName, std::string newStringBoolValue)
+{
+    // first look for variable in vector of values, using the name
+    size_t varIdx = findVarInfoIdx(varName);
+
+    // create a temporary generic pointer for pulling out the value
+    void* variableTypeClass;
+    // set the generic pointer to the input variable value pointer
+    variableTypeClass = inputVariableStorage[varIdx].get_variableTypeClass();
+    // use the pointer to set the value of interest
+    ((boolValue*)variableTypeClass)->set_storedBoolValue_string(newStringBoolValue);
+    // delete the temporary pointer so no leaking memory. The input variable value pointer will still continue on
+    //delete variableTypeClass;
+
+    // if it got here, no error occurred
+    return 0;
+}
+
+bool inputParser::set_size_tValue_string(std::string varName, std::string newStringSize_tValue)
+{
+    // first look for variable in vector of values, using the name
+    size_t varIdx = findVarInfoIdx(varName);
+
+    // create a temporary generic pointer for pulling out the value
+    void* variableTypeClass;
+    // set the generic pointer to the input variable value pointer
+    variableTypeClass = inputVariableStorage[varIdx].get_variableTypeClass();
+    // use the pointer to set the value of interest
+    ((size_tValue*)variableTypeClass)->set_storedSize_tValue_string(newStringSize_tValue);
+    // delete the temporary pointer so no leaking memory. The input variable value pointer will still continue on
+    //delete variableTypeClass;
+
+    // if it got here, no error occurred
+    return 0;
+}
+
+bool inputParser::set_intValue_string(std::string varName, std::string newStringIntValue)
+{
+    // first look for variable in vector of values, using the name
+    size_t varIdx = findVarInfoIdx(varName);
+
+    // create a temporary generic pointer for pulling out the value
+    void* variableTypeClass;
+    // set the generic pointer to the input variable value pointer
+    variableTypeClass = inputVariableStorage[varIdx].get_variableTypeClass();
+    // use the pointer to set the value of interest
+    ((intValue*)variableTypeClass)->set_storedIntValue_string(newStringIntValue);
+    // delete the temporary pointer so no leaking memory. The input variable value pointer will still continue on
+    //delete variableTypeClass;
+
+    // if it got here, no error occurred
+    return 0;
+}
+
+bool inputParser::set_doubleValue_string(std::string varName, std::string newStringDoubleValue, std::string doubleType)
+{
+    // first look for variable in vector of values, using the name
+    size_t varIdx = findVarInfoIdx(varName);
+
+    // create a temporary generic pointer for pulling out the value
+    void* variableTypeClass;
+    // set the generic pointer to the input variable value pointer
+    variableTypeClass = inputVariableStorage[varIdx].get_variableTypeClass();
+    // use the pointer to set the value of interest
+    ((doubleValue*)variableTypeClass)->set_storedDoubleValue_string(newStringDoubleValue,doubleType);
+    // delete the temporary pointer so no leaking memory. The input variable value pointer will still continue on
+    //delete variableTypeClass;
+
+    // if it got here, no error occurred
+    return 0;
+}
+
+/*bool inputParser::set_lat_longValue_string(std::string varName, std::string newStringLatValue, std::string newStringLongValue)
+{
+    // first look for variable in vector of values, using the name
+    size_t varIdx = findVarInfoIdx(varName);
+
+    // create a temporary generic pointer for pulling out the value
+    void* variableTypeClass;
+    // set the generic pointer to the input variable value pointer
+    variableTypeClass = inputVariableStorage[varIdx].get_variableTypeClass();
+    // use the pointer to set the value of interest
+    ((lat_longValue*)variableTypeClass)->set_storedLatLongValue_string(newStringLatValue,newStringLongValue);
+    // delete the temporary pointer so no leaking memory. The input variable value pointer will still continue on
+    //delete variableTypeClass;
+
+    // if it got here, no error occurred
+    return 0;
+}*/
+
+bool inputParser::set_lat_longValue_string(std::string varName, std::string newLatLongValueString)
+{
+    // first look for variable in vector of values, using the name
+    size_t varIdx = findVarInfoIdx(varName);
+
+    // create a temporary generic pointer for pulling out the value
+    void* variableTypeClass;
+    // set the generic pointer to the input variable value pointer
+    variableTypeClass = inputVariableStorage[varIdx].get_variableTypeClass();
+    // use the pointer to set the value of interest
+    ((lat_longValue*)variableTypeClass)->set_storedLatLongValue_string(newLatLongValueString);
+    // delete the temporary pointer so no leaking memory. The input variable value pointer will still continue on
+    //delete variableTypeClass;
+
+    // if it got here, no error occurred
+    return 0;
+}
+
+/*bool inputParser::set_dateValue_string(std::string varName, std::string newStringYearValue, std::string newStringMonthValue, std::string newStringDayValue, std::string newStringHourValue, std::string newStringMinuteValue)
+{
+    // first look for variable in vector of values, using the name
+    size_t varIdx = findVarInfoIdx(varName);
+
+    // create a temporary generic pointer for pulling out the value
+    void* variableTypeClass;
+    // set the generic pointer to the input variable value pointer
+    variableTypeClass = inputVariableStorage[varIdx].get_variableTypeClass();
+    // use the pointer to set the value of interest
+    ((dateValue*)variableTypeClass)->set_storedDateValue_string(newStringYearValue,newStringMonthValue,newStringDayValue,newStringHourValue,newStringMinuteValue);
+    // delete the temporary pointer so no leaking memory. The input variable value pointer will still continue on
+    //delete variableTypeClass;
+
+    // if it got here, no error occurred
+    return 0;
+}*/
+
+bool inputParser::set_dateValue_string(std::string varName, std::string newDateValueString)
+{
+    // first look for variable in vector of values, using the name
+    size_t varIdx = findVarInfoIdx(varName);
+
+    // create a temporary generic pointer for pulling out the value
+    void* variableTypeClass;
+    // set the generic pointer to the input variable value pointer
+    variableTypeClass = inputVariableStorage[varIdx].get_variableTypeClass();
+    // use the pointer to set the value of interest
+    ((dateValue*)variableTypeClass)->set_storedDateValue_string(newDateValueString);
+    // delete the temporary pointer so no leaking memory. The input variable value pointer will still continue on
+    //delete variableTypeClass;
+
+    // if it got here, no error occurred
+    return 0;
+}
+
+/*bool inputParser::set_hour_minValue_string(std::string varName, std::string newStringHourValue, std::string newStringMinuteValue)
+{
+    // first look for variable in vector of values, using the name
+    size_t varIdx = findVarInfoIdx(varName);
+
+    // create a temporary generic pointer for pulling out the value
+    void* variableTypeClass;
+    // set the generic pointer to the input variable value pointer
+    variableTypeClass = inputVariableStorage[varIdx].get_variableTypeClass();
+    // use the pointer to set the value of interest
+    ((hour_minValue*)variableTypeClass)->set_storedHour_MinValue_string(newStringHourValue,newStringMinuteValue);
+    // delete the temporary pointer so no leaking memory. The input variable value pointer will still continue on
+    //delete variableTypeClass;
+
+    // if it got here, no error occurred
+    return 0;
+}*/
+
+bool inputParser::set_hour_minValue_string(std::string varName, std::string newHourMinValue)
+{
+    // first look for variable in vector of values, using the name
+    size_t varIdx = findVarInfoIdx(varName);
+
+    // create a temporary generic pointer for pulling out the value
+    void* variableTypeClass;
+    // set the generic pointer to the input variable value pointer
+    variableTypeClass = inputVariableStorage[varIdx].get_variableTypeClass();
+    // use the pointer to set the value of interest
+    ((hour_minValue*)variableTypeClass)->set_storedHour_MinValue_string(newHourMinValue);
+    // delete the temporary pointer so no leaking memory. The input variable value pointer will still continue on
+    //delete variableTypeClass;
+
+    // if it got here, no error occurred
+    return 0;
+}
+/*** end set variable value functions ***/
+
+/*** load function stuff for count type variables ***/
+bool inputParser::add_createIgnitionLatLongValue_Line(std::string inputDataLine)
+{
+    return stored_create_ignition_from_latlongs.add_createIgnitionLatLongValue_Line(inputDataLine);
+}
+
+bool inputParser::add_polygonIgnitShapeFile_Line(std::string inputDataLine)
+{
+    return stored_polygon_ignit_shape_files.add_polygonIgnitShapeFile_Line(inputDataLine);
+}
+
+bool inputParser::add_GeoMACfirePerimeterFile_Line(std::string inputDataLine)
+{
+    return stored_GeoMAC_fire_perimeter_files.add_GeoMACfirePerimeterFile_Line(inputDataLine);
+}
+
+bool inputParser::add_farsiteOutputFirePerimeterFile_Line(std::string inputDataLine)
+{
+    return stored_farsite_output_fire_perimeter_files.add_farsiteOutputFirePerimeterFile_Line(inputDataLine);
+}
+
+bool inputParser::add_wrfFile_Line(std::string inputDataLine)
+{
+    return stored_wrf_files.add_wrfFile_Line(inputDataLine);
+}
+
+bool inputParser::add_additionalWindNinjaOutputs_googleValue_Line(std::string inputDataLine)
+{
+    return stored_additional_WindNinja_Outputs_google.add_additionalWindNinjaOutputs_googleValue_Line(inputDataLine);
+}
+
+bool inputParser::add_additionalWindNinjaOutputs_shapeValue_Line(std::string inputDataLine)
+{
+    return stored_additional_WindNinja_Outputs_shapefile.add_additionalWindNinjaOutputs_shapeValue_Line(inputDataLine);
+}
+
+bool inputParser::add_additionalWindNinjaOutputs_pdfValue_Line(std::string inputDataLine)
+{
+    return stored_additional_WindNinja_Outputs_pdf.add_additionalWindNinjaOutputs_pdfValue_Line(inputDataLine);
+}
+/*** end load function stuff for count type variables ***/
+
+/*** other set variable value functions ***/
+bool inputParser::set_stringValue(std::string varName, std::string newStringValue)
+{
+    // first look for variable in vector of values, using the name
+    size_t varIdx = findVarInfoIdx(varName);
+
+    // create a temporary generic pointer for pulling out the value
+    void* variableTypeClass;
+    // set the generic pointer to the input variable value pointer
+    variableTypeClass = inputVariableStorage[varIdx].get_variableTypeClass();
+    // use the pointer to set the value of interest
+    ((stringValue*)variableTypeClass)->set_storedStringValue(newStringValue,varName);
+    // delete the temporary pointer so no leaking memory. The input variable value pointer will still continue on
+    //delete variableTypeClass;
+
+    // if it got here, no error occurred
+    return 0;
+}
+
+bool inputParser::set_pathNameValue(std::string varName, std::string newPathNameValue)
+{
+    // first look for variable in vector of values, using the name
+    size_t varIdx = findVarInfoIdx(varName);
+
+    // create a temporary generic pointer for pulling out the value
+    void* variableTypeClass;
+    // set the generic pointer to the input variable value pointer
+    variableTypeClass = inputVariableStorage[varIdx].get_variableTypeClass();
+    // use the pointer to set the value of interest
+    ((pathNameValue*)variableTypeClass)->set_storedPathNameValue(newPathNameValue);
+    // delete the temporary pointer so no leaking memory. The input variable value pointer will still continue on
+    //delete variableTypeClass;
+
+    // if it got here, no error occurred
+    return 0;
+}
+
+bool inputParser::set_lcpFileValue(std::string varName, std::string newLcpFileValue)
+{
+    // first look for variable in vector of values, using the name
+    size_t varIdx = findVarInfoIdx(varName);
+
+    // create a temporary generic pointer for pulling out the value
+    void* variableTypeClass;
+    // set the generic pointer to the input variable value pointer
+    variableTypeClass = inputVariableStorage[varIdx].get_variableTypeClass();
+    // use the pointer to set the value of interest
+    ((lcpFileValue*)variableTypeClass)->set_storedLcpFileValue(newLcpFileValue);
+    // delete the temporary pointer so no leaking memory. The input variable value pointer will still continue on
+    //delete variableTypeClass;
+
+    // if it got here, no error occurred
+    return 0;
+}
+
+bool inputParser::set_shapeFileValue(std::string varName, std::string newShapeFileValue)
+{
+    // first look for variable in vector of values, using the name
+    size_t varIdx = findVarInfoIdx(varName);
+
+    // create a temporary generic pointer for pulling out the value
+    void* variableTypeClass;
+    // set the generic pointer to the input variable value pointer
+    variableTypeClass = inputVariableStorage[varIdx].get_variableTypeClass();
+    // use the pointer to set the value of interest
+    ((shapeFileValue*)variableTypeClass)->set_storedShapeFileValue(newShapeFileValue);
+    // delete the temporary pointer so no leaking memory. The input variable value pointer will still continue on
+    //delete variableTypeClass;
+
+    // if it got here, no error occurred
+    return 0;
+}
+
+bool inputParser::set_wrfFileValue(std::string varName, std::string newWrfFileValue)
+{
+    // first look for variable in vector of values, using the name
+    size_t varIdx = findVarInfoIdx(varName);
+
+    // create a temporary generic pointer for pulling out the value
+    void* variableTypeClass;
+    // set the generic pointer to the input variable value pointer
+    variableTypeClass = inputVariableStorage[varIdx].get_variableTypeClass();
+    // use the pointer to set the value of interest
+    ((wrfFileValue*)variableTypeClass)->set_storedWrfFileName(newWrfFileValue);
+    // delete the temporary pointer so no leaking memory. The input variable value pointer will still continue on
+    //delete variableTypeClass;
+
+    // if it got here, no error occurred
+    return 0;
+}
+/*** end other set variable value functions ***/
+
+/*** get variable value functions ***/
+size_tValue inputParser::get_size_tValue(std::string varName)
+{
+    // first look for variable in vector of values, using the name
+    size_t varIdx = findVarInfoIdx(varName);
+
+    // create a temporary generic pointer for pulling out the value
+    void* variableTypeClass;
+    // set the generic pointer to the input variable value pointer
+    variableTypeClass = inputVariableStorage[varIdx].get_variableTypeClass();
+    // use the pointer to get the value of interest
+    size_tValue foundValue = *((size_tValue*)variableTypeClass);
+    // delete the temporary pointer so no leaking memory. The input variable value pointer will still continue on
+    //delete variableTypeClass;
+    // return the found value
+    return foundValue;
+
+    // if it got here, the variable name doesn't exist in storage
+    printf("could not get bool value for variable name \"%s\", variableName \%s\" does not exist in bool value storage!\n",varName.c_str(),varName.c_str());
+    exit(1);
+}
+
+size_t inputParser::findVarInfoIdx(std::string varName)
+{
+    bool foundVar = false;
+    size_t infoIdx = 0;
+
+    for(size_t varIdx = 0; varIdx < inputVariableStorage.size(); varIdx++)
+    {
+        std::string currentVarName = inputVariableStorage[varIdx].get_variableName();
+        if(currentVarName == varName)
+        {
+            infoIdx = varIdx;
+            foundVar = true;
+            break;
+        }
+    }
+
+    if(foundVar == false)
+    {
+        printf("Couldn't find \"%s\" varName in stored var info! Exiting program!\n",varName.c_str());
+        exit(1);
+    }
+
+    return infoIdx;
+}
+/*** end get variable value functions ***/

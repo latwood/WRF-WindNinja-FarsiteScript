@@ -55,8 +55,8 @@ set(SOURCES "src/main.cpp" "src/lcpDownloader.cpp" "src/createIgnitions.cpp" "sr
         "src/utilityClasses/isValidExecFile.cpp" "src/utilityClasses/doesFilenameExist.cpp" "src/utilityClasses/copySingleFile.cpp"
         "src/utilityClasses/findFileBaseNameStuff.cpp"
 
-	"src/inputClasses/inputVariablesHandler.cpp" "src/inputClasses/inputVariable_info.cpp" "src/inputClasses/inputVariables_infoStorage.cpp"
-	"src/inputClasses/inputVariables_valueStorage.cpp" "src/inputClasses/inputParser.cpp" 
+        "src/inputClasses/inputVariablesHandler.cpp" "src/inputClasses/singleInputVariable.cpp" "src/inputClasses/inputVariablesInitializer.cpp"
+        "src/inputClasses/inputParser.cpp"
 
         "src/inputClasses/singleValueDataTypes/boolValue.cpp" "src/inputClasses/singleValueDataTypes/size_tValue.cpp"
 	"src/inputClasses/singleValueDataTypes/intValue.cpp" "src/inputClasses/singleValueDataTypes/doubleValue.cpp"
