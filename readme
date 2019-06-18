@@ -167,4 +167,49 @@ Future hoped for work
 8) Could do this one sooner than later, stop the delayed command line output printing by changing all print functions from printf to cout. This would entail adding some library utility functions called by whatever needs them for doing value to string conversions so cout won't choke.
 
 
+###############  For future developer notes, links may need updated depending on pushes to repo  #######################
+
+### changing an already existing input variable to the WRF-WindNinja-FarsiteScript, or adding a new input variable but with an already existing input variable type  ###
+
+You will need to modify an existing instance of "addVariable" or create a new instance of "addVariable()" in "inputVariable_infoStorage::setupAvailableVariables()", found in inputVariable_infoStorage.cpp: https://github.com/latwood/WRF-WindNinja-FarsiteScript/blob/master/src/inputClasses/inputVariables_infoStorage.cpp#L124. You will be warned if you try to use an invalid applicationUseName or variable type, or even if the "addVariable()" function calls aren't in a proper order.
+
+If the input variable has an expected default value that is different from the standard default value given by a given variable type class, you will need to modify some part of "inputVariables_valueStorage::setSpecializedDefaults()" found in inputVariable_valueStorage.cpp: https://github.com/latwood/WRF-WindNinja-FarsiteScript/blob/master/src/inputClasses/inputVariables_valueStorage.cpp#L1057.
+
+All new variables or existing variables need to have conflicting options or non-conflicting options checked out. So you will need to modify "inputVariablesHandler::verifyFoundInputCombinations()" found in inputVariablesHandler.cpp: https://github.com/latwood/WRF-WindNinja-FarsiteScript/blob/master/src/inputClasses/inputVariablesHandler.cpp#L466. Depending on the changes, you may have to mess with the various "inputVariablesHandler::checkUsage_<usageType>" functions. Honestly these might already need some work/double checking.
+
+This should be enough unless you are dealing with something with type "string". This is because when a value of type "string" is read into the input classes, a check to see whether it is an allowable word or not for the string must be done. So you will need to modify by adding a new entry for your specific string the "stringValue::isValidString()" function found in stringValue.cpp: https://github.com/latwood/WRF-WindNinja-FarsiteScript/blob/master/src/inputClasses/singleValueDataTypes/stringValue.cpp#L101. 
+
+
+### adding a new input variable that requires adding a new input variable type, and is for a single value of input  ###
+
+Hopefully all the required information is here, this stuff can be all over the place!!!
+
+No need to mess with inputVariable_info.cpp.
+Besides all the above stuff for changing a variable with an existing type, you should probably start at "inputVariable_infoStorage.cpp". You may need to add to the existing "applicationUseName" variables or change their order: https://github.com/latwood/WRF-WindNinja-FarsiteScript/blob/master/src/inputClasses/inputVariables_infoStorage.cpp#L84. You will definitely need to add a new variable count type: https://github.com/latwood/WRF-WindNinja-FarsiteScript/blob/master/src/inputClasses/inputVariables_infoStorage.cpp#L98. Just remember that if you create a type here, you need to create all the uses of that type in other parts of the code!!!.
+
+The next step would be to create the new type classes. The singleValueDataTypes/ folder has all the existing single value data type: https://github.com/latwood/WRF-WindNinja-FarsiteScript/tree/master/src/inputClasses/singleValueDataTypes. Copy and paste the header and .cpp files of whichever one you want to pattern after and rename whatever you need to create your new type. There will always be a reset() function, a setValue() function for regular input as well as a setValue() function for parsed string input from the data parser, some kind of getValue() function, whatever type conversion functions are needed to go from string to the value, whatever type checker to determine if a string of the value can be converted or not, data members for the actual values of the given class type, and default values to set the actual values of the given class type at each call to the class type reset() function.
+
+Now the new data type class needs to be added to the CmakeLists file. Add the appropriate path patterned after the other single inputs: https://github.com/latwood/WRF-WindNinja-FarsiteScript/blob/master/CMakeLists.txt#L61.
+
+Now need to start messing with inputVariable_valueStorage. First add the appropriate header file: https://github.com/latwood/WRF-WindNinja-FarsiteScript/blob/master/src/inputClasses/inputVariables_valueStorage.h#L7, and the appropriate vector of said values to the data members: https://github.com/latwood/WRF-WindNinja-FarsiteScript/blob/master/src/inputClasses/inputVariables_valueStorage.h#L126. Add copies of the data type class public set and get functions: https://github.com/latwood/WRF-WindNinja-FarsiteScript/blob/master/src/inputClasses/inputVariables_valueStorage.h#L45, https://github.com/latwood/WRF-WindNinja-FarsiteScript/blob/master/src/inputClasses/inputVariables_valueStorage.h#L91.
+
+Add a required inputVariable_valueStorage::resetVariables() reset() function for the new variable type: https://github.com/latwood/WRF-WindNinja-FarsiteScript/blob/master/src/inputClasses/inputVariables_valueStorage.cpp#L33. Create the new set and get value functions for the new input variable type: https://github.com/latwood/WRF-WindNinja-FarsiteScript/blob/master/src/inputClasses/inputVariables_valueStorage.cpp#L118, https://github.com/latwood/WRF-WindNinja-FarsiteScript/blob/master/src/inputClasses/inputVariables_valueStorage.cpp#L143, https://github.com/latwood/WRF-WindNinja-FarsiteScript/blob/master/src/inputClasses/inputVariables_valueStorage.cpp#L760. Add an instance of shoving the new values for the new class variable into the new vector of values of this type in the inputVariable_valueStorage::sortInputVariableInfo() function: https://github.com/latwood/WRF-WindNinja-FarsiteScript/blob/master/src/inputClasses/inputVariables_valueStorage.cpp#L996. 
+
+Now time to move on to the inputParser. You will need to add the specific type calls to the new class variable set() functions that set string values to the actual values. This is found in inputParser::loadCountValues(): https://github.com/latwood/WRF-WindNinja-FarsiteScript/blob/master/src/inputClasses/inputParser.cpp#L211.
+
+Now to the very last main input class: inputVariablesHandler. Unfortunately, there is a lot of stuff repeated here that is done by inputVariables_valueStorage. Work to try to use pointers to the given variable type classes has been started in a separate branch that will mean rewriting this whole developer help section, but at least would get rid of this repeatedness and decrease the number of times stuff is stored. But it requires very strong knowledge of pointers, and probably the rule of 3 with the copy constructor and assignment operator to work correctly.
+
+Need to add the copy of the get() functions: https://github.com/latwood/WRF-WindNinja-FarsiteScript/blob/master/src/inputClasses/inputVariablesHandler.h#L35. The inputVariablesHandler::printFoundInput() function is used for debugging purposes, but still should be updated. Add the required printing of the values to this function: https://github.com/latwood/WRF-WindNinja-FarsiteScript/blob/master/src/inputClasses/inputVariablesHandler.cpp#L172. The code implementation of the getValue() functions are easier this time, but still need to add them: https://github.com/latwood/WRF-WindNinja-FarsiteScript/blob/master/src/inputClasses/inputVariablesHandler.cpp#L338.
+
+Okay, that SHOULD be everything. I guess be aware that there are embedded types, so you may not need to make a new type of double, but add implementation of the type to the doubleValue class. You will notice that the lat_coord, long_coord, and signless_percent are all examples of this.
+
+
+### adding a new input variable that requires adding a new input variable type, and is for multiple values of input  ###
+
+Pretty similar to adding a single line of input type variable, but now you don't need to necessarily add a type to inputVariables_infoStorage.cpp since these are of type "count". Now the folder of locations is https://github.com/latwood/WRF-WindNinja-FarsiteScript/tree/master/src/inputClasses/multiValueDataTypes. Watch out in the CmakeLists that you keep the single values separate from the multiple value input classes. Be aware that these usually have multiple types/data members inside and so actually use some of the singleValue input variable classes as datatypes. This also means pulling out and setting values tends to be one at a time to some extent instead of all at once, so look at the other examples of multipleValue type storage. Honestly, some of these ideas Could be improved.
+
+Probably the biggest difference is that now you don't have to edit inputParser::loadCountValues(), because the type is "count" which is type "size_tValue". But now you need to mess with inputParser::loadLoaderFunctionData().
+
+
+
 

@@ -233,7 +233,7 @@ bool WindNinjaAPI::run_WindNinja()
         const char *const papszArgv[] = { WindNinjaApplicationPath.c_str(),
                                           WindNinjaCfgFileNames[wrfCount].c_str(),
                                           NULL };
-        printf("papszArgv is %s %s",WindNinjaApplicationPath.c_str(),WindNinjaCfgFileNames[wrfCount].c_str());
+        //printf("papszArgv is %s %s",WindNinjaApplicationPath.c_str(),WindNinjaCfgFileNames[wrfCount].c_str());
 
         // this method appears to be limited by whatever is the current application in the command line. Doesn't appear possible to supply a path to an executable
         // would like to replace a lot of stuff with WindNinja API
@@ -339,7 +339,7 @@ bool WindNinjaAPI::findFinalRunFiles()
 
     }
 
-    printf("\nFound Wind Files:\n");
+    /*printf("\nFound Wind Files:\n");
     for(size_t fileIdx = 0; fileIdx < atmFiles.size(); fileIdx++)
     {
         printf("atmFiles[%zu] = %s\n",fileIdx,atmFiles[fileIdx].c_str());
@@ -355,7 +355,7 @@ bool WindNinjaAPI::findFinalRunFiles()
     for(size_t fileIdx = 0; fileIdx < cldFiles.size(); fileIdx++)
     {
         printf("cldFiles[%zu] = %s\n",fileIdx,cldFiles[fileIdx].c_str());
-    }
+    }*/
 
     // if it gets here, everything went well
     return true;

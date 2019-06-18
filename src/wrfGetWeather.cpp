@@ -324,7 +324,7 @@ bool wrfGetWeather::getWeather()
         }
     }
 
-    printf("\nFound Weather values:\n");
+    /*printf("\nFound Weather values:\n");
     for(size_t varIdx = 0; varIdx < temperatures.size(); varIdx++)
     {
         printf("temperatures[%zu] = \"%f\"\n",varIdx,temperatures[varIdx]);
@@ -340,7 +340,7 @@ bool wrfGetWeather::getWeather()
     for(size_t varIdx = 0; varIdx < cloudCover.size(); varIdx++)
     {
         printf("cloudCover[%zu] = \"%f\"\n",varIdx,cloudCover[varIdx]);
-    }
+    }*/
 
     // got here somehow so should have gone well
     return true;

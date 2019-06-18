@@ -83,11 +83,11 @@ bool createIgnitions::createAllIgnitions()
         }
     }
 
-    printf("found ignition files:\n");
+    /*printf("found ignition files:\n");
     for(size_t ignitIdx = 0; ignitIdx < ignitionShapefilesForSimulations.size(); ignitIdx++)
     {
         printf("ignitionShapefilesForSimulations[%zu] = \"%s\"\n",ignitIdx,ignitionShapefilesForSimulations[ignitIdx].c_str());
-    }
+    }*/
 
     // if it gets here, everything went well
     return true;

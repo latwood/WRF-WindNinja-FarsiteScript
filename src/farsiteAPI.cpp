@@ -388,7 +388,7 @@ bool farsiteAPI::runFarsite()
             return false;
         }
         std::string execution_command = farsiteApplicationPath + " " + farsiteCommandFiles[runIdx];
-        printf("execution_command = \"%s\"\n",execution_command.c_str());
+        //printf("execution_command = \"%s\"\n",execution_command.c_str());
         //execution_command = farsiteApplicationPath + " /home/atw09001/Documents/cougarCreek-fire/run_cougarCreekFire.txt";
         exec_cmd(execution_command.c_str());
     }
