@@ -627,6 +627,7 @@ bool farsiteAPI::createRawsFile(size_t runIdx)
         fprintf(fzout,"RAWS_UNITS: Metric\n");
     }
     fprintf(fzout,"RAWS: %zu\n",atmFiles.size());
+    calcPrecipPrev = 0; // "Amit" - To initialize this variable whcih would represent the accumulated precipitation at previous time step; this will be subtracted from current time step to get hourly precipitation; for now only adding this line to "metric" system line below as wrf output is in metric system
     for(size_t atmFileIdx = 0; atmFileIdx < atmFiles.size(); atmFileIdx++)
     {
         double calcTemperature = temperatures[atmFileIdx];
@@ -639,7 +640,9 @@ bool farsiteAPI::createRawsFile(size_t runIdx)
         } else if(wrfGetWeather_output_units == "metric")
         {
             calcTemperature = calcTemperature - 273.15; // it was incoming as degK, needs to be outgoing as degC
-            calcPrecip = calcPrecip * 1.0/24.0 * 1000.0;    // it was incoming as kg/(m^2*s), needs to be outgoing as milimeters, used density of water, and these are for a one hour time period out of a day
+        //  calcPrecip = calcPrecip * 1.0/24.0 * 1000.0;    // "Amit"-it was incoming as kg/(m^2*s), needs to be outgoing as milimeters, used density of water, and these are for a one hour time period out of a day
+            calcPrecip = calcPrecip - calcPrecipPrev;    // "Amit"-it was incoming as total mm from simulation begin from WRF(AIRPACT), needs to be outgoing as mm/h, need to subtract from previous time step value to get hourly values
+            calcPrecipPrev = calcPrecip; //"Amit"-Updating the value for previous time step acculumated precipitation so that it gets subtracted from new time step accumulated precipiation value in the next loop run
         }
         fprintf(fzout,"%s %s %s %s%s %.2f %.2f %.2f %s %s %.2f\n",wrfYears[atmFileIdx].c_str(),monthTextToNumber(wrfMonths[atmFileIdx]).c_str(),wrfDays[atmFileIdx].c_str(),
                 wrfHours[atmFileIdx].c_str(),wrfMinutes[atmFileIdx].c_str(),calcTemperature,humidities[atmFileIdx],calcPrecip,
