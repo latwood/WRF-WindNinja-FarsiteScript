@@ -258,9 +258,10 @@ bool wrfFileValue::isValidNetCDFFilename(std::string inputString, bool suppressW
                                 }
                                 conversionSuccess = false;
                             }
-                        } else if( wrf_var_list[wrfVarIdx] == "RAINC" )  //units are kg/(m^2*s)
+                        } else if( wrf_var_list[wrfVarIdx] == "RAINC" )  //units are kg/(m^2*s); units in mm if input from wrf
                         {
-                            if(padfScanline[dataIdx] < -0.0001 || padfScanline[dataIdx] > 100.0)
+                            //if(padfScanline[dataIdx] < -0.0001 || padfScanline[dataIdx] > 100.0) //"Amit"
+                            if(padfScanline[dataIdx] < -0.0001 || padfScanline[dataIdx] > 500.0)
                             {
                                 if(suppressWarnings == false)
                                 {
@@ -268,9 +269,10 @@ bool wrfFileValue::isValidNetCDFFilename(std::string inputString, bool suppressW
                                 }
                                 conversionSuccess = false;
                             }
-                        } else if( wrf_var_list[wrfVarIdx] == "RAINNC" )  //units are kg/(m^2*s)
+                        } else if( wrf_var_list[wrfVarIdx] == "RAINNC" )  //units are kg/(m^2*s); units in mm if input from wrf
                         {
-                            if(padfScanline[dataIdx] < -0.0001 || padfScanline[dataIdx] > 100.0)
+                           // if(padfScanline[dataIdx] < -0.0001 || padfScanline[dataIdx] > 100.0) //"Amit"
+                            if(padfScanline[dataIdx] < -0.0001 || padfScanline[dataIdx] > 500.0)
                             {
                                 if(suppressWarnings == false)
                                 {
