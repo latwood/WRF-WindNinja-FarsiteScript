@@ -615,10 +615,7 @@ bool farsiteAPI::createRawsFile(size_t runIdx)
     std::string guess_RAWS_ELEVATION = "500"; // 2 m was wrf data, but I don't know if it is safe to go that low
     std::string fake_WindSpeed = "150"; // still have to supply it, but is ignored since gridded winds will be used
     std::string fake_WindDir = "180";   // still have to supply it, but is ignored since gridded winds will be used
-    double ary = totalPrecip[0]; //"Amit"
-    int rows =  sizeof ary / sizeof ary[0]; // "Amit"
-    int cols = sizeof ary[0] / sizeof(int); // "Amit"
-    double calcPrecipPrev[rows][columns] = {}; //"Amit"-To initialize this variable which would represent the accumulated precipitation at previous time step; this will be subtracted from current time step to get hourly precipitation; for now only adding this line to "metric" system line below as wrf output is in metric system
+    double calcPrecipPrev = {}; //"Amit"-To initialize this variable which would represent the accumulated precipitation at previous time step; this will be subtracted from current time step to get hourly precipitation; for now only adding this line to "metric" system line below as wrf output is in metric system
     FILE *fzout;
     fzout = fopen(farsiteRawsFiles[runIdx].c_str(), "w");
     fprintf(fzout,"RAWS_ELEVATION: %s\n",guess_RAWS_ELEVATION.c_str());
