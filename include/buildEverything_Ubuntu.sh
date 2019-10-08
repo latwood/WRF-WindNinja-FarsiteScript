@@ -101,7 +101,7 @@ gdalConfigure="./configure --prefix=${gdalBuildDir} --with-netcdf=${netcdf_cBuil
 gdal_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 ## boost is different from other 3rd party libs cause it doesn't use configure, but it is still similar
-bzipLink="-O bzip2-1.0.6.tar.gz https://pilotfiber.dl.sourceforge.net/project/bzip2/bzip2-1.0.6.tar.gz"
+bzipLink="-O bzip2-1.0.6.tar.gz https://pilotfiber.dl.sourceforge.net/project/bzip2/bzip2-1.0.6.tar.gz --no-check-certificate"
 bzipTarFormat="-xzf"
 bzipTarDir="${extraLibsDir}/bzip2-1.0.6.tar.gz"
 bzipTarDirName="${extraLibsDir}/bzip2-1.0.6"
