@@ -110,7 +110,7 @@ netcdf_cConfigure="./configure --prefix=${netcdf_cBuildDir}"
 netcdf_c_shouldMakeClean=0	# set to 1 if you want the unzipped folder deleted before running make again, which means a repeat of the unpacking process. Set this on whichever lib failed to build
 
 
-popplerLink="http://poppler.freedesktop.org/poppler-0.23.4.tar.xz"
+popplerLink="https://poppler.freedesktop.org/poppler-0.23.4.tar.xz"
 popplerTarFormat="-xvf"
 popplerTarDir="${extraLibsDir}/poppler-0.23.4.tar.xz"
 popplerTarDirName="${extraLibsDir}/poppler-0.23.4"
